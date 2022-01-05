@@ -22,8 +22,15 @@ app.use(flash()) //Used for flash messages
 app.get("/", function (req, res){
 
     var APIstatus = false
+    //Names of current players
+    var player1Name = "Sander" 
+    var player2Name = "Amanuel"
+    //Current scores
+    var player1Score = 2
+    var player2Score = 4
 
-    res.render('index', {message: req.flash('message'), title: 'index', constatus: APIstatus})
+    res.render('index', {message: req.flash('message'), title: 'index', constatus: APIstatus,
+    player1Name, player2Name, player1Score, player2Score})
 })
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000
