@@ -30,32 +30,68 @@
 							Please pick a username:
 						</h4>
 
-						<input type="text" id="username" name="username" placeholder="PoolMaster123" required />
+						<input type="text" id="username" name="username" placeholder="Username" required />
+					</div>
+					<div>
+						<h4 for="FirstName">
+							First name:
+						</h4>
+						<input type="text" id="firstname" name="firstname" placeholder="Your first name"required />
+					</div>
+					<div>
+						<h4 for="LastName">
+							Last name:
+						</h4>
+						<input type="text" id="lastname" name="lastname" placeholder="Your last name"required />
+					</div>
+
+					<div>
+						<h4 for="Email">
+							Email:
+						</h4>
+						<input type="text" id="email" name="email" placeholder="Your email" required />
 					</div>
 
 					<div>
 						<h4 for="pwd">
 							Password:
 						</h4>
-						<input type="password" id="pwd" name="pwd" required />
+						<input type="password" id="pwd" name="pwd" placeholder="Choose a strong and secure password" required onkeyup='passwordchecker();' />
 					</div>
 					<div>
 						<h4 for="repwd">
 							Retype password:
 						</h4>
-						<input type="password" id="repwd" name="repwd" required />
-					</div>
+						<input type="password" id="repwd" name="repwd" placeholder="Retype your strong and secure password" onkeyup='passwordchecker();' required />
+						<div>
+							<lab name="pwdmessage" id="pwdmessage"></lab>
+						</div>
+					</div><br /> 
+					
 
 					<div>
-						<h4>Please check that all the data is correct before submitting</h4>
-						<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Create
-							account</button>
+						<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Create account</button>
 					</div>
 		</form>
 		<div>
 			<!-- Henter fram footer fra partials mappen -->
 			<%- include('partials/footer') %>
 		</div>
+		<!-- Check if both passwords match. -->
+		<script>
+			
+				var passwordchecker = function () {
+			if (document.getElementById('pwd').value ==
+				document.getElementById('repwd').value) {
+					document.getElementById('pwdmessage').style.color = 'green';
+				document.getElementById('pwdmessage').innerHTML = 'Passwords are matching!';
+			} else {
+					document.getElementById('pwdmessage').style.color = 'red';
+				document.getElementById('pwdmessage').innerHTML = 'Passwords are not matching!';
+			}
+			
+		}
+		</script>
 		<script src="/js/jquery.min.js"></script>
 		<script src="/js/bootstrap.min.js"></script>
 </body>

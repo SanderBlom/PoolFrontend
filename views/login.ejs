@@ -17,35 +17,46 @@
 
 	<div class="container">
 		</form>
-		<form id="boxed" action="/register" method="POST">
+		<form id="boxed" action="/login" method="POST">
 			<h3>Login to your account</h3>
+			<!--Yellow message for a unsuccessful function-->
 			<% if(locals.message.length> 0) { %>
 				<div class="alert alert-warning">
 					<%= locals.message %>
 				</div>
 				<% }%>
+				<!--Green message for a successful function-->
+				<% if(locals.messagesuccess.length> 0) { %>
+					<div class="alert alert-success">
+						<%= locals.messagesuccess %>
+					</div>
+					<% }%>
+					<% if(message.error) { %>
+						<div class="alert alert-err">
+							<%= message.error %>
+						</div>
+						<% }%>
+				
 
 			<div>
 				<h4 for="username">
 					Username:
 				</h4>
 
-				<input type="text" id="username" name="username" placeholder="PoolMaster123" required />
+				<input type="text" id="username" name="username" placeholder="Your username and NOT email" required />
 			</div>
 
 			<div>
 				<h4 for="pwd">
 					Password:
 				</h4>
-				<input type="password" id="pwd" name="pwd" required />
-			</div>
+				<input type="password" id="pwd" name="pwd" placeholder="Your long and complex password" required />
+			</div><br />
 
 			<div>
 				<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Login</button>
 			</div>
 		</form>
-
-
 				<div>
 					<!-- Henter fram footer fra partials mappen -->
 					<%- include('partials/footer') %>
