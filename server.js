@@ -19,8 +19,9 @@ app.use(session({
 }))
 
 app.use(flash()) //Used for flash messages
-app.get("/", function (req, res){
 
+//function to get the homepage 
+app.get("/", function (req, res){
     var APIstatus = false
     //Names of current players
     var player1Name = "Sander" 
@@ -30,7 +31,18 @@ app.get("/", function (req, res){
     var player2Score = 4
 
     res.render('index', {message: req.flash('message'), title: 'index', constatus: APIstatus,
-    player1Name, player2Name, player1Score, player2Score})
+    player1Name, player2Name, player1Score, player2Score}) //Renderes the index websites and passes different variables and objects to use in frontend
+})
+
+//function to get the register page
+app.get("/register", function (req, res){
+
+    res.render('register', {message: req.flash('message'), title: 'register'}) //Renders the register websites and passes different variables for flash message and title for navbar
+})
+//function to get the login page
+app.get("/login", function (req, res){
+
+    res.render('login', {message: req.flash('message'), title: 'login'}) //Renders the register websites and passes different variables for flash message and title for navbar
 })
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000
