@@ -4,7 +4,7 @@
 <head>
 	<title>Stats</title>
 	<link href="/css/main.css" rel="stylesheet">
-	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script> 
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -20,7 +20,8 @@
 			<div class="container">
 				<table class="table">
 					<div class="container">
-						<canvas id="myChart" width="400" height="400"></canvas>
+						
+						<canvas id="myChart" width="400" height="200"></canvas>
 						<script>
 							const ctx = document.getElementById('myChart').getContext('2d');
 							const myChart = new Chart(ctx, {
@@ -50,6 +51,7 @@
 									}]
 								},
 								options: {
+									indexAxis: 'y',
 									scales: {
 										y: {
 											beginAtZero: true

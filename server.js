@@ -2,6 +2,7 @@
 var express = require('express'); //Web server
 var session = require('express-session') //Used to keep track of sessions
 var flash = require('express-flash');//Used for flash messages
+const methodOverride = require('method-override')
 const { pool } = require('./dbConfig');
 const passport = require('passport') //Lib to keep track of logged in users
 require('dotenv').config(); //Used to store passwords. This should not be uploaded to github :) 
@@ -56,11 +57,10 @@ function checkNotAuth(req, res, next){
         return res.redirect("/")
     }
 
-    res.redirect("login")
+    next()
 }
 //Using passport to keep track of logged in users
 const initializePassport = require('./passport-cfg')
-
 initializePassport(
     passport,
     username => Findusername(username),
@@ -75,7 +75,7 @@ const res = require('express/lib/response');
 
 //Gives express access to views folder 
 app.use(express.static('views'));
-app.set("view engine", "ejs")
+app.set("view engine", "ejs") //Using EJS av view engine 
 app.use(express.urlencoded({ extended: false }))
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -83,19 +83,29 @@ app.use(session({
     saveUninitialized: false,
     //cookie: { maxAge: 60000 }
 }))
-
 app.use(flash()) //Used for flash messages
+app.use(passport.initialize()) //used for auth 
+app.use(passport.session()) //used to keep track of user after get and post 
+app.use(methodOverride('_method')) //used for triggering .delete functions with posts
 
-app.use(passport.initialize())
-app.use(passport.session())
+app.delete('/logout', (req, res) => {
+    req.logOut()
+    res.redirect("/")
+})
 
+//function to get the login page
+app.get("/login", checkNotAuth, (req, res) => {
+   
+    res.render("login",{ title: 'login', message: req.flash('message') })
+})
 
-
-
+app.post("/login", checkNotAuth, passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true
+}))
 //function to get the homepage 
 app.get("/", async function (req, res) {
-   
-
     res.render('index', {
         message: req.flash('message'), title: 'index'}) //Renderes the index websites and passes title for the navbar
 })
@@ -105,7 +115,6 @@ app.get("/register", checkNotAuth, (req, res)  => {
 
     res.render('register', { message: req.flash('message'), title: 'register' }) //Renders the register websites and passes different variables for flash message and title for navbar
 })
-
 
 app.post("/register", async function (req, res) {
     let { username, firstname, lastname, email, pwd, repwd } = req.body
@@ -117,7 +126,6 @@ app.post("/register", async function (req, res) {
     //const adduserquery = `INSERT INTO public.users(username, firstname, lastname, email, password) VALUES ('${username}', '${firstname}', '${lastname}', '${email}', '${hashedPassword}');` //query to insert the new user
 
     try {
-
         emailresponse = await pool.query(queryEmail)
         usernameresponse = await pool.query(queryUsername)
 
@@ -167,17 +175,6 @@ app.post("/register", async function (req, res) {
 
 
 })
-//function to get the login page
-app.get("/login", checkNotAuth, (req, res) => {
-   
-    res.render("login",{ title: 'login', message: req.flash('message') })
-})
-
-app.post("/login", checkNotAuth, passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: true
-}))
 
 app.get("/live/table/:id", (req, res) => {
     var APIstatus = false
@@ -192,12 +189,10 @@ app.get("/live/table/:id", (req, res) => {
 })
 
 app.get("/profile", checkAuth, (req, res) => {
-    
     res.render("profile")
 })
 
 app.get("/statistics", (req, res) => {
-    
     res.render("statistics")
 })
 //-------------------------------------Start server-------------------------------------//
