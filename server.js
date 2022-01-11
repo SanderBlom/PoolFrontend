@@ -1,122 +1,103 @@
 
-var express = require('express'); //Web server
-var session = require('express-session') //Used to keep track of sessions
-var flash = require('express-flash');//Used for flash messages
+const express = require('express'); //Web server
+const session = require('express-session') //Used to keep track of sessions
+const flash = require('express-flash');//Used for flash messages
 const methodOverride = require('method-override')
 const { pool } = require('./dbConfig');
 const passport = require('passport') //Lib to keep track of logged in users
+const bcrypt = require('bcrypt'); //This is used to hash password and check hashes so we dont store the passwords in plain text
 require('dotenv').config(); //Used to store passwords. This should not be uploaded to github :) 
 var app = express();
 const PORT = 3000 //Ports that the server will listen to.
-// Changing the view engine to ejs
-app.set('view engine', 'ejs');
+app.set('view engine', 'ejs'); // Changing the view engine to ejs
 
 
-//Function to find username for passport
-async function Findusername(username) {
-    try {
-        let data = await pool.query(`SELECT username, password, pk FROM users WHERE username = '${username}';`)
-        let result = []
-        if (data.rows.length != 0){
-            var username = data.rows[0].username //storing username in a variable 
-            var password = data.rows[0].password//storing hashed password in a variable 
-            var id = data.rows[0].pk
-            result.push({"username": username, "password": password, "id": id})
-            return result
-        }
-        else {
-            return null
-        }
-        
-        
-    } catch (error) {
+const initializePassport = require("./passport-config");
+initializePassport(passport);
 
-        console.log(error)
-    }
-}
+app.use(express.static('views'));//Gives express access to views folder 
+app.set("view engine", "ejs") //Using EJS av view engine 
+app.use(express.urlencoded({ extended: false }))
 
-async function FinduserId(id) {
-    let result = await pool.query(`SELECT pk FROM users WHERE pk = '${id}';`)
-    return result.rows[0].pk
-}
+app.use(
+    session({
+        // Key we want to keep secret which will encrypt all of our information
+        secret: process.env.SESSION_SECRET,
+        // Should we resave our session variables if nothing has changes which we dont
+        resave: false,
+        // Save empty value if there is no vaue which we do not want to do
+        saveUninitialized: false
+    })
+);
+// Funtion inside passport which initializes passport
+app.use(passport.initialize()); //Staring passport to keep track of our users
+app.use(passport.session());// Store our variables to be persisted across the whole session. Works with app.use(Session) above
+app.use(flash()); //Used for to display flash messages to the frontend
+app.use(flash()) //Used for flash messages
+app.use(methodOverride('_method')) //used for triggering .delete functions with posts function in html
+
 
 //Checks if user is logged in.
-
-function checkAuth(req, res, next){
-    if(req.isAuthenticated){
+function checkAuth(req, res, next) {
+    if (req.user) {
         console.log('Is authenticated')
         return next()
     }
-
-    res.redirect("login")
+    else{
+        res.redirect("/login")
+    }
 }
 
-function checkNotAuth(req, res, next){
-    if(req.isAuthenticated){
-        console.log('Is authenticated')
-        return res.redirect("/")
+function checkNotAuth(req, res, next) {
+    if (req.user) {
+       res.redirect("profile")
     }
-
-    next()
+    else{
+        next()
+    }
 }
 //Using passport to keep track of logged in users
-const initializePassport = require('./passport-cfg')
+/* const initializePassport = require('./passport-cfg')
 initializePassport(
     passport,
     username => Findusername(username),
     id => FinduserId(id)
-) //Running the passport function from passport-cfg file
+)  *///Running the passport function from passport-cfg file
 
 //Dette er sikkert lite veldig lite sikker så her må vi mulig gjøre noe.
 
 
-const bcrypt = require('bcrypt'); //This is used to hash password and check hashes so we dont store the passwords in plain text
-const res = require('express/lib/response');
-
-//Gives express access to views folder 
-app.use(express.static('views'));
-app.set("view engine", "ejs") //Using EJS av view engine 
-app.use(express.urlencoded({ extended: false }))
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    //cookie: { maxAge: 60000 }
-}))
-app.use(flash()) //Used for flash messages
-app.use(passport.initialize()) //used for auth 
-app.use(passport.session()) //used to keep track of user after get and post 
-app.use(methodOverride('_method')) //used for triggering .delete functions with posts
-
 app.delete('/logout', (req, res) => {
     req.logOut()
+    req.flash('message', "You have logged out")
     res.redirect("/")
 })
 
 //function to get the login page
-app.get("/login", checkNotAuth, (req, res) => {
-   
-    res.render("login",{ title: 'login', message: req.flash('message') })
+app.get("/login", (req, res) => {
+
+    res.render("login", { title: 'login', message: req.flash('message') })
 })
 
 app.post("/login", checkNotAuth, passport.authenticate('local', {
-    successRedirect: '/',
+    successRedirect: '/user/dashboard',
     failureRedirect: '/login',
     failureFlash: true
 }))
 //function to get the homepage 
-app.get("/", async function (req, res) {
+app.get("/", function (req, res) {
     res.render('index', {
-        message: req.flash('message'), title: 'index'}) //Renderes the index websites and passes title for the navbar
+        message: req.flash('message'), title: 'index'
+    }) //Renderes the index websites and passes title for the navbar
 })
 
 //function to get the register page
-app.get("/register", checkNotAuth, (req, res)  => {
+app.get("/register", checkNotAuth, (req, res) => {
 
     res.render('register', { message: req.flash('message'), title: 'register' }) //Renders the register websites and passes different variables for flash message and title for navbar
 })
 
-app.post("/register", async function (req, res) {
+app.post("/register", checkNotAuth,  async function (req, res) {
     let { username, firstname, lastname, email, pwd, repwd } = req.body
     let usernameresponse //Respons from database checking the username. The .length parameter should be 0 if there are no other users with the same username.
     let emailresponse //Same as the one above just with the email address
@@ -184,12 +165,43 @@ app.get("/live/table/:id", (req, res) => {
     //Current scores
     var player1Score = 2
     var player2Score = 4
-    res.render('live-table', {title: 'index', constatus: APIstatus,
-    player1Name, player2Name, player1Score, player2Score})
+    res.render('live-table', {
+        title: 'index', constatus: APIstatus,
+        player1Name, player2Name, player1Score, player2Score
+    })
 })
 
-app.get("/profile", checkAuth, (req, res) => {
-    res.render("profile")
+app.get("/user/dashboard",  checkAuth, async (req, res) => {
+    var user = req.user
+    var userid = user.id //This the user id or pk in the database. We can use this to fetch the rest of the data before displaying the page.
+    var username
+    var firstname
+    var lastname
+    let result
+    
+
+    try {
+        result = await pool.query(`SELECT firstname, lastname, username FROM users WHERE id = $1`, [userid])
+            console.log(result.rows)
+            
+          
+        username = await result.rows[0].username
+        console.log('Bruker ' + username)
+        //username = result.rows[0].username
+        //firstname = result.rows[0].firstname
+        //lastname = result.rows[0].lastname
+    
+    
+        
+    } catch (error) {
+        console.log(error)
+        
+    }
+    res.render("profile", {Username: username, message: req.flash('message')})
+   
+
+    
+    
 })
 
 app.get("/statistics", (req, res) => {
