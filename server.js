@@ -13,44 +13,25 @@ app.set('view engine', 'ejs');
 
 //Function to find username for passport
 async function Findusername(username) {
-
     try {
-        let data = await pool.query(`SELECT username, password FROM users WHERE username = '${username}';`)
+        let data = await pool.query(`SELECT username, password, pk FROM users WHERE username = '${username}';`)
         let result = []
-        
-        var username = data.rows[0].username
+        var username = data.rows[0].username //storing 
         var password = data.rows[0].password
-        result.push({"username": username, "password": password})
-    
+        var id = data.rows[0].pk
+        result.push({"username": username, "password": password, "id": id})
         return result
         
     } catch (error) {
 
         console.log(error)
-        
     }
-  
-
-
 }
 
-function FinduserId(pk) {
-
-    let result = pool.query(`SELECT pk FROM users WHERE pk = ${pk};`)
-    return result.rows[0].username
-
-
+async function FinduserId(id) {
+    let result = await pool.query(`SELECT pk FROM users WHERE pk = '${id}';`)
+    return result.rows[0].pk
 }
-
-async function test(){
-    result = await Findusername('test')
-
-    console.log(result)
-}
-
-test()
-
-
 
 
 //Using passport to keep track of logged in users
@@ -59,8 +40,7 @@ const initializePassport = require('./passport-cfg')
 initializePassport(
     passport,
     username => Findusername(username),
-    id => pkid = FinduserId(pk) === id
-
+    id => FinduserId(id)
 ) //Running the passport function from passport-cfg file
 
 //Dette er sikkert lite veldig lite sikker så her må vi mulig gjøre noe.
