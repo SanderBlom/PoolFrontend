@@ -20,23 +20,13 @@
 		<form id="boxed" action="/login" method="POST">
 			<h3>Login to your account</h3>
 			<!--Yellow message for a unsuccessful function-->
-			<% if(locals.message.length> 0) { %>
+			<% if(messages.error) { %>
 				<div class="alert alert-warning">
-					<%= locals.message %>
+					<%= message%>
 				</div>
 				<% }%>
-				<!--Green message for a successful function-->
-				<% if(locals.messagesuccess.length> 0) { %>
-					<div class="alert alert-success">
-						<%= locals.messagesuccess %>
-					</div>
-					<% }%>
-					<% if(message.error) { %>
-						<div class="alert alert-err">
-							<%= message.error %>
-						</div>
-						<% }%>
 				
+			
 
 			<div>
 				<h4 for="username">

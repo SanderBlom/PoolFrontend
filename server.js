@@ -16,11 +16,17 @@ async function Findusername(username) {
     try {
         let data = await pool.query(`SELECT username, password, pk FROM users WHERE username = '${username}';`)
         let result = []
-        var username = data.rows[0].username //storing 
-        var password = data.rows[0].password
-        var id = data.rows[0].pk
-        result.push({"username": username, "password": password, "id": id})
-        return result
+        if (data.rows.length != 0){
+            var username = data.rows[0].username //storing username in a variable 
+            var password = data.rows[0].password//storing hashed password in a variable 
+            var id = data.rows[0].pk
+            result.push({"username": username, "password": password, "id": id})
+            return result
+        }
+        else {
+            return null
+        }
+        
         
     } catch (error) {
 
@@ -33,7 +39,25 @@ async function FinduserId(id) {
     return result.rows[0].pk
 }
 
+//Checks if user is logged in.
 
+function checkAuth(req, res, next){
+    if(req.isAuthenticated){
+        console.log('Is authenticated')
+        return next()
+    }
+
+    res.redirect("login")
+}
+
+function checkNotAuth(req, res, next){
+    if(req.isAuthenticated){
+        console.log('Is authenticated')
+        return res.redirect("/")
+    }
+
+    res.redirect("login")
+}
 //Using passport to keep track of logged in users
 const initializePassport = require('./passport-cfg')
 
@@ -47,6 +71,7 @@ initializePassport(
 
 
 const bcrypt = require('bcrypt'); //This is used to hash password and check hashes so we dont store the passwords in plain text
+const res = require('express/lib/response');
 
 //Gives express access to views folder 
 app.use(express.static('views'));
@@ -68,23 +93,15 @@ app.use(passport.session())
 
 
 //function to get the homepage 
-app.get("/", function (req, res) {
-    var APIstatus = false
-    //Names of current players
-    var player1Name = "Sander"
-    var player2Name = "Amanuel"
-    //Current scores
-    var player1Score = 2
-    var player2Score = 4
+app.get("/", async function (req, res) {
+   
 
     res.render('index', {
-        message: req.flash('message'), title: 'index', constatus: APIstatus,
-        player1Name, player2Name, player1Score, player2Score
-    }) //Renderes the index websites and passes different variables and objects to use in frontend
+        message: req.flash('message'), title: 'index'}) //Renderes the index websites and passes title for the navbar
 })
 
 //function to get the register page
-app.get("/register", function (req, res) {
+app.get("/register", checkNotAuth, (req, res)  => {
 
     res.render('register', { message: req.flash('message'), title: 'register' }) //Renders the register websites and passes different variables for flash message and title for navbar
 })
@@ -109,22 +126,18 @@ app.post("/register", async function (req, res) {
         res.status(404, `Could not complete the database query. Error: ${error}`)
     }
 
-
-
-
     if ((usernameresponse.rows.length == 0) && (emailresponse.rows.length == 0)) {
         //Both email and username is uniqe. Lets let the user create the account.
 
         try {
-            const hashedPassword = await bcrypt.hash(pwd, 10)
-            await pool.query(`INSERT INTO public.users(username, firstname, lastname, email, password) VALUES ('${username}', '${firstname}', '${lastname}', '${email}', '${hashedPassword}');`)
+            const hashedPassword = await bcrypt.hash(pwd, 10) //Hashing the password
+            await pool.query(`INSERT INTO public.users(username, firstname, lastname, email, password) VALUES ('${username}', '${firstname}', '${lastname}', '${email}', '${hashedPassword}');`) //Inserting data into the db
         }
         catch (error) {
             res.status(404, `Could not complete the database query. Error: ${error}`)
         }
-        req.flash('messagesuccess', `You are now registered and can login!`)
+        req.flash('message', `You are now registered and can login!`)
         res.redirect("login")
-
     }
 
     else if ((usernameresponse.rows.length != 0) || (emailresponse.rows.length != 0)) {
@@ -147,27 +160,46 @@ app.post("/register", async function (req, res) {
             req.flash('message', emailerror)
             res.redirect("register")
         }
-
         else {
             res.status(404, 'Not sure what you did here but something broke.')
         }
-
     }
 
 
 })
 //function to get the login page
-app.get("/login", (req, res) => {
-    res.render("login", { message: req.flash('message'), messagesuccess: req.flash('messagesuccess'), title: 'register' })
+app.get("/login", checkNotAuth, (req, res) => {
+   
+    res.render("login",{ title: 'login', message: req.flash('message') })
 })
 
-app.post("/login", passport.authenticate('local', {
+app.post("/login", checkNotAuth, passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true
-
-
 }))
+
+app.get("/live/table/:id", (req, res) => {
+    var APIstatus = false
+    //Names of current players
+    var player1Name = "Sander"
+    var player2Name = "Amanuel"
+    //Current scores
+    var player1Score = 2
+    var player2Score = 4
+    res.render('live-table', {title: 'index', constatus: APIstatus,
+    player1Name, player2Name, player1Score, player2Score})
+})
+
+app.get("/profile", checkAuth, (req, res) => {
+    
+    res.render("profile")
+})
+
+app.get("/statistics", (req, res) => {
+    
+    res.render("statistics")
+})
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000
 app.listen(PORT, () => {

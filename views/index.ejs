@@ -14,58 +14,9 @@
 		<%- include('partials/navbar') %>
 	</div>
 
-	<div class="container">
-		<table class="table">
-			<h3 class="center">Gamescore</h3>
-			<tbody id="boxed">
-				<tr>
-					<th>Player 1: <%= locals.player1Name %>
-					</th>
-					<th>Player 2: <%= locals.player2Name %>
-					</th>
-
-				</tr>
-				<tr>
-					<td>
-						<%= locals.player1Score %>
-					</td>
-					<td>
-						<%= locals.player2Score %>
-					</td>
-				</tr>
-		</table>
+	<div class="container"> 
+		<h4>Her må vi lage en koselig framside</h4>
 	</div>
-	<!--Her kan vi sende push meldinger start-->
-	<div class="container">
-		<% if(locals.message.length> 0) { %>
-			<div class="alert alert-warning">
-				<%= locals.message %>
-			</div>
-			<% }%>
-	</div>
-	<!--Her begynner hoved content på siden-->
-	</div>
-	<div class="container">
-		<form id="boxed">
-			<div class="container2">
-				<h3 class="center">Live view</h3>
-				<!--Om vi sender status = true så blir bilde grønt-->
-				<% if(locals.constatus !=false) { %>
-					<img src="/img/pooltable.png" width="1000" height="600" alt="">
-					<!--Bilde er funnet på google-->
-					<!--Ellers blir bildet grået ut med css og teksten under blir plassert midt på billiardbordet-->
-					<% } else{ %>
-						<img class="img-inactive" src="/img/pooltable.png" width="1000" height="600" alt="">
-						<!--Bilde er funnet på google-->
-						<div class="centered-text">
-							<h3>Not connected to magic billiard API</h3>
-						</div>
-						<% } %>
-			</div>
-		</form>
-	</div>
-
-
 
 	<div>
 		<!-- Henter fram footer fra partials mappen -->
