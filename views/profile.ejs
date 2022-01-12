@@ -24,7 +24,9 @@
 		</div>
 		<% }%>
 	<form id="contact" action='/' method="POST">
-	  <h3>Velkommen: <%=Username%></h3>
+	  <h3>Velkommen!
+		  Username: <%=locals.Username%>
+		User ID: <%=locals.user%> </h3>
 		
 		<h4>If you have edit any parameters please press update.</h4>
 		<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Update</button>

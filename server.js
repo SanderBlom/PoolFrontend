@@ -197,7 +197,7 @@ app.get("/user/dashboard",  checkAuth, async (req, res) => {
         console.log(error)
         
     }
-    res.render("profile", {Username: username, message: req.flash('message')})
+    res.render("profile", {Username: username, user: userid, message: req.flash('message'),})
    
 
     
