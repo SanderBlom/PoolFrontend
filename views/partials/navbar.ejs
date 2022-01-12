@@ -1,8 +1,6 @@
 <head>
-  <!-- Bootstrap Navbar CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Navbar css ref -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
 
 </head>
 <div>
@@ -20,7 +18,7 @@
         <ul class="navbar-nav ml-auto">
           <li class="nav-item active">
           <li class="nav-item">
-            <a class="nav-link active" href="/">Dashboard</a>
+            <a class="nav-link active" href="/">Home</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
@@ -33,15 +31,28 @@
             </div>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/statistics">Statistics</a>
+            <a class="nav-link" href="/statistics">Scoreboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">8-Ball Rules</a>
           </li>
         </ul>
         <% if (locals.user) { %>
-          <div>
+<!--           <div>
               <a class="nav-link"><form action="/logout?_method=DELETE" method="POST">
                 <button class="btn btn-secondary" type="submit" >Log out: <%=username%> </button>
               </form></a>
-          </div>
+          </div> -->
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Settings(<%=username%>)
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="/user/dashboard">Edit user</a> <!--user dashboard-->
+              <a class="dropdown-item"><form action="/logout?_method=DELETE" method="POST"><button class="btn btn-link" type="submit">Log out</button></form></a>
+              
+            </div>
             <% } else { %>
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"

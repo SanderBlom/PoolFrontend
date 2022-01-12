@@ -43,16 +43,16 @@ function checkAuth(req, res, next) {
         console.log('Is authenticated')
         return next()
     }
-    else{
+    else {
         res.redirect("/login")
     }
 }
 
 function checkNotAuth(req, res, next) {
     if (req.user) {
-       res.redirect("/user/dashboard")
+        res.redirect("/user/dashboard")
     }
-    else{
+    else {
         next()
     }
 }
@@ -77,7 +77,7 @@ app.delete('/logout', (req, res) => {
 //function to get the login page
 app.get("/login", checkNotAuth, (req, res) => {
 
-    res.render("login", { title: 'login', message: req.flash('message')})
+    res.render("login", { title: 'login', message: req.flash('message') })
 })
 
 app.post("/login", checkNotAuth, passport.authenticate('local', {
@@ -87,33 +87,23 @@ app.post("/login", checkNotAuth, passport.authenticate('local', {
 }))
 //function to get the homepage 
 app.get("/", async (req, res) => {
-
-    
     try {
-        if(req.user){
-            var userid = req.user.id 
+        if (req.user) {
+            var userid = req.user.id
             var username = req.user.username
             var firstname = req.user.firstname
             var lastname = req.user.lastname
-            res.render('index', {message: req.flash('message'), username, user: userid, title: 'index'}) //Renderes the index websites and passes title for the navbar
-    
+            res.render('index', { message: req.flash('message'), username, user: userid, title: 'index' }) //Renderes the index websites and passes title for the navbar
         }
-        else{
+        else {
             var userid = null
             var username = null
-            res.render('index', {message: req.flash('message'), username: username, user: userid, title: 'index'}) //Renderes the index websites and passes title for the navbar
+            res.render('index', { message: req.flash('message'), username: username, user: userid, title: 'index' }) //Renderes the index websites and passes title for the navbar
         }
-    
-        
+
     } catch (error) {
-
-        console.log(error)
-        
+        console.log('User is not probably not logged in' + error)
     }
-   
-
-    console.log('Login req user' + req.user) 
-    
 })
 
 //function to get the register page
@@ -122,7 +112,7 @@ app.get("/register", checkNotAuth, (req, res) => {
     res.render('register', { message: req.flash('message'), title: 'register' }) //Renders the register websites and passes different variables for flash message and title for navbar
 })
 
-app.post("/register", checkNotAuth,  async function (req, res) {
+app.post("/register", checkNotAuth, async function (req, res) {
     let { username, firstname, lastname, email, pwd, repwd } = req.body
     let usernameresponse //Respons from database checking the username. The .length parameter should be 0 if there are no other users with the same username.
     let emailresponse //Same as the one above just with the email address
@@ -178,8 +168,6 @@ app.post("/register", checkNotAuth,  async function (req, res) {
             res.status(404, 'Not sure what you did here but something broke.')
         }
     }
-
-
 })
 
 app.get("/live/table/:id", (req, res) => {
@@ -190,24 +178,77 @@ app.get("/live/table/:id", (req, res) => {
     //Current scores
     var player1Score = 2
     var player2Score = 4
-    res.render('live-table', {
-        title: 'index', constatus: APIstatus,
-        player1Name, player2Name, player1Score, player2Score
-    })
+    try {
+        if (req.user) {
+            var userid = req.user.id
+            var username = req.user.username
+            var firstname = req.user.firstname
+            var lastname = req.user.lastname
+            res.render('live-table', {
+                message: req.flash('message'), username, user: userid, title: 'live',
+                constatus: APIstatus, player1Name, player2Name, player1Score, player2Score
+            }) //Renderes the index websites and passes title for the navbar
+        }
+        else {
+            var userid = null
+            var username = null
+            res.render('live-table', {
+                message: req.flash('message'), username: username, user: userid, title: 'live',
+                constatus: APIstatus, player1Name, player2Name, player1Score, player2Score
+            }) //Renderes the index websites and passes title for the navbar
+        }
+    } catch (error) {
+        console.log('User is not probably not logged in' + error)
+    }
 })
 
-app.get("/user/dashboard",  checkAuth, async (req, res) => {
-    var userid = req.user.id 
+app.get("/user/dashboard", checkAuth, async (req, res) => {
+    var userid = req.user.id
     var username = req.user.username
     var firstname = req.user.firstname
     var lastname = req.user.lastname
+    var email = req.user.email
+    res.render("profile", { username: username, user: userid, firstname, lastname, email, message: req.flash('message') })
+})
 
-    console.log(userid + username + firstname + lastname) 
-    res.render("profile", {username: username, user: userid, message: req.flash('message')})
+app.post("/user/dashboard", checkAuth, async (req, res) => {
+    let { username, firstname, lastname, email } = req.body
+    const id = req.user.id
+    const query = `UPDATE public.users SET firstname = $1, lastname = $2, email = $3
+	WHERE id = $4;`
+    const values = [`${firstname}`, `${lastname}`, `${email}`, id]
+
+
+    try {
+
+        await pool.query(query, values)
+    } catch (err) {
+        console.log(err.stack)
+    }
+    req.flash('message', `Data updated!`)
+    res.redirect("/user/dashboard", )
 })
 
 app.get("/statistics", (req, res) => {
-    res.render("statistics")
+    try {
+        if (req.user) {
+            var userid = req.user.id
+            var username = req.user.username
+            var firstname = req.user.firstname
+            var lastname = req.user.lastname
+            res.render('statistics', { message: req.flash('message'), username, user: userid, title: 'index' }) //Renderes the statistic websites and passes title for the navbar
+        }
+        else {
+            var userid = null
+            var username = null
+            res.render('statistics', { message: req.flash('message'), username: username, user: userid, title: 'index' }) //Renderes the statistic websites and passes title for the navbar
+        }
+
+    } catch (error) {
+
+        console.log(error)
+
+    }
 })
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000

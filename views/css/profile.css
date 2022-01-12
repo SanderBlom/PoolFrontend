@@ -115,7 +115,6 @@ input {
 #boxed input[type="tel"],
 #boxed input[type="url"],
 #boxed input[type="date"],
-#boxed input[type="password"],
 #boxed input[type="number"],
 #boxed textarea,
 #boxed button[type="submit"]
@@ -127,6 +126,7 @@ input {
   background: #F9F9F9;
   padding: 25px;
   margin: 10px 0;
+  width: auto;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
 
@@ -176,7 +176,6 @@ fieldset {
 #boxed input[type="email"]:hover,
 #boxed input[type="tel"]:hover,
 #boxed input[type="url"]:hover,
-#boxed input[type="password"]:hover,
 #boxed input[type="number"]:hover,
 #boxed input[type="date"],
 #boxed textarea:hover {
@@ -202,24 +201,8 @@ fieldset {
   padding: 10px;
   font-size: 15px;
 }
-#boxed button[type="submit2"] {
-  cursor: pointer;
-  width: 10%;
-  border: none;
-  background: #43A047;
-  color: #FFF;
-  margin: 0 0 5px;
-  padding: 10px;
-  font-size: 15px;
-}
 
 #boxed button[type="submit"]:hover {
-  background: #43A047;
-  -webkit-transition: background 0.3s ease-in-out;
-  -moz-transition: background 0.3s ease-in-out;
-  transition: background-color 0.3s ease-in-out;
-}
-#boxed button[type="submit2"]:hover {
   background: #43A047;
   -webkit-transition: background 0.3s ease-in-out;
   -moz-transition: background 0.3s ease-in-out;
