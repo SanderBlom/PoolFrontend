@@ -50,7 +50,7 @@ function checkAuth(req, res, next) {
 
 function checkNotAuth(req, res, next) {
     if (req.user) {
-       res.redirect("/user/profile")
+       res.redirect("/user/dashboard")
     }
     else{
         next()
@@ -75,9 +75,9 @@ app.delete('/logout', (req, res) => {
 })
 
 //function to get the login page
-app.get("/login", (req, res) => {
+app.get("/login", checkNotAuth, (req, res) => {
 
-    res.render("login", { title: 'login', message: req.flash('message') })
+    res.render("login", { title: 'login', message: req.flash('message')})
 })
 
 app.post("/login", checkNotAuth, passport.authenticate('local', {
@@ -86,10 +86,34 @@ app.post("/login", checkNotAuth, passport.authenticate('local', {
     failureFlash: true
 }))
 //function to get the homepage 
-app.get("/", function (req, res) {
-    res.render('index', {
-        message: req.flash('message'), title: 'index'
-    }) //Renderes the index websites and passes title for the navbar
+app.get("/", async (req, res) => {
+
+    
+    try {
+        if(req.user){
+            var userid = req.user.id 
+            var username = req.user.username
+            var firstname = req.user.firstname
+            var lastname = req.user.lastname
+            res.render('index', {message: req.flash('message'), username, user: userid, title: 'index'}) //Renderes the index websites and passes title for the navbar
+    
+        }
+        else{
+            var userid = null
+            var username = null
+            res.render('index', {message: req.flash('message'), username: username, user: userid, title: 'index'}) //Renderes the index websites and passes title for the navbar
+        }
+    
+        
+    } catch (error) {
+
+        console.log(error)
+        
+    }
+   
+
+    console.log('Login req user' + req.user) 
+    
 })
 
 //function to get the register page
@@ -173,30 +197,13 @@ app.get("/live/table/:id", (req, res) => {
 })
 
 app.get("/user/dashboard",  checkAuth, async (req, res) => {
-    var user = req.user
-    var userid = user.id //This the user id or pk in the database. We can use this to fetch the rest of the data before displaying the page.
-    var username
-    var firstname
-    var lastname
-    let result
-    console.log(req.user.username)
+    var userid = req.user.id 
+    var username = req.user.username
+    var firstname = req.user.firstname
+    var lastname = req.user.lastname
 
-    try {
-        result = await pool.query(`SELECT firstname, lastname, username FROM users WHERE id = $1`, [userid])
-        username = await result.rows[0].username
-        //username = result.rows[0].username
-        //firstname = result.rows[0].firstname
-        //lastname = result.rows[0].lastname
-        
-    } catch (error) {
-        console.log(error)
-        
-    }
-    res.render("profile", {username: username, user: userid, message: req.flash('message'),})
-   
-
-    
-    
+    console.log(userid + username + firstname + lastname) 
+    res.render("profile", {username: username, user: userid, message: req.flash('message')})
 })
 
 app.get("/statistics", (req, res) => {
