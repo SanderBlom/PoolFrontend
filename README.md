@@ -1,5 +1,4 @@
 # PoolFrontend
-Utkast /n
 .env fil må opprettes i root dir med disse variablene:
 DB_USER=brukernavntilDB
 DB_PASSWORD=passordtilDB
