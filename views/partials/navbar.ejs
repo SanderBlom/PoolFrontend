@@ -36,11 +36,10 @@
             <a class="nav-link" href="/statistics">Statistics</a>
           </li>
         </ul>
-
         <% if (locals.user) { %>
           <div>
               <a class="nav-link"><form action="/logout?_method=DELETE" method="POST">
-                <button class="btn btn-secondary" type="submit" >Log out</button>
+                <button class="btn btn-secondary" type="submit" >Log out: <%=username%> </button>
               </form></a>
           </div>
             <% } else { %>

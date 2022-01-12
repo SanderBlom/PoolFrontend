@@ -179,26 +179,20 @@ app.get("/user/dashboard",  checkAuth, async (req, res) => {
     var firstname
     var lastname
     let result
-    
+    console.log(req.user.username)
 
     try {
         result = await pool.query(`SELECT firstname, lastname, username FROM users WHERE id = $1`, [userid])
-            console.log(result.rows)
-            
-          
         username = await result.rows[0].username
-        console.log('Bruker ' + username)
         //username = result.rows[0].username
         //firstname = result.rows[0].firstname
         //lastname = result.rows[0].lastname
-    
-    
         
     } catch (error) {
         console.log(error)
         
     }
-    res.render("profile", {Username: username, user: userid, message: req.flash('message'),})
+    res.render("profile", {username: username, user: userid, message: req.flash('message'),})
    
 
     
