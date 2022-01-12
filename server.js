@@ -50,7 +50,7 @@ function checkAuth(req, res, next) {
 
 function checkNotAuth(req, res, next) {
     if (req.user) {
-       res.redirect("profile")
+       res.redirect("/user/profile")
     }
     else{
         next()
@@ -69,6 +69,7 @@ initializePassport(
 
 app.delete('/logout', (req, res) => {
     req.logOut()
+    console.log('Trying to log you out')
     req.flash('message', "You have logged out")
     res.redirect("/")
 })

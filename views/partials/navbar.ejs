@@ -38,12 +38,11 @@
         </ul>
 
         <% if (locals.user) { %>
-          <li class="nav-item">
-            <a class="nav-link">
-              <form action="/logout?_method=DELETE" method="POST">
-                <button type="submit">Log out</button>
-              </form>>
-            </a>
+          <div>
+              <a class="nav-link"><form action="/logout?_method=DELETE" method="POST">
+                <button class="btn btn-secondary" type="submit" >Log out</button>
+              </form></a>
+          </div>
             <% } else { %>
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
