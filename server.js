@@ -21,11 +21,11 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use(
     session({
-        // Key we want to keep secret which will encrypt all of our information
-        secret: process.env.SESSION_SECRET,
-        // Should we resave our session variables if nothing has changes which we dont
+        
+        secret: process.env.SESSION_SECRET,//Encryption key for our sessions. This should probably be autogenrated for each session?
+        
         resave: false,
-        // Save empty value if there is no vaue which we do not want to do
+        
         saveUninitialized: false
     })
 );

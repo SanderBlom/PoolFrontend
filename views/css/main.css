@@ -87,6 +87,12 @@ input {
   margin: 0 auto;
   position: relative;
 }
+.container-medium {
+  max-width: 400px;
+  width: 30%;
+  margin: 0 auto;
+  position: relative;
+}
 .centered-image {
   position: absolute;
   top: 50%;
