@@ -268,6 +268,26 @@ app.get("/rules", (req, res) => {
     }
 
 })
+
+app.get("/tournament/new", (req, res) => {
+
+    try {
+        if (req.user) {
+            var userid = req.user.id
+            var username = req.user.username
+            res.render('tournamentWizard', { message: req.flash('message'), username, user: userid, title: 'tournament' }) //Renderes the index websites and passes title for the navbar
+        }
+        else {
+            var userid = null
+            var username = null
+            res.render('tournamentWizard', { message: req.flash('message'), username: username, user: userid, title: 'tournament' }) //Renderes the index websites and passes title for the navbar
+        }
+
+    } catch (error) {
+        console.log('User is not probably not logged in' + error)
+    }
+
+})
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000
 app.listen(PORT, () => {

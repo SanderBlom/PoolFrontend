@@ -16,23 +16,41 @@
 	</div>
 	<div class="container-fluid">
 		<div class="row">
-			<div class="col-md-12">
+			<div class="col-md-4">
 				<div class="jumbotron">
 					<h2>Welcome <%=locals.username%>!</h2>
 					<h5>Your our <%=locals.user%>th user to sign up!</h5>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="jumbotron">
+					<form class="form-inline"> <!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+						<div class="form-group mx-sm-3 mb-2">
+							<label for="tablecode" class="sr-only">Password</label>
+							<input type="number" class="form-control" id="tablecode" placeholder="Table ID">
+						  </div>
+						  <button type="submit" class="btn btn-primary mb-2">Quick game</button>
+						  <h5>You can find the table ID printed on your table.</h5>
+					</form>
+					
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="jumbotron">
+					<a class="btn btn-primary btn-large"  href="/tournament/new">Start a tournament!</a>
+					<h5>Get your friends, family or colleagues and start your own tournament</h5>
 				</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-4">
 				<h2>
-					Litt om oss
+					Stats about your last game
 				</h2>
 				<p>
-					Put inn noe tekst her 1 
-				</p>
-				<p>
-					<a class="btn" href="#">Quick game</a>
+					<div>
+						<canvas id="lastgame"></canvas>
+					</div>
 				</p>
 
 			</div>
@@ -68,45 +86,11 @@
 					Your stats
 				</h2>
 				<p>
-					<canvas id="myChart" width="400" height="200"></canvas>
-					<script>
-						const ctx = document.getElementById('myChart').getContext('2d');
-						const myChart = new Chart(ctx, {
-							type: 'bar',
-							data: {
-								labels: ['Fastest loss', 'Other users', 'Fastest win', 'Other users', 'Average playtime', 'Other users'],
-								datasets: [{
-									label: 'x',
-									data: [12, 19, 3, 5, 2, 3],
-									backgroundColor: [
-										'rgba(255, 99, 132, 0.2)',
-										'rgba(255, 99, 132, 0.2)',
-										'rgba(255, 206, 86, 0.2)',
-										'rgba(255, 206, 86, 0.2)',
-										'rgba(153, 102, 255, 0.2)',
-										'rgba(153, 102, 255, 0.2)'
-									],
-									borderColor: [
-										'rgba(255, 99, 132, 1)',
-										'rgba(255, 99, 132, 1)',
-										'rgba(255, 206, 86, 1)',
-										'rgba(255, 206, 86, 1)',
-										'rgba(153, 102, 255, 1)',
-										'rgba(153, 102, 255, 1)'
-									],
-									borderWidth: 1
-								}]
-							},
-							options: {
-								indexAxis: 'y',
-								scales: {
-									y: {
-										beginAtZero: true
-									}
-								}
-							}
-						});
-					</script>
+					<div>
+						<canvas id="overall"></canvas>
+					</div>
+					
+					
 				</p>
 				<p>
 					
@@ -118,7 +102,91 @@
 		<!-- Henter fram footer fra partials mappen -->
 		<%- include('partials/footer') %>
 	</div>
+	
 	<script src="/js/jquery.min.js"></script>
+	<script>
+		const ctx = document.getElementById('overall').getContext('2d');
+		const lastgameCharts = new Chart(ctx, {
+			type: 'bar',
+			data: {
+				labels: ['Fastest loss', 'Other users', 'Fastest win', 'Other users', 'Average playtime', 'Other users'],
+				datasets: [{
+					label: 'x',
+					data: [12, 19, 3, 5, 2, 3],
+					backgroundColor: [
+						'rgba(255, 99, 132, 0.2)',
+						'rgba(255, 99, 132, 0.2)',
+						'rgba(255, 206, 86, 0.2)',
+						'rgba(255, 206, 86, 0.2)',
+						'rgba(153, 102, 255, 0.2)',
+						'rgba(153, 102, 255, 0.2)'
+					],
+					borderColor: [
+						'rgba(255, 99, 132, 1)',
+						'rgba(255, 99, 132, 1)',
+						'rgba(255, 206, 86, 1)',
+						'rgba(255, 206, 86, 1)',
+						'rgba(153, 102, 255, 1)',
+						'rgba(153, 102, 255, 1)'
+					],
+					borderWidth: 1
+				}]
+			},
+			options: {
+				indexAxis: 'y',
+				scales: {
+					y: {
+						beginAtZero: true
+					}
+				}
+			}
+		});
+
+		
+
+		
+	</script>
+	<script>
+	const ctx2 = document.getElementById('lastgame').getContext('2d');
+	const overallChart = new Chart(ctx2, {
+		type: 'bar',
+		data: {
+			labels: ['Time played', 'Your average playtime', 'Score', 'Your average score'],
+			datasets: [{
+				label: 'x',
+				data: [12, 19, 3, 5, 2, 3],
+				backgroundColor: [
+					'rgba(255, 99, 132, 0.2)',
+					'rgba(255, 99, 132, 0.2)',
+					'rgba(255, 206, 86, 0.2)',
+					'rgba(255, 206, 86, 0.2)'
+				],
+				borderColor: [
+					'rgba(255, 99, 132, 1)',
+					'rgba(255, 99, 132, 1)',
+					'rgba(255, 206, 86, 1)',
+					'rgba(255, 206, 86, 1)'	
+				],
+				borderWidth: 1
+			}]
+		},
+		options: {
+			indexAxis: 'y',
+			scales: {
+				y: {
+					beginAtZero: true
+				}
+			}
+		}
+	});
+
+	
+
+	
+</script>
+	<script>
+		
+	</script>
 	<script src="/js/bootstrap.min.js"></script>
 </body>
 
