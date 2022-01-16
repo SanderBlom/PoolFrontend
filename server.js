@@ -79,7 +79,7 @@ app.get("/login", checkNotAuth, (req, res) => {
 
     res.render("login", { title: 'login', message: req.flash('message') })
 })
-
+//Function to fetch login credentials and potentially login the user.The checkNotAuth is middleware to check if the usr/pw is valid
 app.post("/login", checkNotAuth, passport.authenticate('local', {
     successRedirect: '/user/dashboard',
     failureRedirect: '/login',
@@ -91,8 +91,6 @@ app.get("/", async (req, res) => {
         if (req.user) {
             var userid = req.user.id
             var username = req.user.username
-            var firstname = req.user.firstname
-            var lastname = req.user.lastname
             res.render('index', { message: req.flash('message'), username, user: userid, title: 'index' }) //Renderes the index websites and passes title for the navbar
         }
         else {

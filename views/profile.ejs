@@ -3,9 +3,10 @@
 
 <head>
 	<title>Your profile</title>
-	<link href="/css/profile.css" rel="stylesheet">
+	<link href="/css/main.css" rel="stylesheet">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
 </head>
 
 <body>
@@ -13,55 +14,112 @@
 		<!-- Henter fram navbaren fra partials mappen -->
 		<%- include('partials/navbar', {username:username}) %>
 	</div>
-
-	<div class="container">
-		</form>
-		<form id="boxed" method="POST">
-			<div>
-				<h3>Welcome <%=locals.username%>!</h3>
-				<h4>Your our <%=locals.user%>th user to sign up!</h4>
-			</div>
-			<% if(locals.message.length > 0) { %>
-				<div class="alert alert-success">
-					<%= message %>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="jumbotron">
+					<h2>Welcome <%=locals.username%>!</h2>
+					<h5>Your our <%=locals.user%>th user to sign up!</h5>
 				</div>
-				<% }%>
-			<br>
-
-			<div>
-				<lable for="firstname">
-					First name:
-				</lable>
-
-				<input type="text" id="firstname" name="firstname" value="<%=locals.firstname%>" 
-					required />
 			</div>
-
-			<div>
-				<lable for="lastname">
-					Last name:
-				</lable>
-				<input type="text" id="lastname" name="lastname" value="<%=locals.lastname%>"  required />
-			</div>
-			<div>
-				<lable for="email">
-					Email addres:
-				</lable>
-				<input type="email" id="email" name="email"  value="<%=locals.email%>" required />
-			</div>
-				<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Update contact details</button>
-			</div>
-		</form>
-
-
-
-
-		<div>
-			<!-- Henter fram footer fra partials mappen -->
-			<%- include('partials/footer') %>
 		</div>
-		<script src="/js/jquery.min.js"></script>
-		<script src="/js/bootstrap.min.js"></script>
+		<div class="row">
+			<div class="col-md-4">
+				<h2>
+					Litt om oss
+				</h2>
+				<p>
+					Put inn noe tekst her 1 
+				</p>
+				<p>
+					<a class="btn" href="#">Quick game</a>
+				</p>
+
+			</div>
+			<div class="col-md-4">
+				<h2>
+					Edit user details
+				</h2>
+				<p>
+					<form id="boxed" method="POST">
+						<% if(locals.message.length> 0) { %>
+							<div class="alert alert-success">
+								<%= message %>
+							</div>
+							<% }%>
+								<div>
+									<lable for="firstname">First name:</lable>
+									<input type="text" id="firstname" name="firstname" value="<%=locals.firstname%>" required />
+								</div>
+								<div>
+									<lable for="lastname">Last name:</lable>
+									<input type="text" id="lastname" name="lastname" value="<%=locals.lastname%>" required />
+								</div>
+								<div>
+									<lable for="email">Email addres:</lable>
+									<input type="email" id="email" name="email" value="<%=locals.email%>" required />
+								</div>
+								<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Update user details</button>
+					</form>
+				</p>
+			</div>
+			<div class="col-md-4">
+				<h2>
+					Your stats
+				</h2>
+				<p>
+					<canvas id="myChart" width="400" height="200"></canvas>
+					<script>
+						const ctx = document.getElementById('myChart').getContext('2d');
+						const myChart = new Chart(ctx, {
+							type: 'bar',
+							data: {
+								labels: ['Fastest loss', 'Other users', 'Fastest win', 'Other users', 'Average playtime', 'Other users'],
+								datasets: [{
+									label: 'x',
+									data: [12, 19, 3, 5, 2, 3],
+									backgroundColor: [
+										'rgba(255, 99, 132, 0.2)',
+										'rgba(255, 99, 132, 0.2)',
+										'rgba(255, 206, 86, 0.2)',
+										'rgba(255, 206, 86, 0.2)',
+										'rgba(153, 102, 255, 0.2)',
+										'rgba(153, 102, 255, 0.2)'
+									],
+									borderColor: [
+										'rgba(255, 99, 132, 1)',
+										'rgba(255, 99, 132, 1)',
+										'rgba(255, 206, 86, 1)',
+										'rgba(255, 206, 86, 1)',
+										'rgba(153, 102, 255, 1)',
+										'rgba(153, 102, 255, 1)'
+									],
+									borderWidth: 1
+								}]
+							},
+							options: {
+								indexAxis: 'y',
+								scales: {
+									y: {
+										beginAtZero: true
+									}
+								}
+							}
+						});
+					</script>
+				</p>
+				<p>
+					
+				</p>
+			</div>
+		</div>
+	</div>
+	<div>
+		<!-- Henter fram footer fra partials mappen -->
+		<%- include('partials/footer') %>
+	</div>
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
 </body>
 
 </html>
