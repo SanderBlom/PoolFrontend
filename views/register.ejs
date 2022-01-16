@@ -91,10 +91,29 @@
 			}
 			
 		}
-		</script>
-		<!-- Validation-->
-		<script>
 
+
+		</script>
+		<!--Script to disable submit button until from is valid. 
+			Ref: https://stackoverflow.com/questions/49191216/how-can-i-disable-submit-button-after-required-html5-return-true-on-the-javascri-->
+		<script>
+			
+			function disableField() {
+			const invalidForm = document.querySelector('form:invalid');
+			const submitBtn = document.getElementById('submit');
+			if (invalidForm) {
+			  submitBtn.setAttribute('disabled', true);
+			} else {
+			  submitBtn.disabled = false;
+			}
+		  }
+		  
+		  disableField();
+		  
+		  const inputs = document.getElementsByTagName("input");
+		  for (let input of inputs) {
+			input.addEventListener('change', disableField);
+		  }
 		</script>
 		<script src="/js/jquery.min.js"></script>
 		<script src="/js/bootstrap.min.js"></script>
