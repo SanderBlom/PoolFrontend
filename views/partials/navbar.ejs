@@ -31,18 +31,13 @@
             </div>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/statistics">Scoreboard</a>
+            <a class="nav-link" href="/scoreboard">Scoreboard</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">8-Ball Rules</a>
+            <a class="nav-link" href="/rules">8-Ball Rules</a>
           </li>
         </ul>
         <% if (locals.user) { %>
-<!--           <div>
-              <a class="nav-link"><form action="/logout?_method=DELETE" method="POST">
-                <button class="btn btn-secondary" type="submit" >Log out: <%=username%> </button>
-              </form></a>
-          </div> -->
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

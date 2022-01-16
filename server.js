@@ -226,20 +226,20 @@ app.post("/user/dashboard", checkAuth, async (req, res) => {
     req.flash('message', `Data updated!`)
     res.redirect("/user/dashboard", )
 })
-
-app.get("/statistics", (req, res) => {
+//Fetches the scoreboard
+app.get("/scoreboard", (req, res) => {
     try {
         if (req.user) {
             var userid = req.user.id
             var username = req.user.username
             var firstname = req.user.firstname
             var lastname = req.user.lastname
-            res.render('statistics', { message: req.flash('message'), username, user: userid, title: 'index' }) //Renderes the statistic websites and passes title for the navbar
+            res.render('statistics', { message: req.flash('message'), username, user: userid, title: 'scoreboard' }) //Renderes the statistic websites and passes title for the navbar
         }
         else {
             var userid = null
             var username = null
-            res.render('statistics', { message: req.flash('message'), username: username, user: userid, title: 'index' }) //Renderes the statistic websites and passes title for the navbar
+            res.render('statistics', { message: req.flash('message'), username: username, user: userid, title: 'scoreboard' }) //Renderes the statistic websites and passes title for the navbar
         }
 
     } catch (error) {
@@ -247,6 +247,26 @@ app.get("/statistics", (req, res) => {
         console.log(error)
 
     }
+})
+
+app.get("/rules", (req, res) => {
+
+    try {
+        if (req.user) {
+            var userid = req.user.id
+            var username = req.user.username
+            res.render('rules', { message: req.flash('message'), username, user: userid, title: 'rules' }) //Renderes the index websites and passes title for the navbar
+        }
+        else {
+            var userid = null
+            var username = null
+            res.render('rules', { message: req.flash('message'), username: username, user: userid, title: 'rules' }) //Renderes the index websites and passes title for the navbar
+        }
+
+    } catch (error) {
+        console.log('User is not probably not logged in' + error)
+    }
+
 })
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000
