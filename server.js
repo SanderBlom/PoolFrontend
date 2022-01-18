@@ -10,6 +10,8 @@ require('dotenv').config(); //Used to store passwords. This should not be upload
 var app = express();
 const PORT = 3000 //Ports that the server will listen to.
 app.set('view engine', 'ejs'); // Changing the view engine to ejs
+const poolAPIObj = require("./PoolAPI")
+const DB = require("./DB")
 
 
 const initializePassport = require("./passport-config");
@@ -61,7 +63,7 @@ function checkNotAuth(req, res, next) {
 initializePassport(
     passport,
     username => Findusername(username),
-    id => FinduserId(id)
+    id => Finduserid(id)
 )  *///Running the passport function from passport-cfg file
 
 //Dette er sikkert lite veldig lite sikker så her må vi mulig gjøre noe.
@@ -89,7 +91,7 @@ app.post("/login", checkNotAuth, passport.authenticate('local', {
 app.get("/", async (req, res) => {
     try {
         if (req.user) {
-            var userid = req.user.id
+            var userid = req.user.userid
             var username = req.user.username
             res.render('index', { message: req.flash('message'), username, user: userid, title: 'index' }) //Renderes the index websites and passes title for the navbar
         }
@@ -178,7 +180,7 @@ app.get("/live/table/:id", (req, res) => {
     var player2Score = 4
     try {
         if (req.user) {
-            var userid = req.user.id
+            var userid = req.user.userid
             var username = req.user.username
             var firstname = req.user.firstname
             var lastname = req.user.lastname
@@ -201,7 +203,7 @@ app.get("/live/table/:id", (req, res) => {
 })
 
 app.get("/user/dashboard", checkAuth, async (req, res) => {
-    var userid = req.user.id
+    var userid = req.user.userid
     var username = req.user.username
     var firstname = req.user.firstname
     var lastname = req.user.lastname
@@ -211,7 +213,7 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
 
 app.post("/user/dashboard", checkAuth, async (req, res) => {
     let { username, firstname, lastname, email } = req.body
-    const id = req.user.id
+    const id = req.user.userid
     const query = `UPDATE public.users SET firstname = $1, lastname = $2, email = $3
 	WHERE id = $4;`
     const values = [`${firstname}`, `${lastname}`, `${email}`, id]
@@ -230,7 +232,7 @@ app.post("/user/dashboard", checkAuth, async (req, res) => {
 app.get("/scoreboard", (req, res) => {
     try {
         if (req.user) {
-            var userid = req.user.id
+            var userid = req.user.userid
             var username = req.user.username
             var firstname = req.user.firstname
             var lastname = req.user.lastname
@@ -253,7 +255,7 @@ app.get("/rules", (req, res) => {
 
     try {
         if (req.user) {
-            var userid = req.user.id
+            var userid = req.user.userid
             var username = req.user.username
             res.render('rules', { message: req.flash('message'), username, user: userid, title: 'rules' }) //Renderes the index websites and passes title for the navbar
         }
@@ -273,7 +275,7 @@ app.get("/tournament/new", (req, res) => {
 
     try {
         if (req.user) {
-            var userid = req.user.id
+            var userid = req.user.userid
             var username = req.user.username
             res.render('tournamentWizard', { message: req.flash('message'), username, user: userid, title: 'tournament' }) //Renderes the index websites and passes title for the navbar
         }
@@ -288,6 +290,70 @@ app.get("/tournament/new", (req, res) => {
     }
 
 })
+//This is taking the submitted tableid from users dashboard and checks if the table is free. If its free user will be redirected the new game page.
+app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
+    const tableid = await req.body.tableid.trim()
+    var tableAvailability = false;
+    console.log(tableid)
+
+    try {
+        tableAvailability = await poolAPIObj.CheckTableAvailability(tableid) //Checks the tableid the user has submited, and ask the visionsystem if the table is available 
+        
+    } catch (error) {
+        console.log(error)
+    }
+
+    if (tableAvailability == true){
+        console.log("The requested table is free :)")
+        res.redirect(`/user/dashboard/newgame/${tableid}`)
+    }
+
+    else{
+        req.flash('message', `Looks like the table is already in use. Please select another table.`)
+        res.redirect("/user/dashboard")
+    }
+})
+
+
+//This page loads after you have picked a table and the system has checked that its not in use.
+app.get("/user/dashboard/newgame/:id", checkAuth, (req, res) => {
+    var tableid = req.params.id.trim();
+    console.log("test")
+    var player2Username //Defining username to incase the post request is not valid. 
+    try {
+        if (req.user) {
+            var userid = req.user.userid
+            var username = req.user.username
+            res.render('gameWizard', { message: req.flash('message'), username, player2Username, user: userid, title: 'game', tableid })
+        }
+        else {
+            res.redirect("/login") 
+        }
+
+    } catch (error) {
+        console.log('User is not probably not logged in' + error)
+    }
+
+})
+
+//This for the POST request after the user has submitted the the two players username. 
+app.post("/user/dashboard/newgame/:id", checkAuth, (req, res) => {
+    var tableid = req.params.id.trim();
+    let {username, player2Username} = req.body
+
+    if(username == player2Username){
+        req.flash('message', `Nice try, but you can't play against yourself. Please input another username`)
+        res.redirect(`/user/dashboard/newgame/${tableid}`, username, player2Username)
+    }
+
+    else{
+        console.log('Whalla')
+    }
+
+})
+
+
+
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000
 app.listen(PORT, () => {

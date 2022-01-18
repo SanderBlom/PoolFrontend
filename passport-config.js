@@ -3,20 +3,19 @@
 
 //Kilde 2 =https://github.com/WebDevSimplified/Nodejs-Passport-Login
 const LocalStrategy = require('passport-local').Strategy //Local strategy. Other options could be login with google, facebook, etc
-const bcrypt = require('bcrypt') //Require becrypt to check hashes against user password 
+const bcrypt = require('bcrypt') //Require becrypt to give us hashing functionality
 const {pool} = require("./dbConfig") //Required to query the database
 function initialize(passport) {
     console.log("Passport Initialized");
   
     const authUser = (username, password, done) => {
       pool.query(
-        `SELECT id, username, password FROM users WHERE username = $1`,
+        `SELECT userid, username, password FROM users WHERE username = $1`,
         [username],
         (err, results) => {
           if (err) {
             throw err;
           }
-          
   
           if (results.rows.length > 0) {
             const user = results.rows[0];
@@ -49,10 +48,10 @@ function initialize(passport) {
       )
     );
     
-    passport.serializeUser((user, done) => done(null, user.id));
+    passport.serializeUser((user, done) => done(null, user.userid));
   
-    passport.deserializeUser((id, done) => {
-      pool.query(`SELECT id, username, firstname, lastname, email FROM users WHERE id = $1`, [id], (err, results) => {
+    passport.deserializeUser((userid, done) => {
+      pool.query(`SELECT userid, username, firstname, lastname, email FROM users WHERE userid = $1`, [userid], (err, results) => {
         if (err) {
           return done(err);
         }

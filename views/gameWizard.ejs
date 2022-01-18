@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>New game</title>
+	<link href="/css/main.css" rel="stylesheet">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+	<div>
+		<!-- Henter fram navbaren fra partials mappen -->
+		<%- include('partials/navbar') %>
+	</div>
+
+
+	<div class="container-medium">
+		<form id="boxed" action="/user/dashboard/newgame/<%=tableid%>" method="POST">
+			<h3>Game on table <%= tableid%></h3>
+			<!--Yellow message for a unsuccessful function-->
+			<% if(message.length > 0) { %>
+				<div class="alert alert-warning">
+					<%= message%>
+				</div>
+				<% }%>
+					<div><h4>Please input the usernames fro player 1 and player 2</h4></div>
+					<div>
+						<h4 for="username">
+							Player 1 Username:
+						</h4>
+
+						<input type="text" id="username" name="username" value="<%= locals.username%>"
+							required />
+					</div>
+
+					<div>
+						<h4 for="player2Username">
+							Player 1 Username:
+						</h4>
+
+						<input type="text" id="player2Username" name="player2Username" vvalue="<%= locals.player2Username%>"
+							required />
+					</div><br />
+
+					<div>
+						<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Start game</button>
+					</div>
+		</form>
+
+	</div>
+
+
+
+
+	<div>
+		<!-- Henter fram footer fra partials mappen -->
+		<%- include('partials/footer') %>
+	</div>
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+</body>
+
+</html>
