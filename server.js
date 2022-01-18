@@ -35,7 +35,6 @@ app.use(
 app.use(passport.initialize()); //Staring passport to keep track of our users
 app.use(passport.session());// Store our variables to be persisted across the whole session. Works with app.use(Session) above
 app.use(flash()); //Used for to display flash messages to the frontend
-app.use(flash()) //Used for flash messages
 app.use(methodOverride('_method')) //used for triggering .delete functions with posts function in html
 
 
@@ -79,6 +78,7 @@ app.delete('/logout', (req, res) => {
 //function to get the login page
 app.get("/login", checkNotAuth, (req, res) => {
 
+    
     res.render("login", { title: 'login', message: req.flash('message') })
 })
 //Function to fetch login credentials and potentially login the user.The checkNotAuth is middleware to check if the usr/pw is valid
@@ -86,6 +86,7 @@ app.post("/login", checkNotAuth, passport.authenticate('local', {
     successRedirect: '/user/dashboard',
     failureRedirect: '/login',
     failureFlash: true
+    
 }))
 //function to get the homepage 
 app.get("/", async (req, res) => {

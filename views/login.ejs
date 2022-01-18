@@ -21,13 +21,13 @@
 			<!--Yellow message for a unsuccessful function-->
 			<% if(messages.error) { %>
 				<div class="alert alert-warning">
-					<%= message.error%>
+					<%= messages.error%>
 				</div>
 				<% }%>
 
 			<div>
 				<h4 for="username">
-					Username:
+					Username: <%= locals.message%>
 				</h4>
 
 				<input type="text" id="username" name="username" placeholder="Your username and NOT email" required />

@@ -28,13 +28,15 @@ function initialize(passport) {
                 return done(null, user);
               } else {
                 //password is incorrect
-                return done(null, false, { message: "Password is incorrect" });
+                return done(null, false, {
+                  message: "Incorrect password"
+                })
               }
             });
           } else {
             //No user found with that username
             return done(null, false, {
-              message: "No user with that username"
+              message: "No user with that username could be found"
             });
           }
         }
@@ -43,8 +45,8 @@ function initialize(passport) {
   
     passport.use(
       new LocalStrategy(
-        { usernameField: "username", passwordField: "pwd" },
-        authUser
+        { usernameField: "username", passwordField: "pwd"},
+        authUser, 
       )
     );
     
