@@ -10,8 +10,8 @@ require('dotenv').config(); //Used to store passwords. This should not be upload
 var app = express();
 const PORT = 3000 //Ports that the server will listen to.
 app.set('view engine', 'ejs'); // Changing the view engine to ejs
-const poolAPIObj = require("./PoolAPI")
-const DB = require("./DB")
+const poolAPIObj = require("./VisionSystem")
+let db = require("./db.js")
 
 
 const initializePassport = require("./passport-config");
@@ -23,11 +23,9 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use(
     session({
-        
-        secret: process.env.SESSION_SECRET,//Encryption key for our sessions. This should probably be autogenrated for each session?
-        
+
+        secret: process.env.SESSION_SECRET,//Encryption key for our sessions.
         resave: false,
-        
         saveUninitialized: false
     })
 );
@@ -78,7 +76,7 @@ app.delete('/logout', (req, res) => {
 //function to get the login page
 app.get("/login", checkNotAuth, (req, res) => {
 
-    
+
     res.render("login", { title: 'login', message: req.flash('message') })
 })
 //Function to fetch login credentials and potentially login the user.The checkNotAuth is middleware to check if the usr/pw is valid
@@ -86,7 +84,7 @@ app.post("/login", checkNotAuth, passport.authenticate('local', {
     successRedirect: '/user/dashboard',
     failureRedirect: '/login',
     failureFlash: true
-    
+
 }))
 //function to get the homepage 
 app.get("/", async (req, res) => {
@@ -115,60 +113,68 @@ app.get("/register", checkNotAuth, (req, res) => {
 
 app.post("/register", checkNotAuth, async function (req, res) {
     let { username, firstname, lastname, email, pwd, repwd } = req.body
-    let usernameresponse //Respons from database checking the username. The .length parameter should be 0 if there are no other users with the same username.
-    let emailresponse //Same as the one above just with the email address
+    var usernameresponse //Respons from database checking the username. The .length parameter should be 0 if there are no other users with the same username.
+    var emailresponse //Same as the one above just with the email address
 
-    const queryUsername = `SELECT * FROM public.users WHERE username = '${username}';` //query to check if the username is in use.
-    const queryEmail = `SELECT * FROM public.users WHERE email = '${email}';` //query to check if email is in use.
-    //const adduserquery = `INSERT INTO public.users(username, firstname, lastname, email, password) VALUES ('${username}', '${firstname}', '${lastname}', '${email}', '${hashedPassword}');` //query to insert the new user
+    if (pwd == repwd) {
 
-    try {
-        emailresponse = await pool.query(queryEmail)
-        usernameresponse = await pool.query(queryUsername)
-
-    } catch (error) {
-
-        res.status(404, `Could not complete the database query. Error: ${error}`)
-    }
-
-    if ((usernameresponse.rows.length == 0) && (emailresponse.rows.length == 0)) {
-        //Both email and username is uniqe. Lets let the user create the account.
-
+        //Checks if the email and username is already in the database
         try {
-            const hashedPassword = await bcrypt.hash(pwd, 10) //Hashing the password
-            await pool.query(`INSERT INTO public.users(username, firstname, lastname, email, password) VALUES ('${username}', '${firstname}', '${lastname}', '${email}', '${hashedPassword}');`) //Inserting data into the db
+            emailresponse = await db.ValidateUniqueEmail(email)
+            usernameresponse = await db.ValidateUniqueUsername(username)
+
+        } catch (error) {
+
+            console.log(error)
         }
-        catch (error) {
-            res.status(404, `Could not complete the database query. Error: ${error}`)
+
+        if ((usernameresponse == true) && (emailresponse == true)) {
+            //Both email and username are unique. Lets let the user create the account.
+
+            try {
+                const hashedPassword = await bcrypt.hash(pwd, 10) //Hashing the password
+                await pool.query(`INSERT INTO public.users(username, firstname, lastname, email, password) VALUES ('${username}', '${firstname}', '${lastname}', '${email}', '${hashedPassword}');`) //Inserting data into the db
+            }
+            catch (error) {
+                res.status(404, `Could not complete the database query. Error: ${error}`)
+            }
+            req.flash('message', `You are now registered and can login!`)
+            res.redirect("login")
         }
-        req.flash('message', `You are now registered and can login!`)
-        res.redirect("login")
+        //Checks if email or username is unique.
+        else if ((usernameresponse != true) || (emailresponse != true)) {
+            var emailerror = 'Looks like your email is already in use'
+            var usernameerror = 'Looks like your username is already in use'
+            var usernameandemailerror = 'Looks like both email and username is already in use'
+
+            if (usernameresponse == false && emailresponse == false) {
+                //This should be triggered if both username and email is already in use. 
+                req.flash('message', usernameandemailerror)
+                res.redirect("register")
+            }
+
+            else if (usernameresponse == false) {
+                //This should be triggered if the username is already in use.
+                req.flash('message', usernameerror)
+                res.redirect("register")
+            }
+
+            else if (emailresponse == false) {
+                //This should be triggered if the email is already in use.
+                req.flash('message', emailerror)
+                res.redirect("register")
+            }
+            else {
+                req.flash('message', 'Not sure what you did but something broke')
+                res.redirect("register")
+            }
+        }
+    }
+    else {
+        req.flash('message', 'The password entered did not match.')
+        res.redirect("register")
     }
 
-    else if ((usernameresponse.rows.length != 0) || (emailresponse.rows.length != 0)) {
-        var emailerror = 'Looks like your email is already in use'
-        var usernameerror = 'Looks like your username is already in use'
-        var usernameandemailerror = 'Looks like both email and username is already in use'
-
-        if ((usernameresponse.rows.length != 0) && (emailresponse.rows.length != 0)) {
-            //This should be triggered if both username and email is already registerd 
-            req.flash('message', usernameandemailerror)
-            res.redirect("register")
-        }
-
-        if (usernameresponse.rows.length > 0) {
-            req.flash('message', usernameerror)
-            res.redirect("register")
-        }
-
-        if (emailresponse.rows.length > 0) {
-            req.flash('message', emailerror)
-            res.redirect("register")
-        }
-        else {
-            res.status(404, 'Not sure what you did here but something broke.')
-        }
-    }
 })
 
 app.get("/live/table/:id", (req, res) => {
@@ -227,7 +233,7 @@ app.post("/user/dashboard", checkAuth, async (req, res) => {
         console.log(err.stack)
     }
     req.flash('message', `Data updated!`)
-    res.redirect("/user/dashboard", )
+    res.redirect("/user/dashboard",)
 })
 //Fetches the scoreboard
 app.get("/scoreboard", (req, res) => {
@@ -299,17 +305,17 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
 
     try {
         tableAvailability = await poolAPIObj.CheckTableAvailability(tableid) //Checks the tableid the user has submited, and ask the visionsystem if the table is available 
-        
+
     } catch (error) {
         console.log(error)
     }
 
-    if (tableAvailability == true){
+    if (tableAvailability == true) {
         console.log("The requested table is free :)")
         res.redirect(`/user/dashboard/newgame/${tableid}`)
     }
 
-    else{
+    else {
         req.flash('message', `Looks like the table is already in use. Please select another table.`)
         res.redirect("/user/dashboard")
     }
@@ -328,7 +334,7 @@ app.get("/user/dashboard/newgame/:id", checkAuth, (req, res) => {
             res.render('gameWizard', { message: req.flash('message'), username, player2Username, user: userid, title: 'game', tableid })
         }
         else {
-            res.redirect("/login") 
+            res.redirect("/login")
         }
 
     } catch (error) {
@@ -340,14 +346,14 @@ app.get("/user/dashboard/newgame/:id", checkAuth, (req, res) => {
 //This for the POST request after the user has submitted the the two players username. 
 app.post("/user/dashboard/newgame/:id", checkAuth, (req, res) => {
     var tableid = req.params.id.trim();
-    let {username, player2Username} = req.body
+    let { username, player2Username } = req.body
 
-    if(username == player2Username){
+    if (username == player2Username) {
         req.flash('message', `Nice try, but you can't play against yourself. Please input another username`)
         res.redirect(`/user/dashboard/newgame/${tableid}`, username, player2Username)
     }
 
-    else{
+    else {
         console.log('Whalla')
     }
 
