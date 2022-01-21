@@ -7,4 +7,4 @@ async function CheckTableAvailability(tableid) {
 
 
 }
-module.exports = {CheckTableAvailability: CheckTableAvailability};
+module.exports = {CheckTableAvailability};
