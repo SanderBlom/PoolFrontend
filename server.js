@@ -10,7 +10,7 @@ require('dotenv').config(); //Used to store passwords. This should not be upload
 var app = express();
 const PORT = 3000 //Ports that the server will listen to.
 app.set('view engine', 'ejs'); // Changing the view engine to ejs
-const poolAPIObj = require("./VisionSystem")
+let vision = require("./VisionSystem")
 let db = require("./db.js")
 
 
@@ -113,8 +113,18 @@ app.get("/register", checkNotAuth, (req, res) => {
 
 app.post("/register", checkNotAuth, async function (req, res) {
     let { username, firstname, lastname, email, pwd, repwd } = req.body
-    var usernameresponse //Respons from database checking the username. The .length parameter should be 0 if there are no other users with the same username.
-    var emailresponse //Same as the one above just with the email address
+    var usernameresponse //Calling function to check if the username is not taken.
+    var emailresponse //Calling function to check if the email is not taken.
+    var InsertUserResult // Calling function to insert data into the database
+
+    //Checks that the email passes the regex in const emailRegexp.
+    //Found the expression at: https://stackoverflow.com/questions/52456065/how-to-format-and-validate-email-node-js
+    const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    if(emailRegexp.test(email) == false){
+        req.flash('message', 'The email you provided does not pass our email validator. Have you made a typo?')
+        res.redirect("register")
+    }
+
 
     if (pwd == repwd) {
 
@@ -125,21 +135,28 @@ app.post("/register", checkNotAuth, async function (req, res) {
 
         } catch (error) {
 
-            console.log(error)
+            res.send(404, 'Could not check username and email validity')
         }
 
         if ((usernameresponse == true) && (emailresponse == true)) {
             //Both email and username are unique. Lets let the user create the account.
-
+            
             try {
                 const hashedPassword = await bcrypt.hash(pwd, 10) //Hashing the password
-                await pool.query(`INSERT INTO public.users(username, firstname, lastname, email, password) VALUES ('${username}', '${firstname}', '${lastname}', '${email}', '${hashedPassword}');`) //Inserting data into the db
+                InsertUserResult = await db.RegisterNewUser(username, firstname, lastname, email, hashedPassword)   
             }
             catch (error) {
-                res.status(404, `Could not complete the database query. Error: ${error}`)
+                res.status(404, `Could not complete the database query or hash the password. Error: ${error}`)
             }
-            req.flash('message', `You are now registered and can login!`)
-            res.redirect("login")
+            console.log('Server result: ' + InsertUserResult)
+            if (InsertUserResult){
+                req.flash('message', `You are now registered and can login!`)
+                res.redirect("register")
+            }
+            else{
+                req.flash('message', `Ops, something went wrong..`)
+                res.redirect("register")
+            }           
         }
         //Checks if email or username is unique.
         else if ((usernameresponse != true) || (emailresponse != true)) {
@@ -220,20 +237,20 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
 
 app.post("/user/dashboard", checkAuth, async (req, res) => {
     let { username, firstname, lastname, email } = req.body
-    const id = req.user.userid
-    const query = `UPDATE public.users SET firstname = $1, lastname = $2, email = $3
-	WHERE id = $4;`
-    const values = [`${firstname}`, `${lastname}`, `${email}`, id]
+    const id = await req.user.userid
+    let result;
 
+    result = await db.UpdaterUserDetails(firstname, lastname, email, id)
 
-    try {
-
-        await pool.query(query, values)
-    } catch (err) {
-        console.log(err.stack)
+    //Check that the result is true
+    if(result == true){
+        req.flash('message', `Data updated!`)
+        res.redirect("/user/dashboard")
     }
-    req.flash('message', `Data updated!`)
-    res.redirect("/user/dashboard",)
+    else{
+        req.flash('message', `Could not update user details.. Error: ${result.toString()}` )
+        res.redirect("/user/dashboard")
+    }
 })
 //Fetches the scoreboard
 app.get("/scoreboard", (req, res) => {
@@ -301,10 +318,9 @@ app.get("/tournament/new", (req, res) => {
 app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
     const tableid = await req.body.tableid.trim()
     var tableAvailability = false;
-    console.log(tableid)
 
     try {
-        tableAvailability = await poolAPIObj.CheckTableAvailability(tableid) //Checks the tableid the user has submited, and ask the visionsystem if the table is available 
+        tableAvailability = await vision.CheckTableAvailability(tableid) //Checks the tableid the user has submited, and ask the visionsystem if the table is available 
 
     } catch (error) {
         console.log(error)

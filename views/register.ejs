@@ -13,8 +13,6 @@
 		<!-- Henter fram navbaren fra partials mappen -->
 		<%- include('partials/navbar') %>
 	</div>
-
-
 	<div class="container-medium">
 		</form>
 		<form id="boxed" action="/register" method="POST">
@@ -24,7 +22,6 @@
 					<%= locals.message %>
 				</div>
 				<% }%>
-
 					<div>
 						<h4 for="username">
 							Please pick a username:
@@ -44,14 +41,12 @@
 						</h4>
 						<input type="text" id="lastname" name="lastname" placeholder="Your last name"required />
 					</div>
-
 					<div>
 						<h4 for="Email">
 							Email:
 						</h4>
 						<input type="email" id="email" name="email" placeholder="Your email" required />
 					</div>
-
 					<div>
 						<h4 for="pwd">
 							Password:
@@ -70,23 +65,15 @@
 					<div>
 						<lab name="validationmessage" id="validationmessage"></lab>
 					</div>
-					
-
-
 					<div id="submit-div">
 						<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Create account</button>
 					</div>
-					<h4>Do you already have an account? Login <a href="/login"> here</a> </h4>
-					
-
+					<h4>Do you already have an account? Login <a href="/login"> here</a> </h4>		
 		</form>
 		<div>
 			<!-- Henter fram footer fra partials mappen -->
 			<%- include('partials/footer') %>
 		</div>
-		<script>
-			
-		</script>
 		<!-- Checks if both passwords match. -->
 		<script>		
 				var passwordchecker = function () {
@@ -94,18 +81,15 @@
 					document.getElementById('pwdmessage').style.color = 'green';
 				document.getElementById('pwdmessage').innerHTML = 'Passwords are matching!';
 				console.log('pwd length ' + document.getElementById('pwd').value.length);
-
 			} else {
 					document.getElementById('pwdmessage').style.color = 'red';
 				document.getElementById('pwdmessage').innerHTML = 'Passwords are not matching or not long enough (8 characters minimum)';
 			}
-			
 		}
 		</script>
-		<!--Script to disable submit button until from is valid. 
-			Ref: https://stackoverflow.com/questions/49191216/how-can-i-disable-submit-button-after-required-html5-return-true-on-the-javascri-->
+		<!--Script to disable submit button until from is valid. The script bellow is heavily based on the script I found on the url bellow.
+			Ref: https://stackoverflow.com/questions/49191216/how-can-i-disable-submit-button-after-required-html5-return-true-on-the-javascri--> 
 		<script>
-			
 			function disableField() {
 			const invalidForm = document.querySelector('form:invalid');
 			const submitBtn = document.getElementById('boxed-submit');
@@ -114,7 +98,6 @@
 			  	submitBtn.style.opacity ='0.4'
 				submitBtn.innerHTML = 'Please fill out the form'
 				submitBtn.style.backgroundColor = 'grey'
-			  	
 			} else {
 			  submitBtn.disabled = false;
 			  submitBtn.style.opacity ='1'
@@ -122,9 +105,7 @@
 			  submitBtn.style.backgroundColor = '#4CAF50'
 			}
 		  }
-		  
 		  disableField();
-		  
 		  const inputs = document.getElementsByTagName("input");
 		  for (let input of inputs) {
 			input.addEventListener('change', disableField);
