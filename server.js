@@ -76,7 +76,6 @@ app.delete('/logout', (req, res) => {
 //function to get the login page
 app.get("/login", checkNotAuth, (req, res) => {
 
-
     res.render("login", { title: 'login', message: req.flash('message') })
 })
 //Function to fetch login credentials and potentially login the user.The checkNotAuth is middleware to check if the usr/pw is valid
@@ -86,22 +85,19 @@ app.post("/login", checkNotAuth, passport.authenticate('local', {
     failureFlash: true
 
 }))
+
 //function to get the homepage 
 app.get("/", async (req, res) => {
-    try {
-        if (req.user) {
-            var userid = req.user.userid
-            var username = req.user.username
-            res.render('index', { message: req.flash('message'), username, user: userid, title: 'index' }) //Renderes the index websites and passes title for the navbar
-        }
-        else {
-            var userid = null
-            var username = null
-            res.render('index', { message: req.flash('message'), username: username, user: userid, title: 'index' }) //Renderes the index websites and passes title for the navbar
-        }
-
-    } catch (error) {
-        console.log('User is not probably not logged in' + error)
+    //Checks if user is logged in or not
+    if (req.user) {
+        var userid = req.user.userid
+        var username = req.user.username
+        res.render('index', { message: req.flash('message'), username, user: userid, title: 'index' }) //Renderes the index websites and passes title for the navbar
+    }
+    else {
+        var userid = null
+        var username = null
+        res.render('index', { message: req.flash('message'), username: username, user: userid, title: 'index' }) //Renderes the index websites and passes title for the navbar
     }
 })
 
@@ -120,43 +116,39 @@ app.post("/register", checkNotAuth, async function (req, res) {
     //Checks that the email passes the regex in const emailRegexp.
     //Found the expression at: https://stackoverflow.com/questions/52456065/how-to-format-and-validate-email-node-js
     const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    if(emailRegexp.test(email) == false){
+    if (emailRegexp.test(email) == false) {
         req.flash('message', 'The email you provided does not pass our email validator. Have you made a typo?')
         res.redirect("register")
     }
 
-
     if (pwd == repwd) {
-
         //Checks if the email and username is already in the database
         try {
             emailresponse = await db.ValidateUniqueEmail(email)
             usernameresponse = await db.ValidateUniqueUsername(username)
 
         } catch (error) {
-
             res.send(404, 'Could not check username and email validity')
         }
-
         if ((usernameresponse == true) && (emailresponse == true)) {
             //Both email and username are unique. Lets let the user create the account.
-            
+
             try {
                 const hashedPassword = await bcrypt.hash(pwd, 10) //Hashing the password
-                InsertUserResult = await db.RegisterNewUser(username, firstname, lastname, email, hashedPassword)   
+                InsertUserResult = await db.RegisterNewUser(username, firstname, lastname, email, hashedPassword)
             }
             catch (error) {
-                res.status(404, `Could not complete the database query or hash the password. Error: ${error}`)
+                console.log(error)
             }
             console.log('Server result: ' + InsertUserResult)
-            if (InsertUserResult){
+            if (InsertUserResult) {
                 req.flash('message', `You are now registered and can login!`)
                 res.redirect("register")
             }
-            else{
+            else {
                 req.flash('message', `Ops, something went wrong..`)
                 res.redirect("register")
-            }           
+            }
         }
         //Checks if email or username is unique.
         else if ((usernameresponse != true) || (emailresponse != true)) {
@@ -243,12 +235,12 @@ app.post("/user/dashboard", checkAuth, async (req, res) => {
     result = await db.UpdaterUserDetails(firstname, lastname, email, id)
 
     //Check that the result is true
-    if(result == true){
+    if (result == true) {
         req.flash('message', `Data updated!`)
         res.redirect("/user/dashboard")
     }
-    else{
-        req.flash('message', `Could not update user details.. Error: ${result.toString()}` )
+    else {
+        req.flash('message', `Could not update user details.. Error: ${result.toString()}`)
         res.redirect("/user/dashboard")
     }
 })
@@ -374,8 +366,6 @@ app.post("/user/dashboard/newgame/:id", checkAuth, (req, res) => {
     }
 
 })
-
-
 
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000

@@ -60,22 +60,40 @@ async function UpdaterUserDetails(firstname, lastname, email, id) {
 }
 
 async function RegisterNewUser(username, firstname, lastname, email, password) {
-    const query = `INSERT INTO public.users(username, firstname, lastname, email, password) VALUES ($1, $2, $3, $4, $5) RETURNING *;`
-    const values = [`${username}`, `${firstname}`, `${lastname}`, `${email}`, `${password}`]
-    let results
+    const queryUserTable = `INSERT INTO public.users(username, firstname, lastname, email, password) VALUES ($1, $2, $3, $4, $5) RETURNING *;`
+    const valuesUserTable = [`${username}`, `${firstname}`, `${lastname}`, `${email}`, `${password}`]
+    let resultUserTable //Here we store the result of the first query towards the usertable 
+    let resultPlayerTable //Here we store the result of the second query towards the playertable 
 
-    try {
-        results = await pool.query(query, values)
-    } catch (err) {
-        console.log(err)
-    }
-    if (results.rows[0].username == username){
-        return true
-    }
-    else{return false}
+    resultUserTable = await pool.query(queryUserTable, valuesUserTable)
 
-   
+    var userid = await resultUserTable.rows[0].userid
+
+
+    const queryPlayerTable = 'INSERT INTO public.player(userid) VALUES ($1) RETURNING *;'
+    const valuesPlayerTable = [userid]
+
+    //If the insert into user table completed successfully. We can proceed by inserting the user into the player table
+    if (resultUserTable.rows[0].username == username) {
+        
+        resultPlayerTable = await pool.query(queryPlayerTable, valuesPlayerTable)
+
+        if (resultPlayerTable.rows[0].userid == userid) {
+            return true
+        }
+        else{
+            //If last insert failed we have to delete the first insert in the user table
+            const queryDeleteFromUserTable = 'DELETE FROM public.users WHERE username = $1 VALUES ($1) RETURNING *;'
+            const valuesDelteFromUserTable = [userid]
+            pool.query(queryDeleteFromUserTable,valuesDelteFromUserTable)
+            return false
+        }
+    }
+    //If any of the queries above fails, we return false to let the user know that the usercreation failed.
+    else { 
+
+        return false }
 }
 
 //Exporting all the functions so they can be access by server.js
-module.exports = { ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser}
+module.exports = { ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser }
