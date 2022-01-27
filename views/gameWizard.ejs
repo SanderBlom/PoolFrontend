@@ -24,28 +24,17 @@
 					<%= message%>
 				</div>
 				<% }%>
-					<div><h4>Please input the usernames fro player 1 and player 2</h4></div>
 					<div>
-						<h4 for="username">
-							Player 1 Username:
-						</h4>
-
-						<input type="text" id="username" name="username" value="<%= locals.username%>"
-							required />
+						<h2>Game ID: <%= locals.gameid%> </h2>
+						<h4>Give this ID to your opponent</h4>
+						<br>
 					</div>
-
 					<div>
-						<h4 for="player2Username">
-							Player 1 Username:
-						</h4>
+						<h3>Player 1: <%= locals.username1%></h3>
+						<h3>Player 2: <%= locals.username2%></h3>
 
-						<input type="text" id="player2Username" name="player2Username" vvalue="<%= locals.player2Username%>"
-							required />
-					</div><br />
-
-					<div>
-						<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Start game</button>
 					</div>
+					
 		</form>
 
 	</div>

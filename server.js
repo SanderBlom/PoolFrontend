@@ -309,26 +309,66 @@ app.get("/tournament/new", (req, res) => {
 //This is taking the submitted tableid from users dashboard and checks if the table is free. If its free user will be redirected the new game page.
 app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
     const tableid = await req.body.tableid.trim()
+    const userid = await req.user.userid
     var tableAvailability = false;
+    var gameid = null
+    var playercount = null
 
     try {
         tableAvailability = await vision.CheckTableAvailability(tableid) //Checks the tableid the user has submited, and ask the visionsystem if the table is available 
-
     } catch (error) {
         console.log(error)
     }
 
     if (tableAvailability == true) {
-        console.log("The requested table is free :)")
-        res.redirect(`/user/dashboard/newgame/${tableid}`)
+        gameid = await db.CreateNewGame(userid, tableid) //Creating a game and returning the game id.
+ 
     }
 
     else {
         req.flash('message', `Looks like the table is already in use. Please select another table.`)
         res.redirect("/user/dashboard")
     }
+
+    if (gameid != null){
+        playercount = await db.CheckPlayerCountInGame(gameid)
+        console.log('Player count = ' + playercount)
+        if(playercount == 0 || playercount > 3){
+            console.log('Trying to add players')
+            var result = await db.AddPlayerToGame(gameid, userid)
+            console.log('Add player result = ' + result)
+            if(result == true){
+                req.flash('message', `Created a new game! Please give your opponent the game ID so they can join.`)
+                res.redirect(`/game/${gameid}`)
+
+            }
+            else{
+                req.flash('message', `Could not create a new game. Please contact staff`)
+                res.redirect("/user/dashboard")
+            }
+        }
+    }
+
+
 })
 
+app.get("/game/:id", checkAuth, async (req, res)=> {
+    var gameid = req.params.id.trim();
+    var tableid = await db.GetTableID(gameid)
+    let usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
+    var username1 = username[0]
+    var username2 = username[1]
+
+    if (req.user) {
+        var userid = req.user.userid
+        res.render('gameWizard', { message: req.flash('message'), username1, username2, user: userid, gameid, title: 'game', tableid })
+    }
+    else {
+        res.redirect("/login")
+    }
+
+
+})
 
 //This page loads after you have picked a table and the system has checked that its not in use.
 app.get("/user/dashboard/newgame/:id", checkAuth, (req, res) => {
