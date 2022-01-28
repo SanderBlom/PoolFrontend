@@ -111,6 +111,10 @@ async function CreateNewGame(userid, tableid) {
 }
 
 async function AddPlayerToGame(gameid, userid) {
+    if (gameid == null && userid == null){
+        console.log('Inout is empty')
+        return null
+    }
     //Checks that the game is valid (the game id exists, the game has not started, and the game has not ended)
     const query = {
         text: 'SELECT gameid FROM public.game WHERE gameid = $1 AND endtime IS NULL AND starttime IS NULL;',
@@ -125,12 +129,17 @@ async function AddPlayerToGame(gameid, userid) {
     }
     let fetchplayerid = await pool.query(query2) //Returns one row if the gameid exists in the db
     var playerid = fetchplayerid.rows[0].playerid //Fetching playerid from the object
+    let playerids = await FetchPlayerIDinGame(gameid)
+
+    var playerid1 = playerids[0]
+    var playerid2 = playerids[1]
 
 
     //If gameid is valid then add user
     if (gamevalidation.rows.length == 1) {
 
-        if (gamevalidation.rows[0].userid == null) {
+        if (playerid1 == null) {
+            console.log('Jeg skal ikke trigges')
             //If no user is assigned to the game we can assign our fist user to the userid table.
             const query3 = {
                 text: 'INSERT INTO public.game_players(gameid, playerid) VALUES ($1, $2) RETURNING *;',
@@ -141,10 +150,11 @@ async function AddPlayerToGame(gameid, userid) {
             else { return false }
         }
         else {
+            console.log('Jeg skal trigges')
             //This should be triggered when the second player tries to join the game. 
             //The second player will be added to the playerid2 colum since player1 is already added to playerid
             const query4 = {
-                text: 'INSERT INTO public.game_players(gameid, playerid2) VALUES ($1, $2) RETURNING *;',
+                text: 'UPDATE public.game_players SET playerid2 = $2 WHERE gameid = $1 RETURNING *;',
                 values: [gameid, playerid]
             }
             var result = await pool.query(query4)
@@ -215,11 +225,7 @@ async function fetchUsernamesInGame(gameid) {
     let usernames = []
     usernames.push(username1, username2)
 
-    console.log(usernames)
-
     return usernames
-
-
 }
 
 async function GetUsernamesFromPlayerID(playerid) {
@@ -261,20 +267,48 @@ async function GetUsernamesFromPlayerID(playerid) {
 async function IsUserInAGame(userid){
     //returns true if user is in a game
     const query = {
-        text: 'SELECT userid from player WHERE playerid = $1;',
-        values: [playerid]
+        text: 'SELECT playerid from player WHERE userid = $1;',
+        values: [userid]
     }
-    let result = await pool.query(query) //Returns the amount of players in the game
+    let result = await pool.query(query) //Returns the playerid from player table
+    var playerid = result.rows[0].playerid
 
-    if (result.rows.length == 0) {
+        if(playerid != null){
+            const query = {
+                text: 'select * from game_players NATURAL JOIN game WHERE (endtime IS NULL) AND (playerid = $1 OR playerid2 = $1)',
+                values: [playerid]
+            }
+            let result = await pool.query(query)
+            
+
+            if(result.rows.length == 1){return true}
+            else{return false}
+        }
+        else{return null}
+}
+
+async function FetchPlayerIDinGame(gameid){
+    if(gameid == null){
+        console.log('No game id provided')
         return null
     }
+    const query = {
+        text: 'SELECT * from game_players NATURAL JOIN game WHERE (endtime IS NULL) AND gameid = $1;',
+        values: [gameid]
+    }
+    let result = await pool.query(query) 
+    var playerid = result.rows[0].playerid
+    var playerid2 = result.rows[0].playerid2
+    let playerids = []
+    playerids.push(playerid, playerid2)
 
+    return playerids
 
 }
 
 //Exporting all the functions so they can be access by server.js
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
-    CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID, fetchUsernamesInGame
+    CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID, 
+    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame
 }

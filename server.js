@@ -55,16 +55,6 @@ function checkNotAuth(req, res, next) {
         next()
     }
 }
-//Using passport to keep track of logged in users
-/* const initializePassport = require('./passport-cfg')
-initializePassport(
-    passport,
-    username => Findusername(username),
-    id => Finduserid(id)
-)  *///Running the passport function from passport-cfg file
-
-//Dette er sikkert lite veldig lite sikker så her må vi mulig gjøre noe.
-
 
 app.delete('/logout', (req, res) => {
     req.logOut()
@@ -224,7 +214,8 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
     var firstname = req.user.firstname
     var lastname = req.user.lastname
     var email = req.user.email
-    res.render("profile", { username: username, user: userid, firstname, lastname, email, message: req.flash('message') })
+    var ingame = await db.IsUserInAGame(userid)
+    res.render("profile", { username: username, user: userid, firstname, lastname, email, ingame, message: req.flash('message') })
 })
 
 app.post("/user/dashboard", checkAuth, async (req, res) => {
@@ -354,18 +345,32 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
 
 app.get("/game/:id", checkAuth, async (req, res)=> {
     var gameid = req.params.id.trim();
-    var tableid = await db.GetTableID(gameid)
-    let usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
-    var username1 = username[0]
-    var username2 = username[1]
+    try {
+        var tableid = await db.GetTableID(gameid)
+        let usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
+        var username1 = usernames[0]
+        var username2 = usernames[1]
+        var username = req.user.username
+    
+        if(username1 == null && username2 == null){
+            res.redirect("/login")
+        }
+    
+        if (req.user) {
+            var userid = req.user.userid
+            res.render('gameWizard', { message: req.flash('message'),username, username1, username2, user: userid, gameid, title: 'game', tableid })
+        }
+        else {
+            res.redirect("/login")
+        }
 
-    if (req.user) {
-        var userid = req.user.userid
-        res.render('gameWizard', { message: req.flash('message'), username1, username2, user: userid, gameid, title: 'game', tableid })
     }
-    else {
+
+    catch (err) {
+        console.log(err) 
         res.redirect("/login")
     }
+
 
 
 })
@@ -404,6 +409,28 @@ app.post("/user/dashboard/newgame/:id", checkAuth, (req, res) => {
     else {
         console.log('Whalla')
     }
+
+})
+
+app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
+    var gameid = req.body.gameid
+    var userid = req.user.userid
+
+    var result = await db.AddPlayerToGame(gameid, userid)
+    console.log(result)
+
+    if(result == true){
+        res.redirect(`/game/${gameid}`)
+
+    }
+
+  
+
+    
+
+   
+
+    
 
 })
 

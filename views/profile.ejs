@@ -24,19 +24,44 @@
 			</div>
 			<div class="col-md-4">
 				<div class="jumbotron">
-					<form class="form-inline" action="/user/dashboard/newgame" method="POST"> <!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
-						<div class="form-group mx-sm-3 mb-2">
-							<input type="number" class="form-control" name="tableid" id="tableid" placeholder="Table ID" required>
-						  </div>
-						  <button type="submit" class="btn btn-primary mb-2">Create a game</button>
-						  <h5>You can find the table ID printed on your table.</h5>
-					</form>
-					
+					<% if (locals.ingame == false) { %>
+						<form class="form-inline" action="/user/dashboard/newgame" method="POST">
+							<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+							<h6>You can find the table ID printed on your table.</h6>
+							<div class="form-group mx-sm-3 mb-2">
+								<input type="number" class="form-control" name="tableid" id="tableid" placeholder="Table ID"
+									required>
+							</div>
+							<button type="submit" class="btn btn-primary mb-2">Create a game</button>
+	
+						</form>
+	
+						<form class="form-inline" action="/user/dashboard/joingame" method="POST">
+							<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+							<div class="form-group mx-sm-3 mb-2">
+								<input type="number" class="form-control" name="gameid" id="gameid" placeholder="Game ID"
+									required>
+							</div>
+							<button type="submit" class="btn btn-primary mb-2">Join game</button>
+						</form>
+
+						  <% } else { %>
+							<form class="form-inline" action="/user/dashboard/joingame" method="POST">
+								<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+								<div class="form-group mx-sm-3 mb-2">
+									<input type="number" class="form-control" name="gameid" id="gameid" placeholder="Game ID"
+										required>
+								</div>
+								<button type="submit" class="btn btn-primary mb-2">Resume game</button>
+							</form>
+		
+							  <% } %>
+
 				</div>
 			</div>
 			<div class="col-md-4">
 				<div class="jumbotron">
-					<a class="btn btn-primary btn-large"  href="/tournament/new">Start a tournament!</a>
+					<a class="btn btn-primary btn-large" href="/tournament/new">Start a tournament!</a>
 					<h5>Get your friends, family or colleagues and start your own tournament</h5>
 				</div>
 			</div>
@@ -47,9 +72,9 @@
 					Stats about your last game
 				</h2>
 				<p>
-					<div>
-						<canvas id="lastgame"></canvas>
-					</div>
+				<div>
+					<canvas id="lastgame"></canvas>
+				</div>
 				</p>
 
 			</div>
@@ -58,26 +83,29 @@
 					Edit user details
 				</h2>
 				<p>
-					<form id="boxed" method="POST">
-						<% if(locals.message.length> 0) { %>
-							<div class="alert alert-success">
-								<%= message %>
+				<form id="boxed" method="POST">
+					<% if(locals.message.length> 0) { %>
+						<div class="alert alert-success">
+							<%= message %>
+						</div>
+						<% }%>
+							<div>
+								<lable for="firstname">First name:</lable>
+								<input type="text" id="firstname" name="firstname" value="<%=locals.firstname%>"
+									required />
 							</div>
-							<% }%>
-								<div>
-									<lable for="firstname">First name:</lable>
-									<input type="text" id="firstname" name="firstname" value="<%=locals.firstname%>" required />
-								</div>
-								<div>
-									<lable for="lastname">Last name:</lable>
-									<input type="text" id="lastname" name="lastname" value="<%=locals.lastname%>" required />
-								</div>
-								<div>
-									<lable for="email">Email addres:</lable>
-									<input type="email" id="email" name="email" value="<%=locals.email%>" required />
-								</div>
-								<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Update user details</button>
-					</form>
+							<div>
+								<lable for="lastname">Last name:</lable>
+								<input type="text" id="lastname" name="lastname" value="<%=locals.lastname%>"
+									required />
+							</div>
+							<div>
+								<lable for="email">Email addres:</lable>
+								<input type="email" id="email" name="email" value="<%=locals.email%>" required />
+							</div>
+							<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Update user
+								details</button>
+				</form>
 				</p>
 			</div>
 			<div class="col-md-4">
@@ -85,14 +113,14 @@
 					Your stats
 				</h2>
 				<p>
-					<div>
-						<canvas id="overall"></canvas>
-					</div>
-					
-					
+				<div>
+					<canvas id="overall"></canvas>
+				</div>
+
+
 				</p>
 				<p>
-					
+
 				</p>
 			</div>
 		</div>
@@ -101,7 +129,7 @@
 		<!-- Henter fram footer fra partials mappen -->
 		<%- include('partials/footer') %>
 	</div>
-	
+
 	<script src="/js/jquery.min.js"></script>
 	<script>
 		const ctx = document.getElementById('overall').getContext('2d');
@@ -141,50 +169,50 @@
 			}
 		});
 
-		
 
-		
+
+
 	</script>
 	<script>
-	const ctx2 = document.getElementById('lastgame').getContext('2d');
-	const overallChart = new Chart(ctx2, {
-		type: 'bar',
-		data: {
-			labels: ['Time played', 'Your average playtime', 'Score', 'Your average score'],
-			datasets: [{
-				label: 'x',
-				data: [12, 19, 3, 5, 2, 3],
-				backgroundColor: [
-					'rgba(255, 99, 132, 0.2)',
-					'rgba(255, 99, 132, 0.2)',
-					'rgba(255, 206, 86, 0.2)',
-					'rgba(255, 206, 86, 0.2)'
-				],
-				borderColor: [
-					'rgba(255, 99, 132, 1)',
-					'rgba(255, 99, 132, 1)',
-					'rgba(255, 206, 86, 1)',
-					'rgba(255, 206, 86, 1)'	
-				],
-				borderWidth: 1
-			}]
-		},
-		options: {
-			indexAxis: 'y',
-			scales: {
-				y: {
-					beginAtZero: true
+		const ctx2 = document.getElementById('lastgame').getContext('2d');
+		const overallChart = new Chart(ctx2, {
+			type: 'bar',
+			data: {
+				labels: ['Time played', 'Your average playtime', 'Score', 'Your average score'],
+				datasets: [{
+					label: 'x',
+					data: [12, 19, 3, 5, 2, 3],
+					backgroundColor: [
+						'rgba(255, 99, 132, 0.2)',
+						'rgba(255, 99, 132, 0.2)',
+						'rgba(255, 206, 86, 0.2)',
+						'rgba(255, 206, 86, 0.2)'
+					],
+					borderColor: [
+						'rgba(255, 99, 132, 1)',
+						'rgba(255, 99, 132, 1)',
+						'rgba(255, 206, 86, 1)',
+						'rgba(255, 206, 86, 1)'
+					],
+					borderWidth: 1
+				}]
+			},
+			options: {
+				indexAxis: 'y',
+				scales: {
+					y: {
+						beginAtZero: true
+					}
 				}
 			}
-		}
-	});
+		});
 
-	
 
-	
-</script>
+
+
+	</script>
 	<script>
-		
+
 	</script>
 	<script src="/js/bootstrap.min.js"></script>
 </body>
