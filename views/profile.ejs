@@ -20,6 +20,7 @@
 				<div class="jumbotron">
 					<h2>Welcome <%=locals.username%>!</h2>
 					<h5>Your our <%=locals.user%>th user to sign up!</h5>
+					<br>
 				</div>
 			</div>
 			<div class="col-md-4">
@@ -36,7 +37,7 @@
 	
 						</form>
 	
-						<form class="form-inline" action="/user/dashboard/joingame" method="POST">
+						<form class="form-inline" action="/user/dashboard/joingame/" method="POST">
 							<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
 							<div class="form-group mx-sm-3 mb-2">
 								<input type="number" class="form-control" name="gameid" id="gameid" placeholder="Game ID"
@@ -46,14 +47,16 @@
 						</form>
 
 						  <% } else { %>
-							<form class="form-inline" action="/user/dashboard/joingame" method="POST">
+							
+							<form class="form-inline" action="/game/<%=locals.gameid%>" method="GET">
 								<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
 								<div class="form-group mx-sm-3 mb-2">
-									<input type="number" class="form-control" name="gameid" id="gameid" placeholder="Game ID"
-										required>
+									<h6>Looks like your already in a game.</h6>
 								</div>
 								<button type="submit" class="btn btn-primary mb-2">Resume game</button>
 							</form>
+							<br>
+							<br>
 		
 							  <% } %>
 

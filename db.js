@@ -2,6 +2,7 @@
 const { user } = require("pg/lib/defaults");
 const { pool } = require("./dbConfig");
 const moment = require('moment'); //Used to generate timestamps
+const res = require("express/lib/response");
 
 async function ValidateUniqueUsername(username) {
     //This function returns true if the username exist in the database.
@@ -42,21 +43,25 @@ async function ValidateUniqueEmail(email) {
 //This function returns true if the data is successfully updated in the database. 
 async function UpdaterUserDetails(firstname, lastname, email, id) {
     const query = `UPDATE public.users SET firstname = $1, lastname = $2, email = $3
-	WHERE userid = $4;`
+	WHERE userid = $4 RETURING *;`
     const values = [`${firstname}`, `${lastname}`, `${email}`, id]
     //Trying to insert data into database
     try {
         result = await pool.query(query, values)
     } catch (error) {
-        throw error
+        console.log(error)
     }
-    //If we catch an error we want to return the error message back to so it can be handled and potentially be displayed to the UI.
-    if (error) {
-        return error
-    }
-    else {
+
+    if (result.rows.length < 0){
         return true
     }
+    else{
+        console.log('could not update')
+        return false
+    }
+
+
+
 }
 
 async function RegisterNewUser(username, firstname, lastname, email, password) {
@@ -96,7 +101,7 @@ async function RegisterNewUser(username, firstname, lastname, email, password) {
     }
 }
 
-async function CreateNewGame(userid, tableid) {
+async function CreateNewGame(tableid) {
     //This function should generate a game and add the first player to the game.
     const timestamp = moment() //Creating timestamp in millisec
     const timestampFormated = timestamp.format('YYYY-MM-DD HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
@@ -111,8 +116,8 @@ async function CreateNewGame(userid, tableid) {
 }
 
 async function AddPlayerToGame(gameid, userid) {
-    if (gameid == null && userid == null){
-        console.log('Inout is empty')
+    if (gameid == null || userid == null) {
+        console.log('Input is empty')
         return null
     }
     //Checks that the game is valid (the game id exists, the game has not started, and the game has not ended)
@@ -127,12 +132,21 @@ async function AddPlayerToGame(gameid, userid) {
         text: 'SELECT playerid FROM public.player WHERE userid = $1;',
         values: [userid]
     }
-    let fetchplayerid = await pool.query(query2) //Returns one row if the gameid exists in the db
+    let fetchplayerid = await pool.query(query2) 
+    console.log(fetchplayerid.rows[0])
     var playerid = fetchplayerid.rows[0].playerid //Fetching playerid from the object
     let playerids = await FetchPlayerIDinGame(gameid)
 
-    var playerid1 = playerids[0]
-    var playerid2 = playerids[1]
+
+    if(playerids == null){
+        var playerid1 = null
+        var playerid2 = null
+    }
+    else{
+        var playerid1 = playerids[0]
+        var playerid2 = playerids[1]
+    }
+ 
 
 
     //If gameid is valid then add user
@@ -185,6 +199,45 @@ async function CheckPlayerCountInGame(gameid) {
         else if (player1 == null && player2 != null) { return 1 }
         else if (player1 != null && player2 != null) { return 2 }
     }
+}
+async function GetGameIDForActiveGame(userid) {
+    //This returns the gameid for an active game based on the userid inputed.
+
+    playerid = await GetPlayerID(userid)
+    console.log('Dette er userid ' + userid)
+    const query = {
+        text: 'select gameid from game_players NATURAL JOIN game WHERE (endtime IS NULL) AND (playerid = $1 OR playerid2 = $1);',
+        values: [playerid]
+    }
+    let result = await pool.query(query)
+
+
+    if(result.rows[0].gameid != null){
+        const gameid = result.rows[0].gameid
+        console.log('Dette er game id ' + gameid)
+        return gameid
+    }
+    else {
+        console.log('No game if found')
+    }
+
+
+
+}
+
+async function GetPlayerID(userid) {
+    //This returns playerid
+    const query = {
+        text: 'SELECT playerid FROM player WHERE userid = $1;',
+        values: [userid]
+    }
+    let result = await pool.query(query) //Returns the amount of players in the game
+    var playerid = result.rows[0].playerid
+
+    if (playerid != 0) {
+        return playerid
+    }
+    else { console.log('No playerid found for userid= ' + userid) }
 }
 
 async function GetTableID(gameid) {
@@ -257,38 +310,40 @@ async function GetUsernamesFromPlayerID(playerid) {
         }
         else {
             console.log('Something broke....')
-
         }
-
     }
-
 }
 
-async function IsUserInAGame(userid){
+async function IsUserInAGame(userid) {
+    if (userid == null) {
+        console.log('No user id provided. Returning null')
+        return null
+    }
     //returns true if user is in a game
     const query = {
         text: 'SELECT playerid from player WHERE userid = $1;',
         values: [userid]
     }
     let result = await pool.query(query) //Returns the playerid from player table
+    console.log(result.rows)
     var playerid = result.rows[0].playerid
 
-        if(playerid != null){
-            const query = {
-                text: 'select * from game_players NATURAL JOIN game WHERE (endtime IS NULL) AND (playerid = $1 OR playerid2 = $1)',
-                values: [playerid]
-            }
-            let result = await pool.query(query)
-            
-
-            if(result.rows.length == 1){return true}
-            else{return false}
+    if (playerid != null) {
+        const query = {
+            text: 'select * from game_players NATURAL JOIN game WHERE (endtime IS NULL) AND (playerid = $1 OR playerid2 = $1)',
+            values: [playerid]
         }
-        else{return null}
+        let result = await pool.query(query)
+
+
+        if (result.rows.length == 1) { return true }
+        else { return false }
+    }
+    else { return null }
 }
 
-async function FetchPlayerIDinGame(gameid){
-    if(gameid == null){
+async function FetchPlayerIDinGame(gameid) {
+    if (gameid == null) {
         console.log('No game id provided')
         return null
     }
@@ -296,19 +351,44 @@ async function FetchPlayerIDinGame(gameid){
         text: 'SELECT * from game_players NATURAL JOIN game WHERE (endtime IS NULL) AND gameid = $1;',
         values: [gameid]
     }
-    let result = await pool.query(query) 
-    var playerid = result.rows[0].playerid
-    var playerid2 = result.rows[0].playerid2
-    let playerids = []
-    playerids.push(playerid, playerid2)
+    let result = await pool.query(query)
+    console.log(result.rows)
+    let playerids = [] //Init array to store usernames
+    if (result.rows.length == 0) {
+        return null
+    }
+    else {
+        var playerid = result.rows[0].playerid
+        var playerid2 = result.rows[0].playerid2
 
-    return playerids
+        playerids.push(playerid, playerid2)
+
+        return playerids
+
+    }
+
+
+}
+
+async function CancelNonStartedGame(gameid) {
+    //This function will delete the game from the game and game_players table. This should only be done if game has not started
+    const query1 = {
+        text: 'DELETE from game_players WHERE gameid = $1;',
+        values: [gameid]
+    }
+    await pool.query(query1)
+    //After we have deleted fro the game_players table we can the delete the game from gameid
+    const query2 = {
+        text: 'DELETE from game WHERE gameid = $1;',
+        values: [gameid]
+    }
+    await pool.query(query2)
 
 }
 
 //Exporting all the functions so they can be access by server.js
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
-    CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID, 
-    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame
+    CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
+    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame, CancelNonStartedGame, GetGameIDForActiveGame
 }
