@@ -43,25 +43,20 @@ async function ValidateUniqueEmail(email) {
 //This function returns true if the data is successfully updated in the database. 
 async function UpdaterUserDetails(firstname, lastname, email, id) {
     const query = `UPDATE public.users SET firstname = $1, lastname = $2, email = $3
-	WHERE userid = $4 RETURING *;`
+	WHERE userid = $4 RETURNING *;`
     const values = [`${firstname}`, `${lastname}`, `${email}`, id]
-    //Trying to insert data into database
+   
     try {
-        result = await pool.query(query, values)
+        let result = await pool.query(query, values) //Updating the user data in the database
+        if (result.rows.length != 0){
+            return true
+        }
+        else{
+            return false
+        }
     } catch (error) {
         console.log(error)
     }
-
-    if (result.rows.length < 0){
-        return true
-    }
-    else{
-        console.log('could not update')
-        return false
-    }
-
-
-
 }
 
 async function RegisterNewUser(username, firstname, lastname, email, password) {
@@ -219,6 +214,7 @@ async function GetGameIDForActiveGame(userid) {
     }
     else {
         console.log('No game if found')
+        return null
     }
 
 
@@ -310,6 +306,7 @@ async function GetUsernamesFromPlayerID(playerid) {
         }
         else {
             console.log('Something broke....')
+            return null
         }
     }
 }

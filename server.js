@@ -39,7 +39,6 @@ app.use(methodOverride('_method')) //used for triggering .delete functions with 
 //Checks if user is logged in.
 function checkAuth(req, res, next) {
     if (req.user) {
-        console.log('Is authenticated')
         return next()
     }
     else {
@@ -58,7 +57,6 @@ function checkNotAuth(req, res, next) {
 
 app.delete('/logout', (req, res) => {
     req.logOut()
-    console.log('Trying to log you out')
     req.flash('message', "You have logged out")
     res.redirect("/")
 })
@@ -130,7 +128,6 @@ app.post("/register", checkNotAuth, async function (req, res) {
             catch (error) {
                 console.log(error)
             }
-            console.log('Server result: ' + InsertUserResult)
             if (InsertUserResult) {
                 req.flash('message', `You are now registered and can login!`)
                 res.redirect("register")
@@ -216,15 +213,15 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
     var email = req.user.email
     var ingame = await db.IsUserInAGame(userid)
     var gameid = null
-    if(ingame == true){
+    if (ingame == true) {
         gameid = await db.GetGameIDForActiveGame(userid)
-        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message') })
+        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('message') })
 
     }
-    else{
-        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message') })
+    else {
+        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('message') })
     }
-    
+
 })
 
 app.post("/user/dashboard", checkAuth, async (req, res) => {
@@ -240,7 +237,7 @@ app.post("/user/dashboard", checkAuth, async (req, res) => {
         res.redirect("/user/dashboard")
     }
     else {
-        req.flash('message', `Could not update user details.. Error: ${result.toString()}`)
+        req.flash('message', `Could not update user details..`)
         res.redirect("/user/dashboard")
     }
 })
@@ -261,7 +258,7 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
 
     if (tableAvailability == true) {
         gameid = await db.CreateNewGame(userid, tableid) //Creating a game and returning the game id.
- 
+
     }
 
     else {
@@ -269,18 +266,15 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
         res.redirect("/user/dashboard")
     }
 
-    if (gameid != null){
+    if (gameid != null) {
         playercount = await db.CheckPlayerCountInGame(gameid)
-        console.log('Player count = ' + playercount)
-        if(playercount == 0 || playercount > 3){
-            console.log('Trying to add players')
+        if (playercount == 0 || playercount > 3) {
             var result = await db.AddPlayerToGame(gameid, userid)
-            console.log('Add player result = ' + result)
-            if(result == true){
+            if (result == true) {
                 req.flash('message', `Created a new game! Please give your opponent the game ID so they can join.`)
                 res.redirect(`/game/${gameid}`)
             }
-            else{
+            else {
                 req.flash('message', `Could not create a new game. Please contact staff`)
                 res.redirect("/user/dashboard")
             }
@@ -290,7 +284,7 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
 
 })
 
-app.post("/game/cancel/:id", checkAuth, async (req, res) =>{
+app.post("/game/cancel/:id", checkAuth, async (req, res) => {
     //This should only be trigged while waiting for a game start.
     //Here we should add some validation that only users in the game can cancel the game!!
     var gameid = req.params.id.trim();
@@ -300,37 +294,37 @@ app.post("/game/cancel/:id", checkAuth, async (req, res) =>{
 
 })
 
-app.get("/game/:id", checkAuth, async (req, res)=> {
+app.get("/game/:id", checkAuth, async (req, res) => {
     var gameid = req.params.id.trim();
     var username1 = null
     var username2 = null
     try {
         var tableid = await db.GetTableID(gameid)
         let usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
-        if(usernames == null){
+        if (usernames == null) {
             username1 == null
             username2 == null
         }
-        else{
+        else {
             username1 = usernames[0]
             username2 = usernames[1]
         }
-        
+
         var username = req.user.username // fetching username to use in the navbar
-    
-        if(username1 == null && username2 == null){
+
+        if (username1 == null && username2 == null) {
             res.redirect("/login")
         }
         if (req.user) {
             var userid = req.user.userid
-            res.render('gameWizard', { message: req.flash('message'),username, username1, username2, user: userid, gameid, title: 'game', tableid })
+            res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid })
         }
         else {
             res.redirect("/login")
         }
     }
     catch (err) {
-        console.log(err) 
+        console.log(err)
         res.redirect("/login")
     }
 })
@@ -360,13 +354,37 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
     var gameid = req.body.gameid
     var userid = req.user.userid
 
-    var result = await db.AddPlayerToGame(gameid, userid)
-    console.log(result)
+    //Validate that the game exsist and has not been started or has ended
 
-    if(result == true){
-        res.redirect(`/game/${gameid}`)
+    
+
+    var players = await db.CheckPlayerCountInGame(gameid)
+    console.log('Amout of players in requested game:' + players)
+
+    if (players >= 2) {
+        req.flash('gamemessage', "Looks like the game is full")
+        res.redirect("/user/dashboard/")
+        console.log('Game is full')
+    }
+
+
+    else {
+        var result = await db.AddPlayerToGame(gameid, userid)
+        if (result == true) {
+            res.redirect(`/game/${gameid}`)
+
+        }
+        else {
+            console.log('Could not add you to the game')
+            req.flash('message', "Could not add you to the game")
+            res.redirect("/user/dashboard/")
+            
+
+        }
 
     }
+
+
 })
 
 //Fetches the scoreboard

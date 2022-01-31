@@ -17,35 +17,41 @@
 
 	<div class="container-medium">
 		<form id="boxed" action="/user/dashboard/newgame/<%=tableid%>" method="POST">
-			<h3>Game on table <%= tableid%></h3>
+			<h3>Game on table <%= tableid%>
+			</h3>
 			<!--Yellow message for a unsuccessful function-->
-			<% if(message.length > 0) { %>
+			<% if(message.length> 0) { %>
 				<div class="alert alert-warning">
 					<%= message%>
 				</div>
 				<% }%>
 					<div>
-						<h2>Game ID: <%= locals.gameid%> </h2>
+						<h2>Game ID: <%= locals.gameid%>
+						</h2>
 						<h4>Give this ID to your opponent</h4>
 						<br>
 					</div>
 					<div>
-						<h3>Player 1: <%= locals.username1%></h3>
-						<h3>Player 2: <%= locals.username2%></h3>
+						<h3>Player 1: <%= locals.username1%>
+						</h3>
+						<h3>Player 2: <%= locals.username2%>
+						</h3>
 
 					</div>
-					
-		</form>
 
+		</form>
+		<div class="form-group mx-sm-3 mb-2">
 		<form class="form-inline" action="/game/cancel/<%=locals.gameid%>" method="POST">
 			<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
-			<div class="form-group mx-sm-3 mb-2">
-			</div>
+			
+			
 			<button type="submit" class="btn btn-danger">Cancel game</button>
-
 		</form>
-
-
+		<form class="form-inline" action="/game/cancel/<%=locals.gameid%>" method="POST">
+			<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+			
+			<button type="submit" class="btn btn-success">Start game</button>
+		</form>
 	</div>
 
 
