@@ -2,8 +2,7 @@
 const express = require('express'); //Web server
 const session = require('express-session') //Used to keep track of sessions
 const flash = require('express-flash');//Used for flash messages
-const methodOverride = require('method-override')
-const { pool } = require('./dbConfig');
+const methodOverride = require('method-override') //Used to override methods.
 const passport = require('passport') //Lib to keep track of logged in users
 const bcrypt = require('bcrypt'); //This is used to hash password and check hashes so we dont store the passwords in plain text
 require('dotenv').config(); //Used to store passwords. This should not be uploaded to github :) 
@@ -256,13 +255,13 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
         console.log(error)
     }
 
-    if (tableAvailability == true) {
+    if (tableAvailability == "available") {
         gameid = await db.CreateNewGame(userid, tableid) //Creating a game and returning the game id.
 
     }
 
     else {
-        req.flash('message', `Looks like the table is already in use. Please select another table.`)
+        req.flash('gamemessage', `Looks like the table is already in use. Please select another table.`)
         res.redirect("/user/dashboard")
     }
 
@@ -280,7 +279,6 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
             }
         }
     }
-
 
 })
 
@@ -364,7 +362,6 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
     if (players >= 2) {
         req.flash('gamemessage', "Looks like the game is full")
         res.redirect("/user/dashboard/")
-        console.log('Game is full')
     }
 
 

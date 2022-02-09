@@ -383,9 +383,19 @@ async function CancelNonStartedGame(gameid) {
 
 }
 
+async function GetTableIP(tableid) {
+    //This function will delete the game from the game and game_players table. This should only be done if game has not started
+    const query = {
+        text: 'SELECT ipaddress FROM tables WHERE tableid = $1;',
+        values: [tableid]
+    }
+    let result = await pool.query(query)
+    return result.rows[0].ipaddress
+}
+
 //Exporting all the functions so they can be access by server.js
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
-    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame, CancelNonStartedGame, GetGameIDForActiveGame
+    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame, CancelNonStartedGame, GetGameIDForActiveGame, GetTableIP
 }
