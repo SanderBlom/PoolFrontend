@@ -97,6 +97,7 @@ async function RegisterNewUser(username, firstname, lastname, email, password) {
 }
 
 async function CreateNewGame(tableid) {
+    console.log(tableid)
     //This function should generate a game and add the first player to the game.
     const timestamp = moment() //Creating timestamp in millisec
     const timestampFormated = timestamp.format('YYYY-MM-DD HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
@@ -128,7 +129,6 @@ async function AddPlayerToGame(gameid, userid) {
         values: [userid]
     }
     let fetchplayerid = await pool.query(query2) 
-    console.log(fetchplayerid.rows[0])
     var playerid = fetchplayerid.rows[0].playerid //Fetching playerid from the object
     let playerids = await FetchPlayerIDinGame(gameid)
 
@@ -142,13 +142,10 @@ async function AddPlayerToGame(gameid, userid) {
         var playerid2 = playerids[1]
     }
  
-
-
     //If gameid is valid then add user
     if (gamevalidation.rows.length == 1) {
 
         if (playerid1 == null) {
-            console.log('Jeg skal ikke trigges')
             //If no user is assigned to the game we can assign our fist user to the userid table.
             const query3 = {
                 text: 'INSERT INTO public.game_players(gameid, playerid) VALUES ($1, $2) RETURNING *;',
@@ -159,7 +156,6 @@ async function AddPlayerToGame(gameid, userid) {
             else { return false }
         }
         else {
-            console.log('Jeg skal trigges')
             //This should be triggered when the second player tries to join the game. 
             //The second player will be added to the playerid2 colum since player1 is already added to playerid
             const query4 = {
@@ -393,9 +389,24 @@ async function GetTableIP(tableid) {
     return result.rows[0].ipaddress
 }
 
+async function JoinGame(gameid, userid){
+    console.log('Gameid: ' + gameid + 'userid' + userid)
+    var playercount = await CheckPlayerCountInGame(gameid) //Returns and integer of players inside the game.
+    console.log(playercount)
+
+    if (playercount < 2) {
+        var result = await AddPlayerToGame(gameid, userid) //Adds the the playerid to the game 
+        return result
+    }
+    else{return false}
+    
+
+}
+
 //Exporting all the functions so they can be access by server.js
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
-    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame, CancelNonStartedGame, GetGameIDForActiveGame, GetTableIP
+    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame, CancelNonStartedGame, GetGameIDForActiveGame, GetTableIP,
+    JoinGame
 }

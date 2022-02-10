@@ -8,14 +8,16 @@ let db = require("./db.js") //Gives us access to the db class to access data in 
 async function CheckTableAvailability(tableid) {
   
   var ipaddress = await db.GetTableIP(tableid) //We get the ip address of the system by asking the database with the correct tableid
+  console.log(ipaddress)
+  let responseJson
 
-  const API = `https://${ipaddress}:7159/tableStatus`
+  const API = `https://${ipaddress}:7159/tablestatus`
   const agent = new https.Agent({
     rejectUnauthorized: false //This is enabled since we are using a self signed certificate. We should probably setup a letsencrypt sometime.
   })
 
   try {
-    let responseJson
+    
     const respons = await fetch(API, { agent })
     responseJson = await respons.json()
   } catch (error) {
@@ -23,12 +25,15 @@ async function CheckTableAvailability(tableid) {
   }
   
   if (responseJson.length <= 1) {
-    var status = responseJson[0].status
+    console.log(responseJson[0])
+    var status = responseJson[0]
     console.log('status' + status)
     return status
   }
 
-  else{return null}
+  else{
+    console.log('test')
+    return null}
 
 
 }

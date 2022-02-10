@@ -209,11 +209,11 @@ fieldset {
   padding: 10px;
   font-size: 15px;
 }
-#boxed button[type="submit2"] {
+#boxed button[type="submit-cancel"] {
   cursor: pointer;
-  width: 10%;
+  width: 100%;
   border: none;
-  background: #43A047;
+  background: #e20044;
   color: #FFF;
   margin: 0 0 5px;
   padding: 10px;

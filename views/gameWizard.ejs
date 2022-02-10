@@ -17,7 +17,6 @@
 
 	<div class="container-medium">
 		<form id="boxed" action="/user/dashboard/newgame/<%=tableid%>" method="POST">
-			<h3>Game on table <%= tableid%>
 			</h3>
 			<!--Yellow message for a unsuccessful function-->
 			<% if(message.length> 0) { %>
@@ -28,7 +27,8 @@
 					<div>
 						<h2>Game ID: <%= locals.gameid%>
 						</h2>
-						<h4>Give this ID to your opponent</h4>
+						<h4>Table: <%= tableid%>
+						</h4>
 						<br>
 					</div>
 					<div>
@@ -36,33 +36,30 @@
 						</h3>
 						<h3>Player 2: <%= locals.username2%>
 						</h3>
-
 					</div>
 
+					<div class="form-group mx-sm-3 mb-2">
+						<form class="form-inline" action="/game/cancel/<%=locals.gameid%>" method="POST">
+							<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+							
+							
+							<button  class="btn btn-danger" type="submit-cancel">Cancel game</button>
+						</form>
+						<form class="form-inline" action="/game/cancel/<%=locals.gameid%>" method="POST">
+							<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+							
+							<button class="btn btn-success" type="submit">Start game</button>
+						</form>
+					</div>
+				
 		</form>
-		<div class="form-group mx-sm-3 mb-2">
-		<form class="form-inline" action="/game/cancel/<%=locals.gameid%>" method="POST">
-			<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
-			
-			
-			<button type="submit" class="btn btn-danger">Cancel game</button>
-		</form>
-		<form class="form-inline" action="/game/cancel/<%=locals.gameid%>" method="POST">
-			<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
-			
-			<button type="submit" class="btn btn-success">Start game</button>
-		</form>
-	</div>
 
-
-
-
-	<div>
-		<!-- Henter fram footer fra partials mappen -->
-		<%- include('partials/footer') %>
-	</div>
-	<script src="/js/jquery.min.js"></script>
-	<script src="/js/bootstrap.min.js"></script>
+		<div>
+			<!-- Henter fram footer fra partials mappen -->
+			<%- include('partials/footer') %>
+		</div>
+		<script src="/js/jquery.min.js"></script>
+		<script src="/js/bootstrap.min.js"></script>
 </body>
 
 </html>

@@ -214,11 +214,11 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
     var gameid = null
     if (ingame == true) {
         gameid = await db.GetGameIDForActiveGame(userid)
-        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('message') })
+        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage') })
 
     }
     else {
-        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('message') })
+        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage') })
     }
 
 })
@@ -247,7 +247,6 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
     const userid = await req.user.userid
     var tableAvailability = false;
     var gameid = null
-    var playercount = null
 
     try {
         tableAvailability = await vision.CheckTableAvailability(tableid) //Checks the tableid the user has submited, and ask the visionsystem if the table is available 
@@ -256,30 +255,26 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
     }
 
     if (tableAvailability == "available") {
-        gameid = await db.CreateNewGame(userid, tableid) //Creating a game and returning the game id.
-
+        gameid = await db.CreateNewGame(tableid) //Creating a game and returning the game id.
     }
 
     else {
-        req.flash('gamemessage', `Looks like the table is already in use. Please select another table.`)
+        req.flash('gamemessage', `Looks like the table is already in use or does not exsist.`)
         res.redirect("/user/dashboard")
     }
 
     if (gameid != null) {
-        playercount = await db.CheckPlayerCountInGame(gameid)
-        if (playercount == 0 || playercount > 3) {
-            var result = await db.AddPlayerToGame(gameid, userid)
-            if (result == true) {
-                req.flash('message', `Created a new game! Please give your opponent the game ID so they can join.`)
-                res.redirect(`/game/${gameid}`)
-            }
-            else {
-                req.flash('message', `Could not create a new game. Please contact staff`)
-                res.redirect("/user/dashboard")
-            }
+        var result = await db.JoinGame(gameid, userid)
+        if (result == true) {
+            req.flash('message', `Created a new game! Please give your opponent the game ID so they can join.`)
+            res.redirect(`/game/${gameid}`)
+        }
+        else {
+            console.log('Game: ' + gameid + 'Joingame response: ' + result)
+            req.flash('gamemessage', `Could not create a new game. Please contact staff`)
+            res.redirect("/user/dashboard")
         }
     }
-
 })
 
 app.post("/game/cancel/:id", checkAuth, async (req, res) => {
@@ -287,9 +282,7 @@ app.post("/game/cancel/:id", checkAuth, async (req, res) => {
     //Here we should add some validation that only users in the game can cancel the game!!
     var gameid = req.params.id.trim();
     db.CancelNonStartedGame(gameid)
-
     res.redirect("/")
-
 })
 
 app.get("/game/:id", checkAuth, async (req, res) => {
@@ -331,7 +324,7 @@ app.get("/game/:id", checkAuth, async (req, res) => {
 app.get("/user/dashboard/newgame/:id", checkAuth, (req, res) => {
     var tableid = req.params.id.trim();
     console.log("test")
-    var player2Username //Defining username to incase the post request is not valid. 
+    var player2Username 
     try {
         if (req.user) {
             var userid = req.user.userid
@@ -352,10 +345,7 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
     var gameid = req.body.gameid
     var userid = req.user.userid
 
-    //Validate that the game exsist and has not been started or has ended
-
-    
-
+    //Validate that the game exsist and has not been started or ended
     var players = await db.CheckPlayerCountInGame(gameid)
     console.log('Amout of players in requested game:' + players)
 
@@ -372,11 +362,8 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
 
         }
         else {
-            console.log('Could not add you to the game')
-            req.flash('message', "Could not add you to the game")
+            req.flash('gamemessage', "Could not add you to the game. It's either full or does not exsist")
             res.redirect("/user/dashboard/")
-            
-
         }
 
     }
