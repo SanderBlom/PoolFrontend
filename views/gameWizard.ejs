@@ -16,7 +16,7 @@
 
 
 	<div class="container-medium">
-		<form id="boxed" action="/user/dashboard/newgame/<%=tableid%>" method="POST">
+		<form id="boxed">
 			</h3>
 			<!--Yellow message for a unsuccessful function-->
 			<% if(message.length> 0) { %>
@@ -42,9 +42,9 @@
 						<form class="form-inline" action="/game/cancel/<%=locals.gameid%>" method="POST">
 							<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
 							
-							
 							<button  class="btn btn-danger" type="submit-cancel">Cancel game</button>
 						</form>
+						
 						<form class="form-inline" action="/game/cancel/<%=locals.gameid%>" method="POST">
 							<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
 							

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Tables</title>
+	<link href="/css/main.css" rel="stylesheet">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+	<div>
+		<!-- Henter fram navbaren fra partials mappen -->
+		<%- include('partials/navbar') %>
+	</div>
+
+	<div class="container">
+		<table class="table">
+			<h3 class="center">Gamescore</h3>
+			<tbody id="boxed">
+				<tr>
+					<th>Player 1: <%= locals.player1Name %>
+					</th>
+					<th>Player 2: <%= locals.player2Name %>
+					</th>
+
+				</tr>
+				<tr>
+					<td>
+						<%= locals.player1Score %>
+					</td>
+					<td>
+						<%= locals.player2Score %>
+					</td>
+				</tr>
+		</table>
+	</div>
+	</div>
+	<div class="container">
+		<form id="boxed">
+			<div class="container2">
+				<h3 class="center">Latest ball positions</h3>
+				<!--Om vi sender status = true så blir bilde grønt-->
+				<% if(locals.constatus !=false) { %>
+					<img class="object-fit-cover" src="/img/pooltable.png" width="1000" height="600" alt="">
+					<!--Bilde er funnet på google-->
+					<!--Ellers blir bildet grået ut med css og teksten under blir plassert midt på billiardbordet-->
+					<% } else{ %>
+						<img class="img-inactive" src="/img/pooltable.png" width="1000" height="600" alt="">
+						<!--Bilde er funnet på google-->
+						<div class="centered-text">
+							<h3>Not connected to magic billiard API</h3>
+						</div>
+						<% } %>
+			</div>
+		</form>
+	</div>
+
+
+
+	<div>
+		<!-- Henter fram footer fra partials mappen -->
+		<%- include('partials/footer') %>
+	</div>
+
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+</body>
+
+</html>

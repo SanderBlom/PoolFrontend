@@ -10,7 +10,8 @@ var app = express();
 const PORT = 3000 //Ports that the server will listen to.
 app.set('view engine', 'ejs'); // Changing the view engine to ejs
 let vision = require("./VisionSystem")
-let db = require("./db.js")
+let db = require("./db.js") //Used to access the database functions
+
 
 
 const initializePassport = require("./passport-config");
@@ -434,6 +435,28 @@ app.get("/tournament/new", (req, res) => {
 
 })
 
+
+app.get("/testgame", (req, res) => {
+
+    var constatus = true;
+
+    try {
+        if (req.user) {
+            var userid = req.user.userid
+            var username = req.user.username
+            res.render('game', { message: req.flash('message'), username, user: userid, title: 'game', constatus }) //Renderes the index websites and passes title for the navbar
+        }
+        else {
+            var userid = null
+            var username = null
+            res.render('game', { message: req.flash('message'), username: username, user: userid, title: 'game', constatus }) //Renderes the index websites and passes title for the navbar
+        }
+
+    } catch (error) {
+        console.log('User is not probably not logged in' + error)
+    }
+
+})
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000
 app.listen(PORT, () => {
