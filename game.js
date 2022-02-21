@@ -69,10 +69,10 @@ function renderballs(wholeBalls, halfBalls) {
                 context.fillText(ball.number, ball.x, ball.y + 5);
             }
 
-            const buffer = canvas.toDataURL('image/png')
+            const buffer = canvas.toDataURL('image/png') //Generates a base64 string out of the image 
 
             if (buffer != null) {
-                resolve(buffer)
+                resolve(buffer) //Returns the base64 string if is't not null
             }
             else {
                 reject('Image could not be generated')

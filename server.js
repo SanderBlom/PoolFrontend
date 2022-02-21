@@ -11,7 +11,7 @@ const PORT = 3000 //Ports that the server will listen to.
 app.set('view engine', 'ejs'); // Changing the view engine to ejs
 let vision = require("./VisionSystem")
 let db = require("./db.js") //Used to access the database functions
-let draw = require("./draw.js") //Used to access the database functions
+let game = require("./game.js") //Used to access the database functions
 
 
 
@@ -466,7 +466,7 @@ app.get("/testgame", async (req, res) => {
 
     var userid = null
     var username = null
-    draw.renderballs(wholeBalls, halfBalls)
+    game.renderballs(wholeBalls, halfBalls)
     .then((image) => res.render('gametest', { message: req.flash('message'), username, user: userid, title: 'test', gameimage: image }))
    
 })
