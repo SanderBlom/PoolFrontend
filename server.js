@@ -443,26 +443,29 @@ app.get("/testgame", async (req, res) => {
 
     
     const wholeBalls = [
-        { tag: "yellow", x: 100, y: 80, color: "yellow", number: 1 },
-        { tag: "blue", x: 200, y: 400, color: "blue", number: 2 },
-        { tag: "red", x: 500, y: 500, color: "red", number: 3 },
-        { tag: "purple", x: 1000, y: 500, color: "purple", number: 4 },
-        { tag: "orange", x: 900, y: 200, color: "orange", number: 5 },
-        { tag: "green", x: 950, y: 300, color: "#007733", number: 6 },
-        { tag: "brown", x: 600, y: 333, color: "brown", number: 7 },
-        { tag: "black", x: 444, y: 513, color: "black", number: 8 },
-        { tag: "white", x: 1100, y: 80, color: "white", number: null }
+        { tag: "yellow", x: 0.01, y: 1, color: "yellow", number: 1 },
+        { tag: "blue", x: 0.4, y: 0.4, color: "blue", number: 2 },
+        { tag: "red", x: 0.3, y: 0.5, color: "red", number: 3 },
+        { tag: "purple", x: 0.6, y: 0.2, color: "purple", number: 4 },
+        { tag: "orange", x: 1, y: 0.6, color: "orange", number: 5 },
+        { tag: "green", x: 0.8, y: 0.5, color: "#007733", number: 6 },
+        { tag: "brown", x: 0.9, y: 0.8, color: "brown", number: 7 },
+        { tag: "black", x: 0.45, y: 0.28, color: "black", number: 8 },
+        { tag: "white", x: 0.01, y: 0.01, color: "white", number: null }
     ];
     
     const halfBalls = [
-        { tag: "yellow-half", x: 200, y: 80, color: "yellow", number: 9 },
-        { tag: "blue-half", x: 250, y: 400, color: "blue", number: 10 },
-        { tag: "red-half", x: 300, y: 500, color: "red", number: 11 },
-        { tag: "purple-half", x: 800, y: 500, color: "purple", number: 12 },
-        { tag: "orange-half", x: 950, y: 200, color: "orange", number: 13 },
-        { tag: "green-half", x: 900, y: 300, color: "#007733", number: 14 },
-        { tag: "brown-half", x: 650, y: 333, color: "brown", number: 15 }
+        { tag: "yellow-half", x: 0.5, y: 0.5, color: "yellow", number: 9 },
+        { tag: "blue-half", x: 0.3, y: 0.5, color: "blue", number: 10 },
+        { tag: "red-half", x: 1, y: 1, color: "red", number: 11 },
+        { tag: "purple-half", x: 0.8, y: 0.4, color: "purple", number: 12 },
+        { tag: "orange-half", x: 0.33, y: 0.55, color: "orange", number: 13 },
+        { tag: "green-half", x: 1, y: 0.01, color: "#007733", number: 14 },
+        { tag: "brown-half", x: 0.90, y: 1, color: "brown", number: 15 }
     ];
+
+
+
 
     var userid = null
     var username = null
