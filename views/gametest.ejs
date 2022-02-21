@@ -42,7 +42,7 @@
 				<h3 class="center">Latest ball positions</h3>
 				<!--Om vi sender status = true så blir bilde grønt-->
 				<% if(locals.constatus !=false) { %>
-					<img class="object-fit-cover" src="/img/pooltable.png" width="1000" height="600" alt="">
+					<img class="object-fit-cover" src="<%=locals.gameimage  %>" width="1200" height="600" alt="">
 					<!--Bilde er funnet på google-->
 					<!--Ellers blir bildet grået ut med css og teksten under blir plassert midt på billiardbordet-->
 					<% } else{ %>

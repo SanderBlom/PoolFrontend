@@ -11,6 +11,7 @@ const PORT = 3000 //Ports that the server will listen to.
 app.set('view engine', 'ejs'); // Changing the view engine to ejs
 let vision = require("./VisionSystem")
 let db = require("./db.js") //Used to access the database functions
+let draw = require("./draw.js") //Used to access the database functions
 
 
 
@@ -436,26 +437,38 @@ app.get("/tournament/new", (req, res) => {
 })
 
 
-app.get("/testgame", (req, res) => {
+app.get("/testgame", async (req, res) => {
 
-    var constatus = true;
+    var gameid = 2456
 
-    try {
-        if (req.user) {
-            var userid = req.user.userid
-            var username = req.user.username
-            res.render('game', { message: req.flash('message'), username, user: userid, title: 'game', constatus }) //Renderes the index websites and passes title for the navbar
-        }
-        else {
-            var userid = null
-            var username = null
-            res.render('game', { message: req.flash('message'), username: username, user: userid, title: 'game', constatus }) //Renderes the index websites and passes title for the navbar
-        }
+    
+    const wholeBalls = [
+        { tag: "yellow", x: 100, y: 80, color: "yellow", number: 1 },
+        { tag: "blue", x: 200, y: 400, color: "blue", number: 2 },
+        { tag: "red", x: 500, y: 500, color: "red", number: 3 },
+        { tag: "purple", x: 1000, y: 500, color: "purple", number: 4 },
+        { tag: "orange", x: 900, y: 200, color: "orange", number: 5 },
+        { tag: "green", x: 950, y: 300, color: "#007733", number: 6 },
+        { tag: "brown", x: 600, y: 333, color: "brown", number: 7 },
+        { tag: "black", x: 444, y: 513, color: "black", number: 8 },
+        { tag: "white", x: 1100, y: 80, color: "white", number: null }
+    ];
+    
+    const halfBalls = [
+        { tag: "yellow-half", x: 200, y: 80, color: "yellow", number: 9 },
+        { tag: "blue-half", x: 250, y: 400, color: "blue", number: 10 },
+        { tag: "red-half", x: 300, y: 500, color: "red", number: 11 },
+        { tag: "purple-half", x: 800, y: 500, color: "purple", number: 12 },
+        { tag: "orange-half", x: 950, y: 200, color: "orange", number: 13 },
+        { tag: "green-half", x: 900, y: 300, color: "#007733", number: 14 },
+        { tag: "brown-half", x: 650, y: 333, color: "brown", number: 15 }
+    ];
 
-    } catch (error) {
-        console.log('User is not probably not logged in' + error)
-    }
-
+    var userid = null
+    var username = null
+    draw.renderballs(wholeBalls, halfBalls)
+    .then((image) => res.render('gametest', { message: req.flash('message'), username, user: userid, title: 'test', gameimage: image }))
+   
 })
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000
