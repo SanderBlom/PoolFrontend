@@ -97,7 +97,6 @@ async function RegisterNewUser(username, firstname, lastname, email, password) {
 }
 
 async function CreateNewGame(tableid) {
-    console.log(tableid)
     //This function should generate a game and add the first player to the game.
     const timestamp = moment() //Creating timestamp in millisec
     const timestampFormated = timestamp.format('YYYY-MM-DD HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
@@ -108,6 +107,18 @@ async function CreateNewGame(tableid) {
     var gameid = resultgame.rows[0].gameid //Fetching the game ID from the response from the db
 
     return gameid //Returning the gameid 
+
+}
+
+async function StartGame(gameid){
+    const timestamp = moment() //Creating timestamp in millisec
+    const timestampFormated = timestamp.format('YYYY-MM-DD HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
+    const query = {
+        text: 'UPDATE public.game SET starttime = $1 WHERE gameid = $2 RETURNING *;',
+        values: [timestampFormated, gameid]
+    }
+    let result = await pool.query(query)
+    console.log(result.rows)
 
 }
 
@@ -195,7 +206,6 @@ async function GetGameIDForActiveGame(userid) {
     //This returns the gameid for an active game based on the userid inputed.
 
     playerid = await GetPlayerID(userid)
-    console.log('Dette er userid ' + userid)
     const query = {
         text: 'select gameid from game_players NATURAL JOIN game WHERE (endtime IS NULL) AND (playerid = $1 OR playerid2 = $1);',
         values: [playerid]
@@ -205,16 +215,12 @@ async function GetGameIDForActiveGame(userid) {
 
     if(result.rows[0].gameid != null){
         const gameid = result.rows[0].gameid
-        console.log('Dette er game id ' + gameid)
         return gameid
     }
     else {
         console.log('No game if found')
         return null
     }
-
-
-
 }
 
 async function GetPlayerID(userid) {
@@ -242,12 +248,14 @@ async function GetTableID(gameid) {
 
     if (result.rows.length == 0) {
         console.log('You fucked up')
-
+        return null
     }
     else {
         var tableid = result.rows[0].tableid
-        if (tableid > 0)
+        if (tableid > 0){
             return tableid
+        }
+            
         else {
             console.log('Table id is invalid')
         }
@@ -255,7 +263,6 @@ async function GetTableID(gameid) {
 }
 
 async function fetchUsernamesInGame(gameid) {
-    console.log('Fetch usernames (gameid)=  ' + gameid)
     const query = {
         text: 'SELECT playerid, playerid2 FROM public.game_players WHERE gameid = $1;',
         values: [gameid]
@@ -265,7 +272,6 @@ async function fetchUsernamesInGame(gameid) {
     var playerid2 = result.rows[0].playerid2
 
     var username1 = await GetUsernamesFromPlayerID(playerid1)
-    console.log('Username 1')
     var username2 = await GetUsernamesFromPlayerID(playerid2)
     let usernames = []
     usernames.push(username1, username2)
@@ -293,8 +299,6 @@ async function GetUsernamesFromPlayerID(playerid) {
             }
             let result = await pool.query(query) //Returns the amount of players in the game
             var username = result.rows[0].username
-            console.log('username' + username)
-
             if (username != null) {
                 return username
             }
@@ -318,7 +322,6 @@ async function IsUserInAGame(userid) {
         values: [userid]
     }
     let result = await pool.query(query) //Returns the playerid from player table
-    console.log(result.rows)
     var playerid = result.rows[0].playerid
 
     if (playerid != null) {
@@ -328,8 +331,8 @@ async function IsUserInAGame(userid) {
         }
         let result = await pool.query(query)
 
-
         if (result.rows.length == 1) { return true }
+        
         else { return false }
     }
     else { return null }
@@ -345,7 +348,6 @@ async function FetchPlayerIDinGame(gameid) {
         values: [gameid]
     }
     let result = await pool.query(query)
-    console.log(result.rows)
     let playerids = [] //Init array to store usernames
     if (result.rows.length == 0) {
         return null
@@ -353,14 +355,9 @@ async function FetchPlayerIDinGame(gameid) {
     else {
         var playerid = result.rows[0].playerid
         var playerid2 = result.rows[0].playerid2
-
         playerids.push(playerid, playerid2)
-
         return playerids
-
     }
-
-
 }
 
 async function CancelNonStartedGame(gameid) {
@@ -379,15 +376,34 @@ async function CancelNonStartedGame(gameid) {
 
 }
 
-async function GetTableIP(tableid) {
-    //This function will delete the game from the game and game_players table. This should only be done if game has not started
+async function GetTableIPWithTableID(tableid) {
+    //This function will return the ip address of the table
     const query = {
         text: 'SELECT ipaddress FROM tables WHERE tableid = $1;',
         values: [tableid]
     }
     let result = await pool.query(query)
-    return result.rows[0].ipaddress
+    if(result.rows.length > 0){
+        return result.rows[0].ipaddress
+    }
+    else {return null}
+    
 }
+
+async function GetTableIPWithGameID(gameid) {
+    //This function will return the ip address of the table
+    const query = {
+        text: 'SELECT tableid FROM game WHERE gameid = $1;',
+        values: [gameid]
+    }
+    let result = await pool.query(query)
+    if(result.rows.length > 0){
+        return result.rows[0].ipaddress
+    }
+    else {return null}
+    
+}
+
 
 async function JoinGame(gameid, userid){
     console.log('Gameid: ' + gameid + 'userid' + userid)
@@ -403,10 +419,24 @@ async function JoinGame(gameid, userid){
 
 }
 
+async function IsGameActive(gameid){
+    //This function returns true if the inputed gameid is an active game.
+    const query = {
+        text: 'SELECT gameid FROM public.game WHERE (endtime is null) AND (starttime is not null) AND gameid = $1;',
+        values: [gameid]
+    }
+    let result = await pool.query(query)
+
+    if(result.rows.length > 0){
+        return true
+    }
+    else{return false}
+}
+
 //Exporting all the functions so they can be access by server.js
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
-    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame, CancelNonStartedGame, GetGameIDForActiveGame, GetTableIP,
-    JoinGame
+    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame, CancelNonStartedGame, GetGameIDForActiveGame, GetTableIPWithTableID,
+    JoinGame, IsGameActive, StartGame
 }

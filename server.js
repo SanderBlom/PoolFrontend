@@ -31,7 +31,7 @@ app.use(
     })
 );
 // Funtion inside passport which initializes passport
-app.use(passport.initialize()); //Staring passport to keep track of our users
+app.use(passport.initialize()); //Starting passport to keep track of our users
 app.use(passport.session());// Store our variables to be persisted across the whole session. Works with app.use(Session) above
 app.use(flash()); //Used for to display flash messages to the frontend
 app.use(methodOverride('_method')) //used for triggering .delete functions with posts function in html
@@ -46,7 +46,7 @@ function checkAuth(req, res, next) {
         res.redirect("/login")
     }
 }
-
+//If user is logged in and tries to access login or register they will be redirected to their homepage
 function checkNotAuth(req, res, next) {
     if (req.user) {
         res.redirect("/user/dashboard")
@@ -174,38 +174,6 @@ app.post("/register", checkNotAuth, async function (req, res) {
 
 })
 
-app.get("/live/table/:id", (req, res) => {
-    var APIstatus = false
-    //Names of current players
-    var player1Name = "Sander"
-    var player2Name = "Amanuel"
-    //Current scores
-    var player1Score = 2
-    var player2Score = 4
-    try {
-        if (req.user) {
-            var userid = req.user.userid
-            var username = req.user.username
-            var firstname = req.user.firstname
-            var lastname = req.user.lastname
-            res.render('live-table', {
-                message: req.flash('message'), username, user: userid, title: 'live',
-                constatus: APIstatus, player1Name, player2Name, player1Score, player2Score
-            }) //Renderes the index websites and passes title for the navbar
-        }
-        else {
-            var userid = null
-            var username = null
-            res.render('live-table', {
-                message: req.flash('message'), username: username, user: userid, title: 'live',
-                constatus: APIstatus, player1Name, player2Name, player1Score, player2Score
-            }) //Renderes the index websites and passes title for the navbar
-        }
-    } catch (error) {
-        console.log('User is not probably not logged in' + error)
-    }
-})
-
 app.get("/user/dashboard", checkAuth, async (req, res) => {
     var userid = req.user.userid
     var username = req.user.username
@@ -256,7 +224,7 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
         console.log(error)
     }
 
-    if (tableAvailability == "available") {
+    if (tableAvailability == true) {
         gameid = await db.CreateNewGame(tableid) //Creating a game and returning the game id.
     }
 
@@ -284,16 +252,38 @@ app.post("/game/cancel/:id", checkAuth, async (req, res) => {
     //Here we should add some validation that only users in the game can cancel the game!!
     var gameid = req.params.id.trim();
     db.CancelNonStartedGame(gameid)
-    res.redirect("/")
+    req.flash('gamemessage', 'Canceled game with gameid:' + gameid)
+    res.redirect("/user/dashboard")
 })
 
+app.post("/game/start/:id", checkAuth, async (req, res) => {
+    var gameid = req.params.id.trim(); //Getting gameid from url
+    console.log('Cancle gameid' + gameid)
+    let { username1, username2 } = req.body //Getting usernames from post request.
+    var username = await req.user.username //Getting logged in users username
+    if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
+    {
+        try {
+            db.StartGame(gameid)
+        } catch (error) {
+            res.send(404, `Looks like something broke. <a href="/">Go back</a> ` + error)
+        }
+    }
+
+
+    res.redirect("/")
+})
 app.get("/game/:id", checkAuth, async (req, res) => {
     var gameid = req.params.id.trim();
+    var gamestartedstatus 
     var username1 = null
     var username2 = null
+    var username = req.user.username // fetching username to use in the navbar
     try {
         var tableid = await db.GetTableID(gameid)
         let usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
+        console.log('TableID: ' + tableid + ' usernames: ' + usernames)
+
         if (usernames == null) {
             username1 == null
             username2 == null
@@ -302,31 +292,45 @@ app.get("/game/:id", checkAuth, async (req, res) => {
             username1 = usernames[0]
             username2 = usernames[1]
         }
-
-        var username = req.user.username // fetching username to use in the navbar
-
-        if (username1 == null && username2 == null) {
-            res.redirect("/login")
-        }
-        if (req.user) {
-            var userid = req.user.userid
-            res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid })
-        }
-        else {
-            res.redirect("/login")
-        }
     }
-    catch (err) {
-        console.log(err)
+    catch (error) {
+        //res.send(404, `Looks like something broke. <a href="/">Go back</a> ` + error)
+        console.log('Error test ' + error)
+    }
+    if (username1 != null && username2 != null) {
+        gamestartedstatus = true 
+    }
+
+    if (username1 == null && username2 == null) {
+        console.log('User is not logged in or is not a member of the gameid')
         res.redirect("/login")
     }
+    if (req.user) {
+        if(username != username1 && username != username2){
+            //If user is not a part of the game they should be redirected 
+            res.sendStatus(404).send( `Looks like your not supposed to be here...<a href="/">Go back</a> `)
+    
+        }
+        else{
+            console.log('Dette er gamestatus' + gamestartedstatus)
+            var userid = req.user.userid
+            res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid, gamestatus: gamestartedstatus })
+
+        }
+        
+    }
+    else {
+        res.redirect("/login")
+    }
+
+
 })
 
 //This page loads after you have picked a table and the system has checked that its not in use.
 app.get("/user/dashboard/newgame/:id", checkAuth, (req, res) => {
     var tableid = req.params.id.trim();
     console.log("test")
-    var player2Username 
+    var player2Username
     try {
         if (req.user) {
             var userid = req.user.userid
@@ -435,25 +439,33 @@ app.get("/tournament/new", (req, res) => {
     }
 
 })
+app.post("/livegame", async (req, res) => {
+    //This just forwards the users search to the correct page.
+    let { gameid } = req.body
+    res.redirect(`/livegame/${gameid}`)
+})
 
+app.get("/livegame/:id", async (req, res) => {
+    var gameid = req.params.id.trim(); //Fetches game id from url
+    var userid = null
+    var username = null
+    var player1Score = null//This stores the int of how many balls the player has left on the table
+    var player2Score = null//This stores the int of how many balls the player has left on the table
+    var player1Username = null//This stores player1 name 
+    var player2Username = null//This stores player2 name 
 
-app.get("/testgame", async (req, res) => {
-
-    var gameid = 2456
-
-    
     const wholeBalls = [
+        { tag: "white", x: 0.01, y: 0.01, color: "white", number: 0 },
         { tag: "yellow", x: 0.01, y: 1, color: "yellow", number: 1 },
         { tag: "blue", x: 0.4, y: 0.4, color: "blue", number: 2 },
-        { tag: "red", x: 0.3, y: 0.5, color: "red", number: 3 },
+        { tag: "red", x: 0.76, y: 0.5, color: "red", number: 3 },
         { tag: "purple", x: 0.6, y: 0.2, color: "purple", number: 4 },
         { tag: "orange", x: 1, y: 0.6, color: "orange", number: 5 },
         { tag: "green", x: 0.8, y: 0.5, color: "#007733", number: 6 },
         { tag: "brown", x: 0.9, y: 0.8, color: "brown", number: 7 },
-        { tag: "black", x: 0.45, y: 0.28, color: "black", number: 8 },
-        { tag: "white", x: 0.01, y: 0.01, color: "white", number: null }
+        { tag: "black", x: 0.45, y: 0.28, color: "black", number: 8 }
     ];
-    
+
     const halfBalls = [
         { tag: "yellow-half", x: 0.5, y: 0.5, color: "yellow", number: 9 },
         { tag: "blue-half", x: 0.3, y: 0.5, color: "blue", number: 10 },
@@ -464,14 +476,42 @@ app.get("/testgame", async (req, res) => {
         { tag: "brown-half", x: 0.90, y: 1, color: "brown", number: 15 }
     ];
 
+    var gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
+
+    if (gamestatus == true) {
+        let usernames = await db.fetchUsernamesInGame(gameid)
+        player1Username = usernames[0]
+        player2Username = usernames[1]
+    }
+
+    try {
+        if (req.user) {
+            var userid = req.user.userid
+            var username = req.user.username
+            game.renderballs(wholeBalls, halfBalls)
+                .then((image) => res.render('game', {
+                    message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
+                    constatus: gamestatus, player1Name: player1Username, player2Name: player2Username
+                }))
+
+        }
+        else {
+            var userid = null
+            var username = null
+            game.renderballs(wholeBalls, halfBalls)
+                .then((image) => res.render('game', {
+                    message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
+                    constatus: gamestatus, player1Name: player1Username, player2Name: player2Username
+                }))
+
+        }
+
+    } catch (error) {
+        console.log('User is not probably not logged in' + error)
+    }
 
 
 
-    var userid = null
-    var username = null
-    game.renderballs(wholeBalls, halfBalls)
-    .then((image) => res.render('gametest', { message: req.flash('message'), username, user: userid, title: 'test', gameimage: image }))
-   
 })
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000

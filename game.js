@@ -8,6 +8,7 @@ function convertCoordinatesX(inputX) {
     var tableLength = 1114 - ballRadius
     var lengtdiff = 85//Diffrence in pixels between the edge of the table and the cloth where the balls exist.
     var x = (tableLength * inputX) + lengtdiff
+    x = Math.trunc(x)
     return x;
 }
 function convertCoordinatesY(inputY) {
@@ -15,14 +16,9 @@ function convertCoordinatesY(inputY) {
     var tableHeight = 569 - ballRadius
     var lengtdiff = 85//Diffrence in pixels between the edge of the table and the cloth where the balls exist.
     var y = (tableHeight * inputY) + lengtdiff
-    console.log(y)
-
+    y = Math.trunc(y) 
     return y;
 }
-
-
-
-
 
 function renderballs(wholeBalls, halfBalls) {
     return new Promise((resolve, reject) => {
@@ -44,7 +40,7 @@ function renderballs(wholeBalls, halfBalls) {
                 ball.y = convertCoordinatesY(ball.y)
 
                 //Making the main ball
-                if (ball.tag != "white") {
+                if (ball.number != 0) {
                     context2.beginPath();
                     context2.arc(ball.x, ball.y, 20, 0, Math.PI * 2, true)
                     context2.fillStyle = ball.color;

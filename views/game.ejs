@@ -15,23 +15,14 @@
 	</div>
 
 	<div class="container">
+		<h3 class="center">GameID: <%= locals.gameid %></h3>
 		<table class="table">
-			<h3 class="center">Gamescore</h3>
 			<tbody id="boxed">
 				<tr>
 					<th>Player 1: <%= locals.player1Name %>
 					</th>
 					<th>Player 2: <%= locals.player2Name %>
 					</th>
-
-				</tr>
-				<tr>
-					<td>
-						<%= locals.player1Score %>
-					</td>
-					<td>
-						<%= locals.player2Score %>
-					</td>
 				</tr>
 		</table>
 	</div>
@@ -41,15 +32,15 @@
 			<div class="container2">
 				<h3 class="center">Latest ball positions</h3>
 				<!--Om vi sender status = true så blir bilde grønt-->
-				<% if(locals.constatus !=false) { %>
+				<% if(locals.constatus == true) { %>
 					<img class="object-fit-cover" src="<%=locals.gameimage  %>" width="1280" height="731" alt="">
 					<!--Bilde er funnet på google-->
 					<!--Ellers blir bildet grået ut med css og teksten under blir plassert midt på billiardbordet-->
 					<% } else{ %>
-						<img class="img-inactive" src="/img/pooltable.png" width="1000" height="600" alt="">
+						<img class ="img-inactive" src="/img/pooltable.png" width="1280" height="731" alt="">
 						<!--Bilde er funnet på google-->
 						<div class="centered-text">
-							<h3>Not connected to magic billiard API</h3>
+							<h3>Could not find any active games with ID: <%=locals.gameid%></h3>
 						</div>
 						<% } %>
 			</div>
