@@ -392,13 +392,29 @@ async function GetTableIPWithTableID(tableid) {
 
 async function GetTableIPWithGameID(gameid) {
     //This function will return the ip address of the table
+    let tableid = null
+    var ip = null
     const query = {
         text: 'SELECT tableid FROM game WHERE gameid = $1;',
         values: [gameid]
     }
-    let result = await pool.query(query)
-    if(result.rows.length > 0){
-        return result.rows[0].ipaddress
+    let result = await pool.query(query)//Gets the tableid from the database 
+    tableid = result.rows[0].tableid
+    if(tableid =! null){
+        if(tableid == true){
+            tableid = 1
+        }
+        
+        const query2 = {
+            text: `SELECT ipaddress FROM tables WHERE tableid = $1;`,
+            values: [tableid]
+        }
+        let result2 = await pool.query(query2)//Using the tableid to fetch the ip address from the database
+        console.log(result2.rows[0].ipaddress)
+        if(result2.rows[0].ipaddress =! null){//If the address is not null we return the ip address. Else we return null
+            ip = result2.rows[0].ipaddress
+            return ip
+        }
     }
     else {return null}
     
@@ -438,5 +454,5 @@ module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
     fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame, CancelNonStartedGame, GetGameIDForActiveGame, GetTableIPWithTableID,
-    JoinGame, IsGameActive, StartGame
+    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID
 }

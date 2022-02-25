@@ -6,11 +6,10 @@ let db = require("./db.js") //Gives us access to the db class to access data in 
 
 
 async function CheckTableAvailability(tableid) {
-
-  return true
-  
-  /* var ipaddress = await db.GetTableIPWithTableID(tableid) //We get the ip address of the system by asking the database with the correct tableid
   let responseJson
+
+  var ipaddress = await db.GetTableIPWithTableID(tableid) //We get the ip address of the system by asking the database with the correct tableid
+
   const API = `https://${ipaddress}:7159/tablestatus`
   const agent = new https.Agent({
     rejectUnauthorized: false //This is enabled since we are using a self signed certificate. We should probably setup a letsencrypt sometime.
@@ -32,21 +31,30 @@ async function CheckTableAvailability(tableid) {
 
   else{
     console.log('test')
-    return null} */
+    return null} 
 }
 
-async function SendStart(gameid, playerid1, playerid2,username1, username2, timestamp){
+async function SendStart(gameid, playerid1, playerid2, username1, username2, timestamp){
 
-  const body = {gameid: gameid, playerid1: playerid1, playerid2: playerid2, timestamp: timestamp, 
-    username1: username1, username2: username2 };
+  let ipaddress = await db.GetTableIPWithGameID(gameid) 
+  if(ipaddress != nul){
+    const body = {gameid: gameid, playerid1: playerid1, playerid2: playerid2, timestamp: timestamp, 
+      username1: username1, username2: username2 };
+  
+  const response = await fetch(`https://${ipaddress}/startgame`, {
+    method: 'post',
+    body: JSON.stringify(body),
+    headers: {'Content-Type': 'application/json'}
+  });
+  const data = await response.json()
+  console.log(data)
+  if(data != null){
+    //
+    return true 
+  }
 
-const response = await fetch('https://httpbin.org/post', {
-	method: 'post',
-	body: JSON.stringify(body),
-	headers: {'Content-Type': 'application/json'}
-});
-const data = await response.json()
-
+  }
+  else {return false}
 
 }
 
@@ -55,6 +63,6 @@ const data = await response.json()
 
 //Exporting all the functions so they can be access by server.js
 module.exports = {
-  CheckTableAvailability
+  CheckTableAvailability, SendStart
 
 }
