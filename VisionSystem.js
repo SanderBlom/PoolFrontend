@@ -59,7 +59,37 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
 
 }
 
+var tableid2 = 1
 
+async function CheckTableAvailability(tableid2) {
+  let responseJson
+
+  var ipaddress = await db.GetTableIPWithTableID(tableid) //We get the ip address of the system by asking the database with the correct tableid
+
+  const API = `https://${ipaddress}:7159/tablestatus`
+  const agent = new https.Agent({
+    rejectUnauthorized: false //This is enabled since we are using a self signed certificate. We should probably setup a letsencrypt sometime.
+  })
+
+  try {
+    const respons = await fetch(API, { agent })
+    responseJson = await respons.json()
+    console.log('Response table status' + responseJson)
+  } catch (error) {
+    console.log(error)
+  }
+  
+  if (responseJson.length <= 1) {
+    console.log(responseJson[0])
+    var status = responseJson[0]
+    console.log('status' + status)
+    return status
+  }
+
+  else{
+    console.log('test')
+    return null} 
+}
 
 
 //Exporting all the functions so they can be access by server.js
@@ -67,3 +97,5 @@ module.exports = {
   CheckTableAvailability, SendStart
 
 }
+
+CheckTableAvailability(tableid2)
