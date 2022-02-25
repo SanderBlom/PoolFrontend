@@ -18,6 +18,7 @@ async function CheckTableAvailability(tableid) {
   try {
     const respons = await fetch(API, { agent })
     responseJson = await respons.json()
+    console.log('Response table status' + responseJson)
   } catch (error) {
     console.log(error)
   }
