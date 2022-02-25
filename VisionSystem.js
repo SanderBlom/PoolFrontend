@@ -64,7 +64,7 @@ var tableid2 = 1
 async function CheckTableAvailability(tableid2) {
   let responseJson
 
-  var ipaddress = await db.GetTableIPWithTableID(tableid) //We get the ip address of the system by asking the database with the correct tableid
+  var ipaddress = await db.GetTableIPWithTableID(tableid2) //We get the ip address of the system by asking the database with the correct tableid
 
   const API = `https://${ipaddress}:7159/tablestatus`
   const agent = new https.Agent({
