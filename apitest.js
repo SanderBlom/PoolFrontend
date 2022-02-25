@@ -28,3 +28,5 @@ async function CheckTableAvailability() {
       console.log('test')
       return null} 
   }
+
+  CheckTableAvailability()
