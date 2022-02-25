@@ -66,7 +66,7 @@ async function CheckTableAvailability(tableid2) {
 
   var ipaddress = await db.GetTableIPWithTableID(tableid2) //We get the ip address of the system by asking the database with the correct tableid
 
-  const API = `https://${ipaddress}:7159/tablestatus`
+  const API = `https://${ipaddress}:7132/checktable`
   const agent = new https.Agent({
     rejectUnauthorized: false //This is enabled since we are using a self signed certificate. We should probably setup a letsencrypt sometime.
   })
