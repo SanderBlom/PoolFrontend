@@ -3,6 +3,7 @@ const moment = require('moment'); //Used to generate timestamps
 const fetch = require("node-fetch") //Used to fetch data from http/https
 const https = require("https"); //Used to be able to work with self signed certificates 
 let db = require("./db.js") //Gives us access to the db class to access data in the database
+const { pool } = require("./dbConfig");
 
 
 async function CheckTableAvailability() {
@@ -34,4 +35,48 @@ async function CheckTableAvailability() {
       return null} 
   }
 
-  CheckTableAvailability()
+  //CheckTableAvailability()
+
+  async function genRand(min, max, decimalPlaces) {  
+    var rand = Math.random() < 0.5 ? ((1-Math.random()) * (max-min) + min) : (Math.random() * (max-min) + min);  // could be min or max or anything in between
+    var power = Math.pow(10, decimalPlaces);
+    return Math.floor(rand*power) / power;
+}
+  async function dummydata(){
+
+    var gameid = 56
+    var playerid1 = 4
+    var playerid2 = 5
+    var x
+    var y
+    var color
+    var playcount = 1
+    
+
+    for (let index = 0; index < 15; index++) {
+      x = await genRand(0, 1, 2)
+      y = await genRand(0, 1, 2)
+      color = await genRand(0, 15, 0)
+      const timestamp = await moment() //Creating timestamp in millisec
+      const timestampFormated = timestamp.format('YYYY-MM-DD HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
+      console.log('x= ' + x + ' y= ' + y + ' timestamp = ' + timestampFormated + ' index = ' + index)
+
+      const query = {
+        text: `INSERT INTO public.billiardball(
+          gameid, x_pos, y_pos, playerid, "timestamp", playcount, ballcoulor)
+          VALUES (56 , $1, $2, 4, $3, 2, $4);`,
+        values: [ x, y, timestampFormated, color]
+      }
+      await pool.query(query)
+
+      index++
+    }
+
+
+
+
+
+
+  }
+
+  dummydata()

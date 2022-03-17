@@ -311,6 +311,17 @@ async function GetUsernamesFromPlayerID(playerid) {
     }
 }
 
+async function latestBallPosition(gameid){
+    //This function will querry the database and fetch the latest ballpositions in a game.
+    const query = {
+        text: 'SELECT ballcoulor, x_pos, y_pos, playerid FROM billiardball WHERE playcount = (SELECT max(playcount) FROM billiardball) AND gameid = $1;',
+        values: [gameid]
+    }
+    let result = await pool.query(query)
+
+    return result.rows
+}
+
 async function IsUserInAGame(userid) {
     if (userid == null) {
         console.log('No user id provided. Returning null')
@@ -360,19 +371,26 @@ async function FetchPlayerIDinGame(gameid) {
     }
 }
 
-async function CancelNonStartedGame(gameid) {
+async function CancelGame(gameid) {
     //This function will delete the game from the game and game_players table. This should only be done if game has not started
     const query1 = {
         text: 'DELETE from game_players WHERE gameid = $1;',
         values: [gameid]
     }
     await pool.query(query1)
-    //After we have deleted fro the game_players table we can the delete the game from gameid
+
     const query2 = {
-        text: 'DELETE from game WHERE gameid = $1;',
+        text: 'DELETE from billiardball WHERE gameid = $1;',
         values: [gameid]
     }
     await pool.query(query2)
+
+    //After we have deleted fro the game_players table we can the delete the game from gameid
+    const query3 = {
+        text: 'DELETE from game WHERE gameid = $1;',
+        values: [gameid]
+    }
+    await pool.query(query3)
 
 }
 
@@ -453,6 +471,6 @@ async function IsGameActive(gameid){
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
-    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame, CancelNonStartedGame, GetGameIDForActiveGame, GetTableIPWithTableID,
-    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID
+    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
+    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition
 }

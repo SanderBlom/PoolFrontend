@@ -16,11 +16,37 @@ function convertCoordinatesY(inputY) {
     var tableHeight = 569 - ballRadius
     var lengtdiff = 85//Diffrence in pixels between the edge of the table and the cloth where the balls exist.
     var y = (tableHeight * inputY) + lengtdiff
-    y = Math.trunc(y) 
+    y = Math.trunc(y)
     return y;
 }
 
-function renderballs(wholeBalls, halfBalls) {
+function ballColor(color) {
+    console.log('THis is the color comming in: ' + color)
+    const colors = [
+        { color: "white", number: 0 },
+        { color: "yellow", number: 1 },
+        { color: "blue", number: 2 },
+        { color: "red", number: 3 },
+        { color: "purple", number: 4 },
+        { color: "orange", number: 5 },
+        { color: "#007733", number: 6 },
+        { color: "brown", number: 7 },
+        { color: "black", number: 8 },
+        { color: "yellow", number: 9 },
+        { color: "blue", number: 10 },
+        { color: "red", number: 11 },
+        { color: "purple", number: 12 },
+        { color: "orange", number: 13 },
+        { color: "#007733", number: 14 },
+        { color: "brown", number: 15 }
+    ];
+    const findcolor = colors.find((ball) => ball.number == color);
+    
+    return findcolor.color;
+}
+
+
+function renderballs(Balls) {
     return new Promise((resolve, reject) => {
         const billiardboard = createCanvas(1280, 731)
         const billiardballs = createCanvas(1280, 731)
@@ -33,14 +59,15 @@ function renderballs(wholeBalls, halfBalls) {
             //context2.globalCompositeOperation = 'source-over';
             context2.clearRect(0, 5, 1280, 731)
 
-            for (let ball of wholeBalls) {
-                //Converting the 0-1 cordinates 
+            for (let ball of Balls) {
+                ball.x = convertCoordinatesX(ball.x_pos) // Converting the coordinates to match the pooltable image
+                ball.y = convertCoordinatesY(ball.y_pos)// Converting the coordinates to match the pooltable image
+                ball.color = ballColor(ball.ballcoulor) // Fetching correct color depending on the balls number 
+                ball.number = ball.ballcoulor
 
-                ball.x = convertCoordinatesX(ball.x)
-                ball.y = convertCoordinatesY(ball.y)
-
-                //Making the main ball
-                if (ball.number != 0) {
+                    //Drawing the whole balls
+                if (ball.number > 0 && ball.number <= 8) {
+                    
                     context2.beginPath();
                     context2.arc(ball.x, ball.y, 20, 0, Math.PI * 2, true)
                     context2.fillStyle = ball.color;
@@ -57,39 +84,36 @@ function renderballs(wholeBalls, halfBalls) {
                     context2.textAlign = 'center';
                     context2.fillText(ball.number, ball.x, ball.y + 5);
                 }
-
-                else {
-
-                    //Making the white ball
+                    //Drawing the half balls
+                if (ball.number > 8) {
+                    
+                    context2.beginPath();
+                    context2.arc(ball.x, ball.y, 20, 0, Math.PI * 2, true)
+                    context2.fillStyle = ball.color;
+                    context2.fill();
+                    //Making inner white line
+                    context2.beginPath();
+                    context2.rect(ball.x - 19, ball.y - 10, 37.7, 7)//Top line
+                    context2.rect(ball.x - 20, ball.y - 5, 39.5, 10)//Middle line
+                    context2.rect(ball.x - 19, ball.y, 37.7, 7)//Lower line
+                    context2.fillStyle = "white";
+                    context2.fill();
+                    //Adding number
+                    context2 = billiardballs.getContext("2d");
+                    context2.font = '12pt Calibri';
+                    context2.fillStyle = 'black';
+                    context2.textAlign = 'center';
+                    context2.fillText(ball.number, ball.x, ball.y + 5);
+                }
+                    //Drawing the white ball
+                if(ball.number == 0) {
                     context2.beginPath();
                     context2.arc(ball.x, ball.y, 20, 0, Math.PI * 2, true)
                     context2.fillStyle = ball.color;
                     context2.fill();
                 }
             }
-            for (let ball of halfBalls) {
-                //Making the main ball
-                ball.x = convertCoordinatesX(ball.x)
-                ball.y = convertCoordinatesY(ball.y)
-                context2.beginPath();
-                context2.arc(ball.x, ball.y, 20, 0, Math.PI * 2, true)
-                context2.fillStyle = ball.color;
-                context2.fill();
-                //Making inner white line
-                context2.beginPath();
-                context2.rect(ball.x - 19, ball.y - 10, 37.7, 7)//Top line
-                context2.rect(ball.x - 20, ball.y - 5, 39.5, 10)//Middle line
-                context2.rect(ball.x - 19, ball.y, 37.7, 7)//Lower line
-                context2.fillStyle = "white";
-                context2.fill();
-                //Adding number
-                context2 = billiardballs.getContext("2d");
-                context2.font = '12pt Calibri';
-                context2.fillStyle = 'black';
-                context2.textAlign = 'center';
-                context2.fillText(ball.number, ball.x, ball.y + 5);
-            }
-            context.drawImage(billiardballs, 0, 0, 1280, 731)//draws the pooltable to the canvas
+            context.drawImage(billiardballs, 0, 0, 1280, 731)//Draws the pooltable image and the balls to the canvas
             const buffer = billiardboard.toDataURL('image/png') //Generates a base64 string out of the image 
 
             if (buffer != null) {

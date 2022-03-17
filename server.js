@@ -224,7 +224,7 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
         console.log(error)
     }
 
-    if (tableAvailability == true) {
+    if (tableAvailability == false) {
         gameid = await db.CreateNewGame(tableid) //Creating a game and returning the game id.
     }
 
@@ -240,7 +240,6 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
             res.redirect(`/game/${gameid}`)
         }
         else {
-            console.log('Game: ' + gameid + 'Joingame response: ' + result)
             req.flash('gamemessage', `Could not create a new game. Please contact staff`)
             res.redirect("/user/dashboard")
         }
@@ -251,7 +250,14 @@ app.post("/game/cancel/:id", checkAuth, async (req, res) => {
     //This should only be trigged while waiting for a game start.
     //Here we should add some validation that only users in the game can cancel the game!!
     var gameid = req.params.id.trim();
-    db.CancelNonStartedGame(gameid)
+    try {
+        db.CancelGame(gameid)
+    } catch (error) {
+        req.flash('gamemessage', 'Could not cancel your game with gameID:' + gameid)
+        res.redirect("/user/dashboard")
+    }
+    
+    
     req.flash('gamemessage', 'Canceled game with gameid:' + gameid)
     res.redirect("/user/dashboard")
 })
@@ -298,7 +304,8 @@ app.get("/game/:id", checkAuth, async (req, res) => {
         console.log('Error test ' + error)
     }
     if (username1 != null && username2 != null) {
-        gamestartedstatus = true 
+        gamestartedstatus = await db.IsGameActive(gameid)
+        
     }
 
     if (username1 == null && username2 == null) {
@@ -312,7 +319,6 @@ app.get("/game/:id", checkAuth, async (req, res) => {
     
         }
         else{
-            console.log('Dette er gamestatus' + gamestartedstatus)
             var userid = req.user.userid
             res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid, gamestatus: gamestartedstatus })
 
@@ -454,27 +460,10 @@ app.get("/livegame/:id", async (req, res) => {
     var player1Username = null//This stores player1 name 
     var player2Username = null//This stores player2 name 
 
-    const wholeBalls = [
-        { tag: "white", x: 0.01, y: 0.01, color: "white", number: 0 },
-        { tag: "yellow", x: 0.01, y: 1, color: "yellow", number: 1 },
-        { tag: "blue", x: 0.4, y: 0.4, color: "blue", number: 2 },
-        { tag: "red", x: 0.76, y: 0.5, color: "red", number: 3 },
-        { tag: "purple", x: 0.6, y: 0.2, color: "purple", number: 4 },
-        { tag: "orange", x: 1, y: 0.6, color: "orange", number: 5 },
-        { tag: "green", x: 0.8, y: 0.5, color: "#007733", number: 6 },
-        { tag: "brown", x: 0.9, y: 0.8, color: "brown", number: 7 },
-        { tag: "black", x: 0.45, y: 0.28, color: "black", number: 8 }
-    ];
+    let balls = await db.latestBallPosition(gameid)
 
-    const halfBalls = [
-        { tag: "yellow-half", x: 0.5, y: 0.5, color: "yellow", number: 9 },
-        { tag: "blue-half", x: 0.3, y: 0.5, color: "blue", number: 10 },
-        { tag: "red-half", x: 1, y: 1, color: "red", number: 11 },
-        { tag: "purple-half", x: 0.8, y: 0.4, color: "purple", number: 12 },
-        { tag: "orange-half", x: 0.33, y: 0.55, color: "orange", number: 13 },
-        { tag: "green-half", x: 1, y: 0.01, color: "#007733", number: 14 },
-        { tag: "brown-half", x: 0.90, y: 1, color: "brown", number: 15 }
-    ];
+
+    
 
     var gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
 
@@ -488,7 +477,7 @@ app.get("/livegame/:id", async (req, res) => {
         if (req.user) {
             var userid = req.user.userid
             var username = req.user.username
-            game.renderballs(wholeBalls, halfBalls)
+            game.renderballs(balls)
                 .then((image) => res.render('game', {
                     message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
                     constatus: gamestatus, player1Name: player1Username, player2Name: player2Username
@@ -498,7 +487,7 @@ app.get("/livegame/:id", async (req, res) => {
         else {
             var userid = null
             var username = null
-            game.renderballs(wholeBalls, halfBalls)
+            game.renderballs(balls)
                 .then((image) => res.render('game', {
                     message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
                     constatus: gamestatus, player1Name: player1Username, player2Name: player2Username
