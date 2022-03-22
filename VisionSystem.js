@@ -46,7 +46,7 @@ async function CheckTableAvailability(tableid) {
   }
   console.log('This is the table status: ' + responseJson)
 
-  if (responseJson.length > 0) {
+  if (responseJson == true) {
 
     return responseJson
   }
