@@ -19,7 +19,6 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
     headers: {'Content-Type': 'application/json'}
   });
   const data = await response.json()
-  console.log(data)
   if(data != null){
     
     return true 
@@ -27,7 +26,6 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
 
   }
   else {return false}
-
 }
 
 
@@ -36,17 +34,15 @@ async function CheckTableAvailability(tableid) {
 
   var ipaddress = await db.GetTableIPWithTableID(tableid) //We get the ip address of the system by asking the database with the correct tableid
 
-  const API = `https://${ipaddress}:7132/checktable`
-  const agent = new https.Agent({
-    rejectUnauthorized: false //This is enabled since we are using a self signed certificate. We should probably setup a letsencrypt sometime.
-  })
+  const API = `http://${ipaddress}/checktable`
+
 
   try {
     const response = await fetch(API, { 
       agent,
     timeout: '5000' })
     responseJson = await response.json()
-    console.log('Response table status' + responseJson)
+    
   } catch (error) {
     console.log(error)
   }
