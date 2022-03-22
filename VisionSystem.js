@@ -36,17 +36,15 @@ async function CheckTableAvailability(tableid) {
 
   const API = `http://${ipaddress}/checktable`
 
-
   try {
-    const response = await fetch(API, { 
-      agent,
+    const response = await fetch(API, {
     timeout: '5000' })
     responseJson = await response.json()
     
   } catch (error) {
     console.log(error)
   }
-  
+  console.log('This is the table status: ' + responseJson)
   if (responseJson.length > 0) {
     var status = responseJson[0]
     return status
