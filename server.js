@@ -219,7 +219,7 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
     var gameid = null
 
     try {
-        tableAvailability = await vision.CheckTableAvailability(tableid) //Checks the tableid the user has submited, and ask the visionsystem if the table is available 
+        tableAvailability = await vision.CheckTableAvailability(tableid)  //Checks the tableid the user has submited, and ask the visionsystem if the table is available 
     } catch (error) {
         console.log(error)
     }
