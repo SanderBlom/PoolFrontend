@@ -224,8 +224,6 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
         console.log(error)
     }
 
-    console.log('The table status is: ' + tableAvailability)
-
     if (tableAvailability == true) {
         gameid = await db.CreateNewGame(tableid) //Creating a game and returning the game id.
     }

@@ -13,85 +13,57 @@
 		<!-- Henter fram navbaren fra partials mappen -->
 		<%- include('partials/navbar') %>
 	</div>
-
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col-md-12">
-				<div class="jumbotron">
-					<!-- If user is logged in, the quick play button is active. -->
-					<% if (locals.user) { %>
-						<h2>
-							Welcome!
-						</h2>
-						<p>
-							To get started, use the quick play button. If you would like to start a tournament go to your profile page and press the start tournament button.
-						</p>
-						<br>
-						<p>
-							<form class="form-inline"> <!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
-								<div class="form-group mx-sm-3 mb-2">
-									<label for="tablecode" class="sr-only"></label>
-									<input type="number" class="form-control" id="tablecode" placeholder="Table ID">
-								  </div>
-								  <button type="submit" class="btn btn-primary mb-2">Quick game</button>
-							</form>
-						</p>
-						<!-- If user is NOT logged in, the quick play button is inactive. -->
-						  <% } else { %>
+	<div class="bg-image">
+		<br>
+		<br>
+		<br>
+		<!-- Background image -->
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="jumbotron">
+						<!-- If user is logged in, the quick game button is active. -->
+						<% if (locals.user) { %>
 							<h2>
 								Welcome!
 							</h2>
-							<p> Her må vi skrive en fornuftig melding som forklarer hva dette systemer er for noe og hvordan brukeren kan bruke det.</p>
-
 							<p>
-								If you would like to start a tournament or keep track of your games, login or register bellow!<br>
-								<a class="btn btn-primary btn-large" href="/login">Login</a>
+								To get started, use the quick game button.  <br> If you would like to start a tournament go to
+								your profile page and press the start tournament button.
 							</p>
-							
-							  <% } %>
-					
+							<br>
+							<p>
+							<form class="form-inline">
+								<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+								<div class="form-group mx-sm-3 mb-2">
+									<label for="tablecode" class="sr-only"></label>
+									<input type="number" class="form-control" id="tablecode" placeholder="Enter the table ID">
+								</div>
+								<button type="submit" class="btn btn-primary mb-2">Quick game</button>
+							</form>
+							<h6>The table ID can be found on a sticker on your table</h6>
+							</p>
+							<!-- If user is NOT logged in, the quick play button is inactive. -->
+							<% } else { %>
+								<h2>
+									Welcome!
+								</h2>
+								<p>To get started with tracking your games please login og sign up for an account!</p>
+
+								<p>
+									<a class="btn btn-primary btn-large" href="/login">Login</a>
+								</p>
+
+								<% } %>
+
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-4">
-				<h2>
-					Litt om oss
-				</h2>
-				<p>
-					Put inn noe tekst her 1 
-				</p>
-				<p>
-					<a class="btn" href="#">Quick game</a>
-				</p>
 
-			</div>
-			<div class="col-md-4">
-				<h2>
-					Litt om noe annet 
-				</h2>
-				<p>
-					:)
-				</p>
-				<p>
-					<a class="btn" href="#">View details »</a>
-				</p>
-			</div>
-			<div class="col-md-4">
-				<h2>
-					Litt info om x
-				</h2>
-				<p>
-					Enda mer tekst her
-				</p>
-				<p>
-					<a class="btn" href="#">View details »</a>
-				</p>
-			</div>
-		</div>
 	</div>
 
-	<div>
+
+	<div class="footer">
 		<!-- Henter fram footer fra partials mappen -->
 		<%- include('partials/footer') %>
 	</div>
