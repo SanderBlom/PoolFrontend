@@ -467,6 +467,20 @@ async function IsGameActive(gameid){
     else{return false}
 }
 
+async function Statsmonthly(gameid){
+    //This function returns true if the inputed gameid is an active game.
+    const query = {
+        text: 'SELECT gameid FROM public.game WHERE (endtime is null) AND (starttime is not null) AND gameid = $1;',
+        values: [gameid]
+    }
+    let result = await pool.query(query)
+
+    if(result.rows.length > 0){
+        return true
+    }
+    else{return false}
+}
+
 //Exporting all the functions so they can be access by server.js
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,

@@ -12,7 +12,7 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
     const body = {gameid: gameid, playerid1: playerid1, playerid2: playerid2, timestamp: timestamp, 
       username1: username1, username2: username2 };
   
-  const response = await fetch(`https://${ipaddress}/startgame`, {
+  const response = await fetch(`http://${ipaddress}/startgame`, {
     method: 'post',
     timeout: '5000',
     body: JSON.stringify(body),
@@ -27,6 +27,8 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
   }
   else {return false}
 }
+
+
 
 
 async function CheckTableAvailability(tableid) {
