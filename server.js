@@ -276,7 +276,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
     {
         try {
-            startgametime = await redb.StartGame(gameid) //Sets the start time in the database.
+            startgametime = await db.StartGame(gameid) //Sets the start time in the database.
         } catch (error) {
             res.send(404, `Looks like something broke. <a href="/">Go back</a> ` + error)
         }
