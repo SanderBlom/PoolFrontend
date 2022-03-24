@@ -288,7 +288,24 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
             console.log('Table status = ' + tablestatus)
             if(tablestatus == true){
                 console.log('Gameid= ' + gameid + ' pID 1= ' + playerid1 + ' pID 2=' + playerid2 + ' usrName1= ' + username1 + ' usrName2= ' + username2 + 'timestamp ' + startgametime)
-                vision.SendStart(gameid, playerid1, playerid2, username1, username2, startgametime) //Send data to API to check
+               let result = await  vision.SendStart(gameid, playerid1, playerid2, username1, username2, startgametime) //Send data to API to check
+
+               if(result == true){
+                   res.redirect(`/livegame/${gameid}`)
+               }
+
+               else{
+                req.flash('gamemessage', 'Error in response from API')
+                res.redirect("/user/dashboard")
+               }
+            }
+            if(tablestatus == false){
+                req.flash('gamemessage', 'Table is already in use.')
+                res.redirect("/user/dashboard")
+            }
+            else{
+                req.flash('gamemessage', 'No response from API')
+                res.redirect("/user/dashboard")
             }
 
         }
