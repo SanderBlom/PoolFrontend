@@ -416,7 +416,6 @@ async function GetTableIPWithTableID(tableid) {
 async function GetTableIPWithGameID(gameid) {
     //This function will return the ip address of the table
     let tableid = null
-    var ip = null
     const query = {
         text: 'SELECT tableid FROM game WHERE gameid = $1;',
         values: [gameid]
@@ -435,7 +434,7 @@ async function GetTableIPWithGameID(gameid) {
         let result2 = await pool.query(query2)//Using the tableid to fetch the ip address from the database
         console.log(result2.rows[0].ipaddress)
         if(result2.rows[0].ipaddress =! null){//If the address is not null we return the ip address. Else we return null
-            ip = result2.rows[0].ipaddress
+            let ip = result2.rows[0].ipaddress
             return ip
         }
     }
