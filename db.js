@@ -45,13 +45,13 @@ async function UpdaterUserDetails(firstname, lastname, email, id) {
     const query = `UPDATE public.users SET firstname = $1, lastname = $2, email = $3
 	WHERE userid = $4 RETURNING *;`
     const values = [`${firstname}`, `${lastname}`, `${email}`, id]
-   
+
     try {
         let result = await pool.query(query, values) //Updating the user data in the database
-        if (result.rows.length != 0){
+        if (result.rows.length != 0) {
             return true
         }
-        else{
+        else {
             return false
         }
     } catch (error) {
@@ -110,7 +110,7 @@ async function CreateNewGame(tableid) {
 
 }
 
-async function StartGame(gameid){
+async function StartGame(gameid) {
     const timestamp = moment() //Creating timestamp in millisec
     const timestampFormated = timestamp.format('YYYY-MM-DD HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
     const query = {
@@ -120,10 +120,10 @@ async function StartGame(gameid){
     let result = await pool.query(query)
     console.log(result.rows)
 
-    if(result.rows.length > 0){
-        return timestampFormated 
+    if (result.rows.length > 0) {
+        return timestampFormated
     }
-    else{return null}
+    else { return null }
 
 }
 
@@ -144,20 +144,20 @@ async function AddPlayerToGame(gameid, userid) {
         text: 'SELECT playerid FROM public.player WHERE userid = $1;',
         values: [userid]
     }
-    let fetchplayerid = await pool.query(query2) 
+    let fetchplayerid = await pool.query(query2)
     var playerid = fetchplayerid.rows[0].playerid //Fetching playerid from the object
     let playerids = await GetPlayerIDinGame(gameid)
 
 
-    if(playerids == null){
+    if (playerids == null) {
         var playerid1 = null
         var playerid2 = null
     }
-    else{
+    else {
         var playerid1 = playerids[0]
         var playerid2 = playerids[1]
     }
- 
+
     //If gameid is valid then add user
     if (gamevalidation.rows.length == 1) {
 
@@ -218,7 +218,7 @@ async function GetGameIDForActiveGame(userid) {
     let result = await pool.query(query)
 
 
-    if(result.rows[0].gameid != null){
+    if (result.rows[0].gameid != null) {
         const gameid = result.rows[0].gameid
         return gameid
     }
@@ -257,10 +257,10 @@ async function GetTableID(gameid) {
     }
     else {
         var tableid = result.rows[0].tableid
-        if (tableid > 0){
+        if (tableid > 0) {
             return tableid
         }
-            
+
         else {
             console.log('Table id is invalid')
         }
@@ -316,7 +316,7 @@ async function GetUsernamesFromPlayerID(playerid) {
     }
 }
 
-async function latestBallPosition(gameid){
+async function latestBallPosition(gameid) {
     //This function will querry the database and fetch the latest ballpositions in a game.
     const query = {
         text: 'SELECT ballcoulor, x_pos, y_pos, playerid FROM billiardball WHERE playcount = (SELECT max(playcount) FROM billiardball) AND gameid = $1;',
@@ -348,7 +348,7 @@ async function IsUserInAGame(userid) {
         let result = await pool.query(query)
 
         if (result.rows.length == 1) { return true }
-        
+
         else { return false }
     }
     else { return null }
@@ -406,11 +406,11 @@ async function GetTableIPWithTableID(tableid) {
         values: [tableid]
     }
     let result = await pool.query(query)
-    if(result.rows.length > 0){
+    if (result.rows.length > 0) {
         return result.rows[0].ipaddress
     }
-    else {return null}
-    
+    else { return null }
+
 }
 
 async function GetTableIPWithGameID(gameid) {
@@ -422,28 +422,27 @@ async function GetTableIPWithGameID(gameid) {
     }
     let result = await pool.query(query)//Gets the tableid from the database 
     tableid = result.rows[0].tableid
-    if(tableid =! null){
-        if(tableid == true){
+    if (tableid = ! null) {
+        if (tableid == true) {
             tableid = 1
         }
-        
+
         const query2 = {
             text: `SELECT ipaddress FROM tables WHERE tableid = $1;`,
             values: [tableid]
         }
         let result2 = await pool.query(query2)//Using the tableid to fetch the ip address from the database
         console.log(result2.rows[0].ipaddress)
-        if(result2.rows[0].ipaddress =! null){//If the address is not null we return the ip address. Else we return null
-            let ip = result2.rows[0].ipaddress
-            return ip
-        }
+        let ip = result2.rows[0].ipaddress
+        return ip
+
     }
-    else {return null}
-    
+    else { return null }
+
 }
 
 
-async function JoinGame(gameid, userid){
+async function JoinGame(gameid, userid) {
     console.log('Gameid: ' + gameid + 'userid' + userid)
     var playercount = await CheckPlayerCountInGame(gameid) //Returns and integer of players inside the game.
     console.log(playercount)
@@ -452,12 +451,12 @@ async function JoinGame(gameid, userid){
         var result = await AddPlayerToGame(gameid, userid) //Adds the the playerid to the game 
         return result
     }
-    else{return false}
-    
+    else { return false }
+
 
 }
 
-async function IsGameActive(gameid){
+async function IsGameActive(gameid) {
     //This function returns true if the inputed gameid is an active game.
     const query = {
         text: 'SELECT gameid FROM public.game WHERE (endtime is null) AND (starttime is not null) AND gameid = $1;',
@@ -465,13 +464,13 @@ async function IsGameActive(gameid){
     }
     let result = await pool.query(query)
 
-    if(result.rows.length > 0){
+    if (result.rows.length > 0) {
         return true
     }
-    else{return false}
+    else { return false }
 }
 
-async function Statsmonthly(gameid){
+async function Statsmonthly(gameid) {
     //This function returns true if the inputed gameid is an active game.
     const query = {
         text: 'SELECT gameid FROM public.game WHERE (endtime is null) AND (starttime is not null) AND gameid = $1;',
@@ -479,10 +478,10 @@ async function Statsmonthly(gameid){
     }
     let result = await pool.query(query)
 
-    if(result.rows.length > 0){
+    if (result.rows.length > 0) {
         return true
     }
-    else{return false}
+    else { return false }
 }
 
 //Exporting all the functions so they can be access by server.js
