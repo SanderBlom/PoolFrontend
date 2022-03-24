@@ -236,7 +236,7 @@ app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
     if (gameid != null) {
         var result = await db.JoinGame(gameid, userid)
         if (result == true) {
-            req.flash('message', `Created a new game! Please give your opponent the game ID so they can join.`)
+            req.flash('message', `Please give your opponent the game ID so they can join.`)
             res.redirect(`/game/${gameid}`)
         }
         else {
@@ -264,20 +264,43 @@ app.post("/game/cancel/:id", checkAuth, async (req, res) => {
 
 app.post("/game/start/:id", checkAuth, async (req, res) => {
     var gameid = req.params.id.trim(); //Getting gameid from url
-    console.log('Cancle gameid' + gameid)
     let { username1, username2 } = req.body //Getting usernames from post request.
     var username = await req.user.username //Getting logged in users username
+    var startgametime //Storing the timestamp for gamestart
+    var tablestatus //Stores the table status. This should be true if there are no active games on the table.
+    var tableid 
+
+    let playerids = await db.GetPlayerIDinGame(gameid)
+    var playerid1 = playerids[0]
+    var playerid2 = playerids[1]
     if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
     {
         try {
-            db.StartGame(gameid)
+            startgametime = await redb.StartGame(gameid) //Sets the start time in the database.
         } catch (error) {
             res.send(404, `Looks like something broke. <a href="/">Go back</a> ` + error)
         }
+
+        if(startgamestatus == true) {
+            tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
+            tablestatus = await vision.CheckTableAvailability(tableid)
+            if(tablestatus != true){
+                console.log('Gameid= ' + gameid + ' pID 1= ' + playerid1 + ' pID 2=' + playerid2 + ' usrName1= ' + username1 + ' usrName2= ' + username2 + 'timestamp ' + startgametime)
+                vision.SendStart(gameid,playerid1, playerid2, username1, username2,startgametime)
+            }
+
+        }
+
+    }
+
+    else{
+        //If the user trying to start the game is not one of the users that plays. Redirect him back to his profile.
+        req.flash('gamemessage', 'Looks like your not a part on the game...')
+        res.redirect("/user/dashboard")
     }
 
 
-    res.redirect("/")
+    
 })
 app.get("/game/:id", checkAuth, async (req, res) => {
     var gameid = req.params.id.trim();
