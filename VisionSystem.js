@@ -5,27 +5,29 @@ const https = require("https"); //Used to be able to work with self signed certi
 let db = require("./db.js") //Gives us access to the db class to access data in the database
 
 
-async function SendStart(gameid, playerid1, playerid2, username1, username2, timestamp){
-//This function will start send necessary data to start a game. Returns true or false depending if the game is started or not.
-  let ipaddress = await db.GetTableIPWithGameID(gameid) 
-  if(ipaddress != null){
-    const body = {gameid: gameid, playerid1: playerid1, playerid2: playerid2, timestamp: timestamp, 
-      username1: username1, username2: username2 };
-  
+async function SendStart(gameid, playerid1, playerid2, username1, username2, timestamp) {
+  //This function will start send necessary data to start a game. Returns true or false depending if the game is started or not.
+  let ipaddress = await db.GetTableIPWithGameID(gameid)
+  console.log('ip =' + ipaddress)
+  const body = {
+    gameid: gameid, playerid1: playerid1, playerid2: playerid2, timestamp: timestamp,
+    username1: username1, username2: username2
+  };
+
   const response = await fetch(`http://${ipaddress}/startgame`, {
     method: 'post',
     timeout: '5000',
     body: JSON.stringify(body),
-    headers: {'Content-Type': 'application/json'}
+    headers: { 'Content-Type': 'application/json' }
   });
   const data = await response.json()
-  if(data != null){
-    
-    return true 
+  if (data != null) {
+
+    return true
   }
 
-  }
-  else {return false}
+
+  else { return false }
 }
 
 
@@ -40,9 +42,10 @@ async function CheckTableAvailability(tableid) {
 
   try {
     const response = await fetch(API, {
-    timeout: '5000' })
+      timeout: '5000'
+    })
     responseJson = await response.json()
-    
+
   } catch (error) {
     console.log(error)
   }
@@ -53,9 +56,10 @@ async function CheckTableAvailability(tableid) {
     return responseJson
   }
 
-  else{
+  else {
 
-    return false} 
+    return false
+  }
 }
 
 
