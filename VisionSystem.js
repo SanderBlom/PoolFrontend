@@ -8,7 +8,7 @@ let db = require("./db.js") //Gives us access to the db class to access data in 
 async function SendStart(gameid, playerid1, playerid2, username1, username2, timestamp){
 //This function will start send necessary data to start a game. Returns true or false depending if the game is started or not.
   let ipaddress = await db.GetTableIPWithGameID(gameid) 
-  if(ipaddress != nul){
+  if(ipaddress != null){
     const body = {gameid: gameid, playerid1: playerid1, playerid2: playerid2, timestamp: timestamp, 
       username1: username1, username2: username2 };
   
