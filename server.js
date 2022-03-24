@@ -290,6 +290,10 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
             }
 
         }
+        else{
+            req.flash('gamemessage', 'Could not start the game...')
+            res.redirect("/user/dashboard")
+        }
 
     }
 
