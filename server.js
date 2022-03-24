@@ -281,7 +281,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
             res.send(404, `Looks like something broke. <a href="/">Go back</a> ` + error)
         }
 
-        if(startgamestatus == true) {
+        if(startgamestatus != null) {
             tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
             tablestatus = await vision.CheckTableAvailability(tableid)
             if(tablestatus != true){
