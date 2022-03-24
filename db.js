@@ -120,6 +120,11 @@ async function StartGame(gameid){
     let result = await pool.query(query)
     console.log(result.rows)
 
+    if(result.rows.length > 0){
+        return timestampFormated 
+    }
+    else{return null}
+
 }
 
 async function AddPlayerToGame(gameid, userid) {
@@ -141,7 +146,7 @@ async function AddPlayerToGame(gameid, userid) {
     }
     let fetchplayerid = await pool.query(query2) 
     var playerid = fetchplayerid.rows[0].playerid //Fetching playerid from the object
-    let playerids = await FetchPlayerIDinGame(gameid)
+    let playerids = await GetPlayerIDinGame(gameid)
 
 
     if(playerids == null){
@@ -349,7 +354,7 @@ async function IsUserInAGame(userid) {
     else { return null }
 }
 
-async function FetchPlayerIDinGame(gameid) {
+async function GetPlayerIDinGame(gameid) {
     if (gameid == null) {
         console.log('No game id provided')
         return null
@@ -485,6 +490,6 @@ async function Statsmonthly(gameid){
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
-    fetchUsernamesInGame, IsUserInAGame, FetchPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
+    fetchUsernamesInGame, IsUserInAGame, GetPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
     JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition
 }
