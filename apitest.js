@@ -99,7 +99,7 @@ async function CheckTableAvailability() {
   }
   
   const time = moment() //Creating timestamp in millisec
-  var timestamp = time.format('yyyy-MM-ddTHH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
+  var timestamp = time.format('YYYY-MM-DDTHH:mm:SS') //Formats data into valid ISO 8601 standard for postgres
   var gameid = 61
   var playerid1 = 5
   var playerid2 = 4
