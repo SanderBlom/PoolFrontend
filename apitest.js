@@ -94,7 +94,7 @@ async function CheckTableAvailability() {
       body: JSON.stringify(body),
       headers: { 'Content-Type': 'application/json' }
     });
-    console.log(body)
+    //console.log(body)
     console.log(response)
     if (response != null) {
   
