@@ -88,7 +88,7 @@ async function CheckTableAvailability() {
       username1: username1, username2: username2
     };
   
-    const response = await fetch(`http://${ipaddress}/startgame`, {
+    const response = await fetch(`http://${ipaddress}/gamestart`, {
       method: 'post',
       timeout: '5000',
       body: JSON.stringify(body),
