@@ -79,10 +79,6 @@ async function CheckTableAvailability() {
 
   }
 
-  const timestampunix = moment() //Creating timestamp in millisec
-  const timestamp = timestampunix.format('DD/MM/YYYY HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
-
-
   async function SendStart(gameid, playerid1, playerid2, username1, username2, timestamp) {
     //This function will start send necessary data to start a game. Returns true or false depending if the game is started or not.
     const ipaddress = await db.GetTableIPWithGameID(gameid)
@@ -109,8 +105,8 @@ async function CheckTableAvailability() {
     else { return false }
   }
   
-  const timestampunix = moment() //Creating timestamp in millisec
-  var timestamp = timestampunix.format('DD/MM/YYYY HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
+  const time = moment() //Creating timestamp in millisec
+  var timestamp = time.format('DD/MM/YYYY HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
   var gameid = 61
   var playerid1 = 5
   var playerid2 = 4
