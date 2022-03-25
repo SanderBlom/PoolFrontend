@@ -280,15 +280,16 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
         } catch (error) {
             res.send(404, `Looks like something broke. <a href="/">Go back</a> ` + error)
         }
-
+        let timestamp = startgametime.format('DD/MM/YYYY HH:mm:ss')
+        console.log('New timestamp' + timestamp)
         if(startgametime != null) {
             console.log('This is working')
             tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
             tablestatus = await vision.CheckTableAvailability(tableid)
             console.log('Table status = ' + tablestatus)
             if(tablestatus == true){
-                console.log('Gameid= ' + gameid + ' pID 1= ' + playerid1 + ' pID 2=' + playerid2 + ' usrName1= ' + username1 + ' usrName2= ' + username2 + 'timestamp ' + startgametime)
-               let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, startgametime) //Send data to API to check
+                console.log('Gameid= ' + gameid + ' pID 1= ' + playerid1 + ' pID 2=' + playerid2 + ' usrName1= ' + username1 + ' usrName2= ' + username2 + 'timestamp ' + timestamp)
+               let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestamp) //Send data to API to check
 
                if(result == true){
                    res.redirect(`/livegame/${gameid}`)
