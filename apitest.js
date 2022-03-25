@@ -96,13 +96,6 @@ async function CheckTableAvailability() {
     });
     //console.log(body)
     console.log(response)
-    if (response != null) {
-  
-      return true
-    }
-  
-  
-    else { return false }
   }
   
   const time = moment() //Creating timestamp in millisec
