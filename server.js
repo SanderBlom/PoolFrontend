@@ -276,7 +276,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
     {
         const timestamp = moment() //Creating timestamp in millisec
-        const timestampFormated = timestamp.format('DD/MM/YYYY HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
+        const timestampFormated = timestamp.format('DD/MM/YYYY HH:mm:ss') //Formats data into a format that matches with C# Timestamp format 
         tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
         tablestatus = await vision.CheckTableAvailability(tableid) //Checks that noby has started a game on the same table.
         console.log('Table status = ' + tablestatus)
