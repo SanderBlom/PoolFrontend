@@ -95,7 +95,7 @@ async function CheckTableAvailability() {
       headers: { 'Content-Type': 'application/json' }
     });
     //console.log(body)
-    console.log(response)
+    console.log(response[0].status)
   }
   
   const time = moment() //Creating timestamp in millisec
