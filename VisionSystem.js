@@ -5,6 +5,7 @@ const https = require("https"); //Used to be able to work with self signed certi
 let db = require("./db.js") //Gives us access to the db class to access data in the database
 
 
+
 async function SendStart(gameid, playerid1, playerid2, username1, username2, timestamp) {
   //This function will start send necessary data to start a game. Returns true or false depending if the game is started or not.
   const ipaddress = await db.GetTableIPWithGameID(gameid)
@@ -14,21 +15,15 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
     username1: username1, username2: username2
   };
 
-  const response = await fetch(`http://${ipaddress}/startgame`, {
+  const response = await fetch(`http://${ipaddress}/gamestart`, {
     method: 'post',
     timeout: '5000',
     body: JSON.stringify(body),
     headers: { 'Content-Type': 'application/json' }
   });
-  console.log(body)
-  console.log(response)
-  if (response != null) {
 
-    return true
-  }
+  return response.status //200 = ok, 400 = wrong format and 404 = no response
 
-
-  else { return false }
 }
 
 

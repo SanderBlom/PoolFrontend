@@ -276,30 +276,35 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
     {
         const timestamp = moment() //Creating timestamp in millisec
-        const timestampFormated = timestamp.format('DD/MM/YYYY HH:mm:ss') //Formats data into a format that matches with C# Timestamp format 
+        const timestampFormated = timestamp.format('YYYY-MM-DDTHH:mm:SS') //Formats data into a format that matches with C# Timestamp format.
         tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
-        tablestatus = await vision.CheckTableAvailability(tableid) //Checks that noby has started a game on the same table.
-        console.log('Table status = ' + tablestatus)
+        tablestatus = await vision.CheckTableAvailability(tableid) //Checks that nobody has started a game on the same table.
         if (tablestatus == true) {
             //console.log('Gameid= ' + gameid + ' pID 1= ' + playerid1 + ' pID 2=' + playerid2 + ' usrName1= ' + username1 + ' usrName2= ' + username2 + 'timestamp ' + timestampFormated)
-            let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check
+            let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check. Returns HTTP status codes
 
-            if (result == true) {
-                res.redirect(`/livegame/${gameid}`)
+            if (result == 200) {
+                var creategame = await db.StartGame(gameid)
+                if(creategame == true){
+                    res.redirect(`/livegame/${gameid}`)
+                }
+                else{
+                    //We should add a stop game API call here.
+                    req.flash('gamemessage', 'Could not start the game')
+                    res.redirect("/user/dashboard")
+                }
+                
             }
             else {
-                console.log('Dont active')
                 req.flash('gamemessage', 'Error in response from API')
                 res.redirect("/user/dashboard")
             }
         }
         else if (tablestatus == false) {
-            console.log('Dont active')
             req.flash('gamemessage', 'Table is already in use.')
             res.redirect("/user/dashboard")
         }
         else {
-            console.log('Dont active')
             req.flash('gamemessage', 'No response from API')
             res.redirect("/user/dashboard")
         }
