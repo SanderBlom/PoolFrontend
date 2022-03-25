@@ -281,7 +281,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
             res.send(404, `Looks like something broke. <a href="/">Go back</a> ` + error)
         }
         const timestamp = moment() //Creating timestamp in millisec
-        const timestampFormated = timestamp.format('DD/MM/YYYY HH:mm:ss')
+        const timestampFormated = timestamp.format('DD/MM/YYYY HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
         if(startgametime != null) {
             console.log('This is working')
             tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
