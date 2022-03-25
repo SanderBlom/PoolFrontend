@@ -256,8 +256,8 @@ app.post("/game/cancel/:id", checkAuth, async (req, res) => {
         req.flash('gamemessage', 'Could not cancel your game with gameID:' + gameid)
         res.redirect("/user/dashboard")
     }
-    
-    
+
+
     req.flash('gamemessage', 'Canceled game with gameid:' + gameid)
     res.redirect("/user/dashboard")
 })
@@ -266,62 +266,45 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     var gameid = req.params.id.trim(); //Getting gameid from url
     let { username1, username2 } = req.body //Getting usernames from post request.
     var username = await req.user.username //Getting logged in users username
-    var startgametime //Storing the timestamp for gamestart
     var tablestatus //Stores the table status. This should be true if there are no active games on the table.
-    var tableid 
+    var tableid
 
     let playerids = await db.GetPlayerIDinGame(gameid)
     var playerid1 = playerids[0]
     var playerid2 = playerids[1]
     if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
     {
-        try {
-            startgametime = await db.StartGame(gameid) //Sets the start time in the database.
-        } catch (error) {
-            res.send(404, `Looks like something broke. <a href="/">Go back</a> ` + error)
-        }
         const timestamp = moment() //Creating timestamp in millisec
         const timestampFormated = timestamp.format('DD/MM/YYYY HH:mm:ss') //Formats data into valid ISO 8601 standard for postgres
-        if(startgametime != null) {
-            console.log('This is working')
-            tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
-            tablestatus = await vision.CheckTableAvailability(tableid)
-            console.log('Table status = ' + tablestatus)
-            if(tablestatus == true){
-                console.log('Gameid= ' + gameid + ' pID 1= ' + playerid1 + ' pID 2=' + playerid2 + ' usrName1= ' + username1 + ' usrName2= ' + username2 + 'timestamp ' + timestampFormated)
-               let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check
+        tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
+        tablestatus = await vision.CheckTableAvailability(tableid) //Checks that noby has started a game on the same table.
+        console.log('Table status = ' + tablestatus)
+        if (tablestatus == true) {
+            console.log('Gameid= ' + gameid + ' pID 1= ' + playerid1 + ' pID 2=' + playerid2 + ' usrName1= ' + username1 + ' usrName2= ' + username2 + 'timestamp ' + timestampFormated)
+            let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check
 
-               if(result == true){
-                   res.redirect(`/livegame/${gameid}`)
-               }
-
-               else{
+            if (result == true) {
+                res.redirect(`/livegame/${gameid}`)
+            }
+            else {
                 console.log('Dont active')
                 req.flash('gamemessage', 'Error in response from API')
                 res.redirect("/user/dashboard")
-               }
             }
-            else if(tablestatus == false){
-                console.log('Dont active')
-                req.flash('gamemessage', 'Table is already in use.')
-                res.redirect("/user/dashboard")
-            }
-            else{
-                console.log('Dont active')
-                req.flash('gamemessage', 'No response from API')
-                res.redirect("/user/dashboard")
-            }
-
         }
-        else{
+        else if (tablestatus == false) {
             console.log('Dont active')
-            req.flash('gamemessage', 'Could not start the game...')
+            req.flash('gamemessage', 'Table is already in use.')
             res.redirect("/user/dashboard")
         }
-
+        else {
+            console.log('Dont active')
+            req.flash('gamemessage', 'No response from API')
+            res.redirect("/user/dashboard")
+        }
     }
 
-    else{
+    else {
         //If the user trying to start the game is not one of the users that plays. Redirect him back to his profile.
         console.log('Dont active')
         req.flash('gamemessage', 'Looks like your not a part on the game...')
@@ -329,11 +312,11 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     }
 
 
-    
+
 })
 app.get("/game/:id", checkAuth, async (req, res) => {
     var gameid = req.params.id.trim();
-    var gamestartedstatus 
+    var gamestartedstatus
     var username1 = null
     var username2 = null
     var username = req.user.username // fetching username to use in the navbar
@@ -357,7 +340,7 @@ app.get("/game/:id", checkAuth, async (req, res) => {
     }
     if (username1 != null && username2 != null) {
         gamestartedstatus = await db.IsGameActive(gameid)
-        
+
     }
 
     if (username1 == null && username2 == null) {
@@ -365,17 +348,17 @@ app.get("/game/:id", checkAuth, async (req, res) => {
         res.redirect("/login")
     }
     if (req.user) {
-        if(username != username1 && username != username2){
+        if (username != username1 && username != username2) {
             //If user is not a part of the game they should be redirected 
-            res.sendStatus(404).send( `Looks like your not supposed to be here...<a href="/">Go back</a> `)
-    
+            res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
+
         }
-        else{
+        else {
             var userid = req.user.userid
             res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid, gamestatus: gamestartedstatus })
 
         }
-        
+
     }
     else {
         res.redirect("/login")
@@ -515,7 +498,7 @@ app.get("/livegame/:id", async (req, res) => {
     let balls = await db.latestBallPosition(gameid)
 
 
-    
+
 
     var gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
 

@@ -121,9 +121,9 @@ async function StartGame(gameid) {
     console.log(result.rows)
 
     if (result.rows.length > 0) {
-        return timestampFormated
+        return true
     }
-    else { return null }
+    else { return false }
 
 }
 
