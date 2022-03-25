@@ -20,6 +20,7 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
     body: JSON.stringify(body),
     headers: { 'Content-Type': 'application/json' }
   });
+  console.log(body)
   const data = await response.json()
   if (data != null) {
 
