@@ -22,7 +22,7 @@ async function CheckTableAvailability(tableid) {
   } catch (error) {
     console.log(error)
   }
-  console.log('This is the table status: ' + responseJson.status)
+  console.log('This is the table status: ' + responseJson)
 
   if (responseJson == true) {
 

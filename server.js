@@ -213,7 +213,7 @@ app.post("/user/dashboard", checkAuth, async (req, res) => {
 })
 
 //This is taking the submitted tableid from users dashboard and checks if the table is free. If its free user will be redirected the new game page.
-app.post("/user/dashboard/newgame", checkAuth, async (req, res) => {
+app.post("/game/create", checkAuth, async (req, res) => {
     const tableid = await req.body.tableid.trim()
     const userid = await req.user.userid
     var tableAvailability = false;
@@ -374,7 +374,7 @@ app.get("/game/:id", checkAuth, async (req, res) => {
 })
 
 //This page loads after you have picked a table and the system has checked that its not in use.
-app.get("/user/dashboard/newgame/:id", checkAuth, (req, res) => {
+app.get("/game/create/:id", checkAuth, (req, res) => {
     var tableid = req.params.id.trim();
     console.log("test")
     var player2Username
