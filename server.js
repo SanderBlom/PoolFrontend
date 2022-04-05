@@ -503,51 +503,60 @@ app.get("/livegame/:id", async (req, res) => {
     var gameid = req.params.id.trim(); //Fetches game id from url
     var userid = null
     var username = null
-    var player1Score = null//This stores the int of how many balls the player has left on the table
-    var player2Score = null//This stores the int of how many balls the player has left on the table
+    //var player1Score = null//This stores the int of how many balls the player has left on the table
+    //var player2Score = null//This stores the int of how many balls the player has left on the table
     var player1Username = null//This stores player1 name 
     var player2Username = null//This stores player2 name 
-
-    let balls = await db.latestBallPosition(gameid)
-
-
-
-    var time = await db.TimePlayed(gameid) //Fetches minutes since game started
-    var gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
-
-    if (gamestatus == true) {
-        let usernames = await db.fetchUsernamesInGame(gameid)
-        player1Username = usernames[0]
-        player2Username = usernames[1]
-    }
-
+    let error
+    let time
+    let balls
+    let usernames
     try {
-        if (req.user) {
-            var userid = req.user.userid
-            var username = req.user.username
-            game.renderballs(balls)
-                .then((image) => res.render('game', {
-                    message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
-                    constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time
-                }))
+        balls = await db.latestBallPosition(gameid) //Fetches last ball positions from the database
+        time = await db.TimePlayed(gameid) //Fetches minutes since game started
+        gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
 
-        }
-        else {
-            var userid = null
-            var username = null
-            game.renderballs(balls)
-                .then((image) => res.render('game', {
-                    message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
-                    constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time
-                }))
-
+        if (gamestatus == true) {
+            usernames = await db.fetchUsernamesInGame(gameid)
+            player1Username = usernames[0]
+            player2Username = usernames[1]
         }
 
     } catch (error) {
-        console.log('User is not probably not logged in' + error)
+        
+    }
+    if(error){
+        res.send(400, `Problems fetching gamedata. <a href="/">Go back</a> ` + error)
     }
 
-
+    else{
+        try {
+            if (req.user) {
+                var userid = req.user.userid
+                var username = req.user.username
+                game.renderballs(balls)
+                    .then((image) => res.render('game', {
+                        message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
+                        constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time
+                    }))
+    
+            }
+            else {
+                var userid = null
+                var username = null
+                game.renderballs(balls)
+                    .then((image) => res.render('game', {
+                        message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
+                        constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time
+                    }))
+    
+            }
+    
+        } catch (error) {
+            console.log('User is not probably not logged in' + error)
+        }
+    }
+    
 
 })
 //-------------------------------------Start server-------------------------------------//
