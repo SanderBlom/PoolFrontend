@@ -118,8 +118,6 @@ async function StartGame(gameid) {
         values: [timestampFormated, gameid]
     }
     let result = await pool.query(query)
-    console.log(result.rows)
-
     if (result.rows.length > 0) {
         return true
     }
@@ -252,7 +250,6 @@ async function GetTableID(gameid) {
     let result = await pool.query(query) //Fetches tableid from game table
 
     if (result.rows.length == 0) {
-        console.log('You fucked up')
         return null
     }
     else {
@@ -307,7 +304,7 @@ async function GetUsernamesFromPlayerID(playerid) {
             if (username != null) {
                 return username
             }
-            else { console.log('No username found') }
+            else { console.log('No username found'); return null}
         }
         else {
             console.log('Something broke....')
@@ -432,7 +429,6 @@ async function GetTableIPWithGameID(gameid) {
             values: [tableid]
         }
         let result2 = await pool.query(query2)//Using the tableid to fetch the ip address from the database
-        console.log(result2.rows[0].ipaddress)
         let ip = result2.rows[0].ipaddress
         return ip
 
@@ -443,7 +439,6 @@ async function GetTableIPWithGameID(gameid) {
 
 
 async function JoinGame(gameid, userid) {
-    console.log('Gameid: ' + gameid + 'userid' + userid)
     var playercount = await CheckPlayerCountInGame(gameid) //Returns and integer of players inside the game.
     console.log(playercount)
 
@@ -480,9 +475,7 @@ async function TimePlayed(gameid) {
 
     let minutes = result.rows[0].now.minutes
     let hours = result.rows[0].now.hours
-    
-    let time = (hours * 60) + minutes
-    console.log(time)
+    let time = (hours * 60) + minutes // Make the time in minutes instead of hours + minutes
     return time
 
 }

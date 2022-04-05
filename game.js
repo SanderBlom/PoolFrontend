@@ -21,7 +21,6 @@ function convertCoordinatesY(inputY) {
 }
 
 function ballColor(color) {
-    console.log('THis is the color comming in: ' + color)
     const colors = [
         { color: "white", number: 0 },
         { color: "yellow", number: 1 },
