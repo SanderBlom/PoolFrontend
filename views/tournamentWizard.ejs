@@ -13,16 +13,56 @@
 		<!-- Henter fram navbaren fra partials mappen -->
 		<%- include('partials/navbar') %>
 	</div>
-	
-	<h4>Her må vi lage en fin wizard. Sjekk google for bootstrap wizards eksempler</h4>
 
-
-				<div>
-					<!-- Henter fram footer fra partials mappen -->
-					<%- include('partials/footer') %>
+	<div class="container-medium">
+		<form id="boxed" action="/tournament/new" method="POST">
+			<h3>Create new tournament</h3>
+			<!--Yellow message for a unsuccessful function-->
+			<% if(messages.error) { %>
+				<div class="alert alert-warning">
+					<%= messages.error%>
 				</div>
-				<script src="/js/jquery.min.js"></script>
-				<script src="/js/bootstrap.min.js"></script>
+				<% }%>
+
+			<div id="inputs">
+				<label for="add">Add players</label>
+				<button type="button" id="add" name="button" class="btn btn-primary mb-2" onclick="newuser()">+</button> <br>
+				<!-- <input type="text" id="username" name="username" placeholder="Username" required /> -->
+			</div>
+			<br />
+			<div>
+				<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Create tournament</button>
+			</div>
+			<h4>The tournament mode is limited to 20 players </h4>
+		</form>
+		
+	</div>
+
+
+	<div>
+		<!-- Henter fram footer fra partials mappen -->
+		<%- include('partials/footer') %>
+	</div>
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script>
+		//ref: https://stackoverflow.com/questions/14853779/adding-input-elements-dynamically-to-form
+
+		var id = 1;
+		var newuser = function () {
+			var parent = document.getElementById('inputs');
+			var label = document.createElement("label")
+			var field = document.createElement("input")
+			label.id = "username" + id;
+			label.innerHTML = "Player" + id;
+			field.className = "form-control"
+			field.style = "display:block;"
+			field.id = "username" + id;
+			parent.appendChild(label);//Legger til label over textboks
+			parent.appendChild(field); //Legger til textbox for username input
+			id += 1;
+		}
+	</script>
 </body>
 
 </html>

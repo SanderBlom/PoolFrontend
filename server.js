@@ -467,7 +467,7 @@ app.get("/rules", (req, res) => {
 
 })
 
-app.get("/tournament/new", (req, res) => {
+app.get("/tournament/new", checkAuth, (req, res) => {
 
     try {
         if (req.user) {
@@ -484,6 +484,13 @@ app.get("/tournament/new", (req, res) => {
     } catch (error) {
         console.log('User is not probably not logged in' + error)
     }
+
+})
+
+app.post("/tournament/new", checkAuth, (req, res) => {
+
+    let test = req.body.
+    console.log(test)
 
 })
 app.post("/livegame", async (req, res) => {
@@ -505,7 +512,7 @@ app.get("/livegame/:id", async (req, res) => {
 
 
 
-
+    var time = await db.TimePlayed(gameid) //Fetches minutes since game started
     var gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
 
     if (gamestatus == true) {
@@ -521,7 +528,7 @@ app.get("/livegame/:id", async (req, res) => {
             game.renderballs(balls)
                 .then((image) => res.render('game', {
                     message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
-                    constatus: gamestatus, player1Name: player1Username, player2Name: player2Username
+                    constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time
                 }))
 
         }
@@ -531,7 +538,7 @@ app.get("/livegame/:id", async (req, res) => {
             game.renderballs(balls)
                 .then((image) => res.render('game', {
                     message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
-                    constatus: gamestatus, player1Name: player1Username, player2Name: player2Username
+                    constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time
                 }))
 
         }

@@ -101,10 +101,10 @@ async function CheckTableAvailability(tableid) {
   
   const time = moment() //Creating timestamp in millisec
   var timestamp = time.format('YYYY-MM-DDTHH:mm:SS') //Formats data into valid ISO 8601 standard for postgres
-  var gameid = 61
-  var playerid1 = 5
-  var playerid2 = 4
-  var username1 = 'test2'
-  var username2 = 'test'
+  var gameid = 62
+  var playerid1 = 4
+  var playerid2 = 5
+  var username1 = 'test'
+  var username2 = 'test2'
 
   //SendStart(gameid, playerid1, playerid2, username1, username2,timestamp)

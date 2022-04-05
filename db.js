@@ -470,6 +470,23 @@ async function IsGameActive(gameid) {
     else { return false }
 }
 
+async function TimePlayed(gameid) {
+    //This will return a timestamp object with hours, minutes and seconds from the database. We then format the data and return an integer representing the time in minutes 
+    const query = {
+        text: 'SELECT current_timestamp - starttime as now FROM game  WHERE (endtime is null) AND (starttime is not null) AND gameid = $1;',
+        values: [gameid]
+    }
+    let result = await pool.query(query)
+
+    let minutes = result.rows[0].now.minutes
+    let hours = result.rows[0].now.hours
+    
+    let time = (hours * 60) + minutes
+    console.log(time)
+    return time
+
+}
+
 async function Statsmonthly(gameid) {
     //This function returns true if the inputed gameid is an active game.
     const query = {
@@ -489,5 +506,5 @@ module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
     fetchUsernamesInGame, IsUserInAGame, GetPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
-    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition
+    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed
 }
