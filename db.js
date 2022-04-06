@@ -516,14 +516,14 @@ async function AvrageStatsWL() {
 
     for (let index = 0; index < result.rows.length; index++) {
          let indexWL = (result.rows[index].wins / result.rows[index].losses)
-         WL.push(indexWL)
+         WL.push(indexWL) //Adding each WL to the array
     }
     for (let index = 0; index < WL.length; index++) {
-        sum += WL[index];
+        sum += WL[index]; //Summing all the values in the array
         
     }
-    let averageWL = sum / WL.length
-    return averageWL
+    let averageWL = sum / WL.length //Calculates the average win / loss ratio
+    return averageWL 
 }
 
 async function Statsmonthly(gameid) {
