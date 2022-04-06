@@ -272,6 +272,12 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     var tablestatus //Stores the table status. This should be true if there are no active games on the table.
     var tableid
 
+    //Checks that the game is not allready started
+    let gamestatus = await db.IsGameActive(gameid)
+    if(gamestatus == true){
+        res.redirect(`/livegame/${gameid}`)
+    }
+    else{
     let playerids = await db.GetPlayerIDinGame(gameid)
     var playerid1 = playerids[0]
     var playerid2 = playerids[1]
@@ -320,6 +326,9 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     }
 
 
+
+    }
+    
 
 })
 app.get("/game/:id", checkAuth, async (req, res) => {
