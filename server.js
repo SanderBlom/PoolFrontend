@@ -541,10 +541,12 @@ app.get("/livegame/:id", async (req, res) => {
     let time
     let balls
     let usernames
+    let gamestatus
     try {
         balls = await db.latestBallPosition(gameid) //Fetches last ball positions from the database
         time = await db.TimePlayed(gameid) //Fetches minutes since game started
         gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
+        console.log('Gamestatus: ' + gamestatus)
 
         if (gamestatus == true) {
             usernames = await db.fetchUsernamesInGame(gameid)
