@@ -472,10 +472,17 @@ async function TimePlayed(gameid) {
         values: [gameid]
     }
     let result = await pool.query(query)
-
+    let time = null
     let minutes = result.rows[0].now.minutes
     let hours = result.rows[0].now.hours
-    let time = (hours * 60) + minutes // Make the time in minutes instead of hours + minutes
+
+    if(hours >= 1){
+        time = (hours * 60) + minutes // Make the time in minutes instead of hours + minutes
+    }
+    else{
+        time = minutes // Make the time in minutes instead of hours + minutes
+    }
+    
     return time
 
 }
