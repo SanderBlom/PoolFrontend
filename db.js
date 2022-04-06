@@ -465,6 +465,7 @@ async function IsGameActive(gameid) {
     else { return false }
 }
 
+
 async function TimePlayed(gameid) {
     //This will return a timestamp object with hours, minutes and seconds from the database. We then format the data and return an integer representing the time in minutes 
     const query = {
