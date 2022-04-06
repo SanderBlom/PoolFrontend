@@ -25,34 +25,34 @@
 			</div>
 			<div class="col-md-4">
 				<div class="jumbotron">
-					<% if (locals.ingame == false) { %>
+					<% if (locals.ingame==false) { %>
 						<form class="form-inline" action="/game/create" method="POST">
-							<% if(locals.gamemessage.length > 0) { %>
+							<% if(locals.gamemessage.length> 0) { %>
 								<div class="alert alert-warning">
 									<%= gamemessage %>
 								</div>
 								<% }%>
-							<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
-							<h6>You can find the table ID printed on your table.</h6>
-							<div class="form-group mx-sm-3 mb-2">
-								<input type="number" class="form-control" name="tableid" id="tableid" placeholder="Table ID"
-									required>
-							</div>
-							<button type="submit" class="btn btn-primary mb-2">Create a game</button>
-	
+									<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+									<h6>You can find the table ID printed on your table.</h6>
+									<div class="form-group mx-sm-3 mb-2">
+										<input type="number" class="form-control" name="tableid" id="tableid"
+											placeholder="Table ID" required>
+									</div>
+									<button type="submit" class="btn btn-primary mb-2">Create a game</button>
+
 						</form>
-	
+
 						<form class="form-inline" action="/user/dashboard/joingame/" method="POST">
 							<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
 							<div class="form-group mx-sm-3 mb-2">
-								<input type="number" class="form-control" name="gameid" id="gameid" placeholder="Game ID"
-									required>
+								<input type="number" class="form-control" name="gameid" id="gameid"
+									placeholder="Game ID" required>
 							</div>
 							<button type="submit" class="btn btn-primary mb-2">Join game</button>
 						</form>
 
-						  <% } else { %>
-							
+						<% } else { %>
+
 							<form class="form-inline" action="/game/<%=locals.gameid%>" method="GET">
 								<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
 								<div class="form-group mx-sm-3 mb-2">
@@ -62,13 +62,13 @@
 							</form>
 							<br>
 							<br>
-							<% if(locals.gamemessage.length > 0) { %>
+							<% if(locals.gamemessage.length> 0) { %>
 								<div class="alert alert-warning">
 									<%= gamemessage %>
 								</div>
 								<% }%>
-		
-							  <% } %>
+
+									<% } %>
 
 				</div>
 			</div>
@@ -93,11 +93,26 @@
 			</div>
 			<div class="col-md-4">
 				<h2>
+					Your win/loss ratio
+				</h2>
+				<p>
+				<div>
+					<canvas id="overall"></canvas>
+				</div>
+
+
+				</p>
+				<p>
+
+				</p>
+			</div>
+			<div class="col-md-4">
+				<h2>
 					Edit user details
 				</h2>
 				<p>
 				<form id="boxed" method="POST">
-					<% if(locals.message.length > 0) { %>
+					<% if(locals.message.length> 0) { %>
 						<div class="alert alert-success">
 							<%= message %>
 						</div>
@@ -121,21 +136,6 @@
 				</form>
 				</p>
 			</div>
-			<div class="col-md-4">
-				<h2>
-					Your win/loss ratio
-				</h2>
-				<p>
-				<div>
-					<canvas id="overall"></canvas>
-				</div>
-
-
-				</p>
-				<p>
-
-				</p>
-			</div>
 		</div>
 	</div>
 	<div>
@@ -151,15 +151,14 @@
 			data: {
 				labels: ['Your W/L ratio', 'Average W/L ratio'],
 				datasets: [{
-					label: 'x',
 					data: ["<%=locals.personalWL%>", "<%=locals.averagewl%>"],
 					backgroundColor: [
 						'rgba(255, 99, 132, 0.2)',
-						'rgba(153, 102, 255, 0.2)'
+						'rgba(153, 102, 255, 0.2)',
 					],
 					borderColor: [
 						'rgba(255, 99, 132, 1)',
-						'rgba(153, 102, 255, 1)'
+						'rgba(153, 102, 255, 1)',
 					],
 					borderWidth: 1
 				}]
@@ -167,10 +166,17 @@
 			options: {
 				indexAxis: 'y',
 				scales: {
-					y: {
-						beginAtZero: true
-					}
-				}
+					xAxes: [{
+						display: false
+					}],
+					yAxes: [{
+						display: false
+					}],
+				},
+				tooltips: {
+					enabled: false,
+				},
+				plugins: { legend: { display: false }, } //Removes the dataset label
 			}
 		});
 
@@ -208,7 +214,8 @@
 					y: {
 						beginAtZero: true
 					}
-				}
+				},
+				plugins: { legend: { display: false }, } //Removes the dataset label
 			}
 		});
 
