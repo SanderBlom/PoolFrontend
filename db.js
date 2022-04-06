@@ -487,8 +487,47 @@ async function TimePlayed(gameid) {
 
 }
 
+async function PersonalStatsWL(userid) {
+    
+    const query = {
+        text: 'SELECT * FROM public.player WHERE userid = $1;',
+        values: [userid]
+    }
+    let result = await pool.query(query)
+    let wl
+
+    if (result.rows[0].losses == 0) {
+        wl = 0
+        return wl
+    }
+    else { 
+        wl = result.rows[0].wins / result.rows[0].losses
+        return wl  }
+}
+
+async function AvrageStatsWL() {
+    //This functions returns the average win/loss ratio for all the players 
+    const query = {
+        text: 'SELECT wins, losses FROM player WHERE losses > 0'
+    }
+    let result = await pool.query(query)
+    let WL = []
+    let sum = 0
+
+    for (let index = 0; index < result.rows.length; index++) {
+         let indexWL = (result.rows[index].wins / result.rows[index].losses)
+         WL.push(indexWL)
+    }
+    for (let index = 0; index < WL.length; index++) {
+        sum += WL[index];
+        
+    }
+    let averageWL = sum / WL.length
+    return averageWL
+}
+
 async function Statsmonthly(gameid) {
-    //This function returns true if the inputed gameid is an active game.
+    
     const query = {
         text: 'SELECT gameid FROM public.game WHERE (endtime is null) AND (starttime is not null) AND gameid = $1;',
         values: [gameid]
@@ -506,5 +545,5 @@ module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
     fetchUsernamesInGame, IsUserInAGame, GetPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
-    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed
+    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL
 }

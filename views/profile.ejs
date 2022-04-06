@@ -123,7 +123,7 @@
 			</div>
 			<div class="col-md-4">
 				<h2>
-					Your stats
+					Your win/loss ratio
 				</h2>
 				<p>
 				<div>
@@ -149,10 +149,10 @@
 		const lastgameCharts = new Chart(ctx, {
 			type: 'bar',
 			data: {
-				labels: ['Fastest loss', 'Other users', 'Fastest win', 'Other users', 'Average playtime', 'Other users'],
+				labels: ['Your W/L ratio', 'Average W/L ratio'],
 				datasets: [{
 					label: 'x',
-					data: [12, 19, 3, 5, 2, 3],
+					data: ["<%=locals.personalWL%>", "<%=locals.averagewl%>"],
 					backgroundColor: [
 						'rgba(255, 99, 132, 0.2)',
 						'rgba(255, 99, 132, 0.2)',
