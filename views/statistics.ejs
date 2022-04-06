@@ -24,14 +24,16 @@
 						<canvas id="myChart" width="400" height="200"></canvas>
 						
 						<script>
+							var arrayLabel = <%- JSON.stringify(locals.Usernames); %>;
+							var arrayData = <%- JSON.stringify(locals.WL); %>;
 							const ctx = document.getElementById('myChart').getContext('2d');
 							const myChart = new Chart(ctx, {
 								type: 'bar',
 								data: {
-									labels: <%- JSON.stringify(locals.Usernames); %>,
+									labels: arrayLabel,
 									datasets: [{
 										label: 'Highest win/loss ratio this month',
-										data: <%- JSON.stringify(locals.WL); %>,
+										data: arrayData,
 										backgroundColor: [
 											'rgba(255, 99, 132, 0.2)',
 											'rgba(54, 162, 235, 0.2)',

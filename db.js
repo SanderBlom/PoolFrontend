@@ -542,7 +542,6 @@ async function Top25WL(gameid) {
          indexWL = indexWL.toFixed(2) // rounds up to two decimals
          result.rows[index].wl = indexWL //Adds new property to store calculated W/L
          result.rows[index].username = await GetUsername(result.rows[index].userid) //Adds new property to store username
-
     }
     return result.rows
 

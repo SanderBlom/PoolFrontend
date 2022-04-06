@@ -432,27 +432,42 @@ app.get("/scoreboard", async (req, res) => {
     let usernames = []
     let wl = []
     for (let index = 0; index < data.length; index++) {
+        //Adds usernames and win/loss ratio to two arrays
         var name = data[index].username
         //name = await addQuotes(name)
         usernames.push(name)
         wl.push(data[index].wl)
 
-
     }
-    //usernames = usernames.toString()
-    console.log(usernames)
+    //Sorting array from high to low
+    //Adding the data into one array
+    var Data = [];
+    for (let i = 0; i < usernames.length; ++i) {
+        Data.push({
+            label: usernames[i],
+            data: wl[i]
+        });
+    }
+
+    // Sorting the array based on the W/L ratio (dec)
+    Data.sort((a, b) => parseFloat(b.data) - parseFloat(a.data));
+
+    //Splittng the data into two arrays.
+    var sortedLabels = Data.map(e => e.label);
+    var sortedData = Data.map(e => e.data);
+    
     try {
         if (req.user) {
             var userid = req.user.userid
             var username = req.user.username
             var firstname = req.user.firstname
             var lastname = req.user.lastname
-            res.render('statistics', { message: req.flash('message'), username, user: userid, title: 'scoreboard', Usernames: usernames, WL: wl }) //Renderes the statistic websites and passes title for the navbar
+            res.render('statistics', { message: req.flash('message'), username, user: userid, title: 'scoreboard', Usernames: sortedLabels, WL: sortedData }) //Renderes the statistic websites and passes title for the navbar
         }
         else {
             var userid = null
             var username = null
-            res.render('statistics', { message: req.flash('message'), username: username, user: userid, title: 'scoreboard', Usernames: usernames, WL: wl }) //Renderes the statistic websites and passes title for the navbar
+            res.render('statistics', { message: req.flash('message'), username: username, user: userid, title: 'scoreboard', Usernames: sortedLabels, WL: sortedData }) //Renderes the statistic websites and passes title for the navbar
         }
 
     } catch (error) {
