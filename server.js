@@ -6,7 +6,7 @@ const methodOverride = require('method-override') //Used to override methods.
 const passport = require('passport') //Lib to keep track of logged in users
 const bcrypt = require('bcrypt'); //This is used to hash password and check hashes so we dont store the passwords in plain text
 require('dotenv').config(); //Used to store passwords. This should not be uploaded to github :) 
-var app = express(); 
+var app = express();
 const PORT = 3000 //Ports that the server will listen to.
 app.set('view engine', 'ejs'); // Changing the view engine to ejs
 let vision = require("./VisionSystem")
@@ -187,11 +187,11 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
     var gameid = null
     if (ingame == true) {
         gameid = await db.GetGameIDForActiveGame(userid)
-        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'), personalWL: wl, averagewl:avwl })
+        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'), personalWL: wl, averagewl: avwl })
 
     }
     else {
-        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'), personalWL: wl, averagewl:avwl })
+        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'), personalWL: wl, averagewl: avwl })
     }
 
 })
@@ -287,15 +287,15 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
 
             if (result == 200) {
                 var creategame = await db.StartGame(gameid)
-                if(creategame == true){
+                if (creategame == true) {
                     res.redirect(`/livegame/${gameid}`)
                 }
-                else{
+                else {
                     //We should add a stop game API call here.
                     req.flash('gamemessage', 'Could not start the game')
                     res.redirect("/user/dashboard")
                 }
-                
+
             }
             else {
                 req.flash('gamemessage', 'Error in response from API')
@@ -427,19 +427,32 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
 })
 
 //Fetches the scoreboard
-app.get("/scoreboard", (req, res) => {
+app.get("/scoreboard", async (req, res) => {
+    let data = await db.Top25WL()
+    let usernames = []
+    let wl = []
+    for (let index = 0; index < data.length; index++) {
+        var name = data[index].username
+        //name = await addQuotes(name)
+        usernames.push(name)
+        wl.push(data[index].wl)
+
+
+    }
+    //usernames = usernames.toString()
+    console.log(usernames)
     try {
         if (req.user) {
             var userid = req.user.userid
             var username = req.user.username
             var firstname = req.user.firstname
             var lastname = req.user.lastname
-            res.render('statistics', { message: req.flash('message'), username, user: userid, title: 'scoreboard' }) //Renderes the statistic websites and passes title for the navbar
+            res.render('statistics', { message: req.flash('message'), username, user: userid, title: 'scoreboard', Usernames: usernames, WL: wl }) //Renderes the statistic websites and passes title for the navbar
         }
         else {
             var userid = null
             var username = null
-            res.render('statistics', { message: req.flash('message'), username: username, user: userid, title: 'scoreboard' }) //Renderes the statistic websites and passes title for the navbar
+            res.render('statistics', { message: req.flash('message'), username: username, user: userid, title: 'scoreboard', Usernames: usernames, WL: wl }) //Renderes the statistic websites and passes title for the navbar
         }
 
     } catch (error) {
@@ -492,7 +505,7 @@ app.get("/tournament/new", checkAuth, (req, res) => {
 app.post("/tournament/new", checkAuth, (req, res) => {
 
     let test = req.body.
-    console.log(test)
+        console.log(test)
 
 })
 app.post("/livegame", async (req, res) => {
@@ -525,13 +538,13 @@ app.get("/livegame/:id", async (req, res) => {
         }
 
     } catch (error) {
-        
+
     }
-    if(error){
+    if (error) {
         res.send(400, `Problems fetching gamedata. <a href="/">Go back</a> ` + error)
     }
 
-    else{
+    else {
         try {
             if (req.user) {
                 var userid = req.user.userid
@@ -541,7 +554,7 @@ app.get("/livegame/:id", async (req, res) => {
                         message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
                         constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time
                     }))
-    
+
             }
             else {
                 var userid = null
@@ -551,16 +564,22 @@ app.get("/livegame/:id", async (req, res) => {
                         message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
                         constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time
                     }))
-    
+
             }
-    
+
         } catch (error) {
             console.log('User is not probably not logged in' + error)
         }
     }
-    
+
 
 })
+
+async function addQuotes(string) {
+    string = '"' + string + '"';  
+    JSON.stringify(string); 
+    return string
+}
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000
 app.listen(PORT, () => {

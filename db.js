@@ -502,6 +502,8 @@ async function PersonalStatsWL(userid) {
     }
     else { 
         wl = result.rows[0].wins / result.rows[0].losses
+        wl = wl.toFixed(2)
+        console.log(wl)
         return wl  }
 }
 
@@ -526,18 +528,35 @@ async function AvrageStatsWL() {
     return averageWL 
 }
 
-async function Statsmonthly(gameid) {
-    
+async function Top25WL(gameid) {
+    //This will return an array with the top 25 players
     const query = {
-        text: 'SELECT gameid FROM public.game WHERE (endtime is null) AND (starttime is not null) AND gameid = $1;',
-        values: [gameid]
+        text: 'SELECT wins, losses, userid FROM public.player;'
+    }
+    let result = await pool.query(query)
+    for (let index = 0; index < result.rows.length; index++) {
+         let indexWL = (result.rows[index].wins / result.rows[index].losses)
+         if(isNaN(indexWL)){
+             indexWL = 0
+         }
+         indexWL = indexWL.toFixed(2) // rounds up to two decimals
+         result.rows[index].wl = indexWL //Adds new property to store calculated W/L
+         result.rows[index].username = await GetUsername(result.rows[index].userid) //Adds new property to store username
+
+    }
+    return result.rows
+
+}
+
+async function GetUsername(userid) {
+    //This function returns the username given the userid 
+    const query = {
+        text: 'SELECT username FROM public.users WHERE userid = $1;',
+        values: [userid]
     }
     let result = await pool.query(query)
 
-    if (result.rows.length > 0) {
-        return true
-    }
-    else { return false }
+    return result.rows[0].username
 }
 
 //Exporting all the functions so they can be access by server.js
@@ -545,5 +564,5 @@ module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
     fetchUsernamesInGame, IsUserInAGame, GetPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
-    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL
+    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL, GetUsername
 }
