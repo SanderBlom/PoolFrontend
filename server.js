@@ -601,11 +601,6 @@ app.get("/livegame/:id", async (req, res) => {
 
 })
 
-async function addQuotes(string) {
-    string = '"' + string + '"';
-    JSON.stringify(string);
-    return string
-}
 //-------------------------------------Start server-------------------------------------//
 //starts server on port 3000
 app.listen(PORT, () => {
