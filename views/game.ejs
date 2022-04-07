@@ -16,20 +16,18 @@
 	</div>
 
 	<div class="container">
-		<h3 class="center">GameID: <%= locals.gameid %></h3>
 		<table class="table">
 			<tbody id="boxed">
 				<tr>
-					<th>Player 1: <%= locals.player1Name %>
+					<th>Player 1 (Whole): <%= locals.player1Name %>
 					</th>
-					<th>Player 2: <%= locals.player2Name %>
+					<th>Player 2 (Half): <%= locals.player2Name %>
 					</th>
 				</tr>
-		</table>
-		<table class="table">
-			<tbody id="boxed">
 				<tr>
-					<th style="text-align: center"> Minutes played: <%= locals.minutes %>
+					<th>Minutes played: <%= locals.minutes %>
+					</th>
+					<th>Game ID: <%= locals.gameid %>
 					</th>
 				</tr>
 		</table>
@@ -54,6 +52,7 @@
 			</div>
 		</form>
 	</div>
+	
 
 
 

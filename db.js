@@ -474,9 +474,9 @@ async function TimePlayed(gameid) {
     }
     let result = await pool.query(query)
     let time = null
+    console.log(result.rows)
     let minutes = result.rows[0].now.minutes
     let hours = result.rows[0].now.hours
-    let seconds = result.rows[0].now.seconds
     
     if(hours >= 1){
         time = (hours * 60) + minutes // Make the time in minutes instead of hours + minutes
