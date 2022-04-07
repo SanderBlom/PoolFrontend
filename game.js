@@ -51,7 +51,6 @@ function renderballs(Balls) {
         const billiardballs = createCanvas(1280, 731)
         var context = billiardboard.getContext('2d')
         var context2 = billiardballs.getContext('2d')
-
         loadImage('views/img/pooltable.png').then(image => {
             context.clearRect(0, 0, 1280, 731)
             context.drawImage(image, 0, 0, 1280, 731)//draws the pooltable to the canvas
