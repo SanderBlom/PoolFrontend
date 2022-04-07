@@ -337,10 +337,10 @@ app.get("/game/:id", checkAuth, async (req, res) => {
     var username1 = null
     var username2 = null
     var username = req.user.username // fetching username to use in the navbar
+    let error = null
     try {
         var tableid = await db.GetTableID(gameid)
         let usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
-        console.log('TableID: ' + tableid + ' usernames: ' + usernames)
 
         if (usernames == null) {
             username1 == null
@@ -351,37 +351,37 @@ app.get("/game/:id", checkAuth, async (req, res) => {
             username2 = usernames[1]
         }
     }
-    catch (error) {
-        //res.send(404, `Looks like something broke. <a href="/">Go back</a> ` + error)
-        console.log('Error test ' + error)
+    catch (err) {
+        error = err
     }
-    if (username1 != null && username2 != null) {
-        gamestartedstatus = await db.IsGameActive(gameid)
-
+    if(error){
+        res.sendStatus(404).send(`Could not get the game details..<a href="/">Go back</a> `)
     }
-
-    if (username1 == null && username2 == null) {
-        console.log('User is not logged in or is not a member of the gameid')
-        res.redirect("/login")
-    }
-    if (req.user) {
-        if (username != username1 && username != username2) {
-            //If user is not a part of the game they should be redirected 
-            res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
-
+    else{
+        if (username1 != null && username2 != null) {
+            gamestartedstatus = await db.IsGameActive(gameid)
+    
+        }
+    
+        if (username1 == null && username2 == null) {
+            console.log('User is not logged in or is not a member of the gameid')
+            res.redirect("/login")
+        }
+        if (req.user) {
+            if (username != username1 && username != username2) {
+                //If user is not a part of the game they should be redirected 
+                res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
+            }
+            else {
+                var userid = req.user.userid
+                res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid, gamestatus: gamestartedstatus })
+            }
+    
         }
         else {
-            var userid = req.user.userid
-            res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid, gamestatus: gamestartedstatus })
-
+            res.redirect("/login")
         }
-
     }
-    else {
-        res.redirect("/login")
-    }
-
-
 })
 
 //This page loads after you have picked a table and the system has checked that its not in use.
