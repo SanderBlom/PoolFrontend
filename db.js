@@ -55,7 +55,7 @@ async function UpdaterUserDetails(firstname, lastname, email, id) {
             return false
         }
     } catch (error) {
-        console.log(error)
+        return false
     }
 }
 
@@ -127,7 +127,6 @@ async function StartGame(gameid) {
 
 async function AddPlayerToGame(gameid, userid) {
     if (gameid == null || userid == null) {
-        console.log('Input is empty')
         return null
     }
     //Checks that the game is valid (the game id exists, the game has not started, and the game has not ended)
@@ -238,7 +237,7 @@ async function GetPlayerID(userid) {
     if (playerid != 0) {
         return playerid
     }
-    else { console.log('No playerid found for userid= ' + userid) }
+    else { console.log('No playerid found for userid= ' + userid); return null }
 }
 
 async function GetTableID(gameid) {
@@ -259,7 +258,7 @@ async function GetTableID(gameid) {
         }
 
         else {
-            console.log('Table id is invalid')
+            console.log('Table id is invalid'); return null
         }
     }
 }
@@ -307,8 +306,7 @@ async function GetUsernamesFromPlayerID(playerid) {
             else { console.log('No username found'); return null}
         }
         else {
-            console.log('Something broke....')
-            return null
+            console.log('Userid is null...mvh GetUsernamesFromPlayerID '); return null
         }
     }
 }
@@ -353,7 +351,7 @@ async function IsUserInAGame(userid) {
 
 async function GetPlayerIDinGame(gameid) {
     if (gameid == null) {
-        console.log('No game id provided')
+        console.log('No game id provided. Returning null')
         return null
     }
     const query = {
@@ -440,7 +438,6 @@ async function GetTableIPWithGameID(gameid) {
 
 async function JoinGame(gameid, userid) {
     var playercount = await CheckPlayerCountInGame(gameid) //Returns and integer of players inside the game.
-    console.log(playercount)
 
     if (playercount < 2) {
         var result = await AddPlayerToGame(gameid, userid) //Adds the the playerid to the game 
@@ -474,7 +471,6 @@ async function TimePlayed(gameid) {
     }
     let result = await pool.query(query)
     let time = null
-    console.log(result.rows)
     let minutes = result.rows[0].now.minutes
     let hours = result.rows[0].now.hours
     
@@ -488,15 +484,12 @@ async function TimePlayed(gameid) {
         else{
             time = minutes // Make the time in minutes instead of hours + minutes
         }
-        
     }
-    
     return time
-
 }
 
 async function PersonalStatsWL(userid) {
-    
+    //This function finds the win/loss ratio for a specific user
     const query = {
         text: 'SELECT * FROM public.player WHERE userid = $1;',
         values: [userid]
@@ -536,8 +529,16 @@ async function AvrageStatsWL() {
     return averageWL 
 }
 
+async function GetGameWinner(gameid){
+    //This function will get the username of the winner in a specific game
+    const query = {
+        text: 'SELECT wins, losses, userid FROM public.player;'
+    }
+    let result = await pool.query(query)
+}
+
 async function Top25WL(gameid) {
-    //This will return an array with the top 25 players
+    //This will return an array with the top 25 players based on win/loss ratio
     const query = {
         text: 'SELECT wins, losses, userid FROM public.player;'
     }
@@ -552,7 +553,6 @@ async function Top25WL(gameid) {
          result.rows[index].username = await GetUsername(result.rows[index].userid) //Adds new property to store username
     }
     return result.rows
-
 }
 
 async function GetUsername(userid) {
