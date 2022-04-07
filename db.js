@@ -476,6 +476,11 @@ async function TimePlayed(gameid) {
     let time = null
     let minutes = result.rows[0].now.minutes
     let hours = result.rows[0].now.hours
+    let seconds = result.rows[0].now.seconds
+    
+    if(minutes > 1){
+        minutes = 0
+    }
 
     if(hours >= 1){
         time = (hours * 60) + minutes // Make the time in minutes instead of hours + minutes
