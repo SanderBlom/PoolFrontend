@@ -314,7 +314,7 @@ async function GetUsernamesFromPlayerID(playerid) {
 async function latestBallPosition(gameid) {
     //This function will querry the database and fetch the latest ballpositions in a game.
     const query = {
-        text: 'SELECT ballcoulor, x_pos, y_pos, playerid FROM billiardball WHERE playcount = (SELECT max(playcount) FROM billiardball) AND gameid = $1;',
+        text: 'SELECT ballcoulor, x_pos, y_pos, playerid FROM billiardball WHERE playcount = (SELECT max(playcount) FROM billiardball WHERE gameid = $1) AND gameid = $1;',
         values: [gameid]
     }
     let result = await pool.query(query)
@@ -532,9 +532,11 @@ async function AvrageStatsWL() {
 async function GetGameWinner(gameid){
     //This function will get the username of the winner in a specific game
     const query = {
-        text: 'SELECT wins, losses, userid FROM public.player;'
+        text: 'SELECT winner FROM public.game WHERE gameid = $1;',
+        values: [gameid]
     }
     let result = await pool.query(query)
+    let winner = null
 }
 
 async function Top25WL(gameid) {
