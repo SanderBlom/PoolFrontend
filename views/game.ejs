@@ -38,30 +38,29 @@
 			<div class="container2">
 				<h3 class="center">Latest ball positions</h3>
 				<!--Om vi sender status = true så blir bilde grønt-->
-				<% if(locals.constatus == true) { %>
+				<% if(locals.constatus==true) { %>
 					<img class="object-fit-cover" src="<%=locals.gameimage  %>" width="1280" height="731" alt="">
-					<!--Bilde er funnet på google-->
+					
 					<!--Ellers blir bildet grået ut med css og teksten under blir plassert midt på billiardbordet-->
 					<% } else{ %>
-						<img class ="img-inactive" src="/img/pooltable.png" width="1280" height="731" alt="">
+						<img class="img-inactive" src="/img/pooltable.png" width="1280" height="731" alt="">
 						<!--Bilde er funnet på google-->
 						<div class="centered-text">
 
 							<% if(locals.winner){ %>
-								<h3>The game with gameID: <%=locals.gameid %> has ended.</h3>
-								<h3>The winner was: <%=locals.winner %> </h3>
-							  <% } else{ %>  
-								<h3>No data was found related to gameID: <%=locals.gameid %>.</h3>
-								<h3>Maybe you typed the wrong gameID?</h3>
-							 <% } %>
-							
-							
+								<label>The game with gameID: <%=locals.gameid %> has ended.</label>
+								<label>The winner was: <%=locals.winner %>
+								</label>
+								<% } else{ %>
+									<label>No data was found related to gameID: <%=locals.gameid %>.</label>
+									<label>Maybe you typed the wrong gameID?</label>
+									<% } %>
 						</div>
 						<% } %>
 			</div>
 		</form>
 	</div>
-	
+
 
 
 
