@@ -17,6 +17,7 @@
 	<div class="container-medium">
 		<form id="boxed" action="/tournament/new" method="POST">
 			<h3>Create new tournament</h3>
+			<h4>Please add all the usernames of all the players</h4>
 			<!--Yellow message for a unsuccessful function-->
 			<% if(messages.error) { %>
 				<div class="alert alert-warning">
@@ -24,18 +25,28 @@
 				</div>
 				<% }%>
 
-			<div id="inputs">
-				<label for="add">Add players</label>
-				<button type="button" id="add" name="button" class="btn btn-primary mb-2" onclick="newuser()">+</button> <br>
-				<!-- <input type="text" id="username" name="username" placeholder="Username" required /> -->
-			</div>
-			<br />
-			<div>
-				<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Create tournament</button>
-			</div>
-			<h4>The tournament mode is limited to 20 players </h4>
+					<div>
+						<div id="survey_options">
+							<input type="text" name="survey_options[]" class="survey_options" size="50"
+								placeholder="Username0" required>
+						</div>
+						<div class="controls">
+							<button type="button" id="add" name="button" class="btn btn-primary mb-2" onclick="addnew()">+</button>
+							<button style="float: right " type="button" id="del" name="button" class="btn btn-danger" onclick="delold()">-</button> <br>
+							<!-- <a href="#" id="add_more_fields"><i class="fa fa-plus"></i>Add More</a>
+							<a href="#" id="remove_fields"><i class="fa fa-plus"></i>Remove Field</a> -->
+						</div>
+					</div>
+					
+					<div class="submit-div">
+						<button name="submit" type="submit" id="boxed-submit" onclick="submitBtn()">+</button>
+					</div>
+					<div>
+						<label name="limitlabel" id="limitlabel">This gamemode is limited to 12 players</label>
+					</div>
+					
 		</form>
-		
+
 	</div>
 
 
@@ -46,23 +57,45 @@
 	<script src="/js/jquery.min.js"></script>
 	<script src="/js/bootstrap.min.js"></script>
 	<script>
-		//ref: https://stackoverflow.com/questions/14853779/adding-input-elements-dynamically-to-form
-
-		var id = 1;
-		var newuser = function () {
-			var parent = document.getElementById('inputs');
-			var label = document.createElement("label")
-			var field = document.createElement("input")
-			label.id = "username" + id;
-			label.innerHTML = "Player" + id;
-			field.className = "form-control"
-			field.style = "display:block;"
-			field.id = "username" + id;
-			parent.appendChild(label);//Legger til label over textboks
-			parent.appendChild(field); //Legger til textbox for username input
-			id += 1;
+		var survey_options = document.getElementById('survey_options');
+		var count = 1
+		var addnew = function(){
+			if(count <= 12){
+			var newField = document.createElement('input');
+			newField.setAttribute('type', 'text');
+			newField.setAttribute('name', 'survey_options[]');
+			newField.setAttribute('class', 'survey_options');
+			newField.setAttribute('siz', 50);
+			newField.setAttribute('placeholder', `Username${count}`);
+			newField.required = true;
+			survey_options.appendChild(newField);
+			var limittext = document.getElementById('limitlabel').style.color = 'black';
+			count = count + 1
+			}
+			else{
+				var limittext = document.getElementById('limitlabel').style.color = 'red';
+			}
+			
 		}
+		
+		var delold = function(){
+			var input_tags = survey_options.getElementsByTagName('input');
+			if (input_tags.length > 1) {
+				survey_options.removeChild(input_tags[(input_tags.length) - 1]);
+				if(count >= 12){
+					var limittext = document.getElementById('limitlabel').style.color = 'black';
+				}
+				count = count - 1
+			}
+		}
+
+		var submitBtn = function(){
+			document.getElementById("boxed").submit();
+		}
+		
+		
 	</script>
+
 </body>
 
 </html>

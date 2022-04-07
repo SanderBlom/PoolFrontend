@@ -274,61 +274,61 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
 
     //Checks that the game is not allready started
     let gamestatus = await db.IsGameActive(gameid)
-    if(gamestatus == true){
+    if (gamestatus == true) {
         res.redirect(`/livegame/${gameid}`)
     }
-    else{
-    let playerids = await db.GetPlayerIDinGame(gameid)
-    var playerid1 = playerids[0]
-    var playerid2 = playerids[1]
-    if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
-    {
-        const timestamp = moment() //Creating timestamp in millisec
-        const timestampFormated = timestamp.format('YYYY-MM-DDTHH:mm:SS') //Formats data into a format that matches with C# Timestamp format.
-        tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
-        tablestatus = await vision.CheckTableAvailability(tableid) //Checks that nobody has started a game on the same table.
-        if (tablestatus == true) {
-            //console.log('Gameid= ' + gameid + ' pID 1= ' + playerid1 + ' pID 2=' + playerid2 + ' usrName1= ' + username1 + ' usrName2= ' + username2 + 'timestamp ' + timestampFormated)
-            let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check. Returns HTTP status codes
+    else {
+        let playerids = await db.GetPlayerIDinGame(gameid)
+        var playerid1 = playerids[0]
+        var playerid2 = playerids[1]
+        if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
+        {
+            const timestamp = moment() //Creating timestamp in millisec
+            const timestampFormated = timestamp.format('YYYY-MM-DDTHH:mm:SS') //Formats data into a format that matches with C# Timestamp format.
+            tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
+            tablestatus = await vision.CheckTableAvailability(tableid) //Checks that nobody has started a game on the same table.
+            if (tablestatus == true) {
+                //console.log('Gameid= ' + gameid + ' pID 1= ' + playerid1 + ' pID 2=' + playerid2 + ' usrName1= ' + username1 + ' usrName2= ' + username2 + 'timestamp ' + timestampFormated)
+                let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check. Returns HTTP status codes
 
-            if (result == 200) {
-                var creategame = await db.StartGame(gameid)
-                if (creategame == true) {
-                    res.redirect(`/livegame/${gameid}`)
+                if (result == 200) {
+                    var creategame = await db.StartGame(gameid)
+                    if (creategame == true) {
+                        res.redirect(`/livegame/${gameid}`)
+                    }
+                    else {
+                        //We should add a stop game API call here.
+                        req.flash('gamemessage', 'Could not start the game')
+                        res.redirect("/user/dashboard")
+                    }
+
                 }
                 else {
-                    //We should add a stop game API call here.
-                    req.flash('gamemessage', 'Could not start the game')
+                    req.flash('gamemessage', 'Error in response from API')
                     res.redirect("/user/dashboard")
                 }
-
+            }
+            else if (tablestatus == false) {
+                req.flash('gamemessage', 'Table is already in use.')
+                res.redirect("/user/dashboard")
             }
             else {
-                req.flash('gamemessage', 'Error in response from API')
+                req.flash('gamemessage', 'No response from API')
                 res.redirect("/user/dashboard")
             }
         }
-        else if (tablestatus == false) {
-            req.flash('gamemessage', 'Table is already in use.')
-            res.redirect("/user/dashboard")
-        }
+
         else {
-            req.flash('gamemessage', 'No response from API')
+            //If the user trying to start the game is not one of the users that plays. Redirect him back to his profile.
+            console.log('Dont active')
+            req.flash('gamemessage', 'Looks like your not a part on the game...')
             res.redirect("/user/dashboard")
         }
-    }
-
-    else {
-        //If the user trying to start the game is not one of the users that plays. Redirect him back to his profile.
-        console.log('Dont active')
-        req.flash('gamemessage', 'Looks like your not a part on the game...')
-        res.redirect("/user/dashboard")
-    }
 
 
 
     }
-    
+
 
 })
 app.get("/game/:id", checkAuth, async (req, res) => {
@@ -350,24 +350,23 @@ app.get("/game/:id", checkAuth, async (req, res) => {
             username1 = usernames[0]
             username2 = usernames[1]
         }
+        if (username1 != null && username2 != null) {
+            gamestartedstatus = await db.IsGameActive(gameid)
+
+        }
     }
     catch (err) {
         error = err
     }
-    if(error){
+    if (error) {
         res.sendStatus(404).send(`Could not get the game details..<a href="/">Go back</a> `)
     }
-    else{
-        if (username1 != null && username2 != null) {
-            gamestartedstatus = await db.IsGameActive(gameid)
-    
-        }
-    
+    else {
         if (username1 == null && username2 == null) {
             console.log('User is not logged in or is not a member of the gameid')
             res.redirect("/login")
         }
-        if (req.user) {
+        else if (req.user) {
             if (username != username1 && username != username2) {
                 //If user is not a part of the game they should be redirected 
                 res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
@@ -376,8 +375,10 @@ app.get("/game/:id", checkAuth, async (req, res) => {
                 var userid = req.user.userid
                 res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid, gamestatus: gamestartedstatus })
             }
-    
+
         }
+
+
         else {
             res.redirect("/login")
         }
@@ -464,7 +465,7 @@ app.get("/scoreboard", async (req, res) => {
     //Splittng the data into two arrays.
     var sortedLabels = Data.map(e => e.label);
     var sortedData = Data.map(e => e.data);
-    
+
     try {
         if (req.user) {
             var userid = req.user.userid
@@ -528,7 +529,7 @@ app.get("/tournament/new", checkAuth, (req, res) => {
 
 app.post("/tournament/new", checkAuth, (req, res) => {
 
-    let test = req.body.
+    let test = req.body
         console.log(test)
 
 })
@@ -602,8 +603,8 @@ app.get("/livegame/:id", async (req, res) => {
 })
 
 async function addQuotes(string) {
-    string = '"' + string + '"';  
-    JSON.stringify(string); 
+    string = '"' + string + '"';
+    JSON.stringify(string);
     return string
 }
 //-------------------------------------Start server-------------------------------------//
