@@ -552,24 +552,27 @@ app.get("/livegame/:id", async (req, res) => {
     let balls
     let usernames
     let gamestatus
+    let winner = null
     try {
+        winner = await db.GetGameWinner(gameid) //Gets the winner of the game. Return null if no winner is found
         balls = await db.latestBallPosition(gameid) //Fetches last ball positions from the database
         time = await db.TimePlayed(gameid) //Fetches minutes since game started
         gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
-
+        
         if (gamestatus == true) {
             usernames = await db.fetchUsernamesInGame(gameid)
             player1Username = usernames[0]
             player2Username = usernames[1]
         }
 
-    } catch (error) {
+    } catch (err) {   
+        error = err
 
     }
     if (error) {
-        res.send(400, `Problems fetching gamedata. <a href="/">Go back</a> ` + error)
+        res.status(400).send(`Problems fetching gamedata. <a href="/">Go back</a> ` + error)
     }
-
+    
     else {
         try {
             if (req.user) {
@@ -578,7 +581,7 @@ app.get("/livegame/:id", async (req, res) => {
                 game.renderballs(balls)
                     .then((image) => res.render('game', {
                         message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
-                        constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time
+                        constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time, winner: winner
                     }))
 
             }
@@ -588,7 +591,7 @@ app.get("/livegame/:id", async (req, res) => {
                 game.renderballs(balls)
                     .then((image) => res.render('game', {
                         message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
-                        constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time
+                        constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time, winner: winner
                     }))
 
             }

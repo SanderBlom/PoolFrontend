@@ -303,7 +303,7 @@ async function GetUsernamesFromPlayerID(playerid) {
             if (username != null) {
                 return username
             }
-            else { console.log('No username found'); return null}
+            else { console.log('No username found'); return null }
         }
         else {
             console.log('Userid is null...mvh GetUsernamesFromPlayerID '); return null
@@ -471,21 +471,28 @@ async function TimePlayed(gameid) {
     }
     let result = await pool.query(query)
     let time = null
-    let minutes = result.rows[0].now.minutes
-    let hours = result.rows[0].now.hours
-    
-    if(hours >= 1){
-        time = (hours * 60) + minutes // Make the time in minutes instead of hours + minutes
-    }
-    else{
-        if(minutes < 1){
-            time = 0 // Make the time in minutes instead of hours + minutes
+
+    if (result.rows.length > 0) {
+        let minutes = result.rows[0].now.minutes
+        let hours = result.rows[0].now.hours
+
+        if (hours >= 1) {
+            time = (hours * 60) + minutes // Make the time in minutes instead of hours + minutes
         }
-        else{
-            time = minutes // Make the time in minutes instead of hours + minutes
+        else {
+            if (minutes < 1) {
+                time = 0 // Make the time in minutes instead of hours + minutes
+            }
+            else {
+                time = minutes // Make the time in minutes instead of hours + minutes
+            }
         }
+        return time
     }
-    return time
+    else {
+        return null
+    }
+
 }
 
 async function PersonalStatsWL(userid) {
@@ -501,11 +508,12 @@ async function PersonalStatsWL(userid) {
         wl = 0
         return wl
     }
-    else { 
+    else {
         wl = result.rows[0].wins / result.rows[0].losses
         wl = wl.toFixed(2)
         console.log(wl)
-        return wl  }
+        return wl
+    }
 }
 
 async function AvrageStatsWL() {
@@ -518,25 +526,36 @@ async function AvrageStatsWL() {
     let sum = 0
 
     for (let index = 0; index < result.rows.length; index++) {
-         let indexWL = (result.rows[index].wins / result.rows[index].losses)
-         WL.push(indexWL) //Adding each WL to the array
+        let indexWL = (result.rows[index].wins / result.rows[index].losses)
+        WL.push(indexWL) //Adding each WL to the array
     }
     for (let index = 0; index < WL.length; index++) {
         sum += WL[index]; //Summing all the values in the array
-        
+
     }
     let averageWL = sum / WL.length //Calculates the average win / loss ratio
-    return averageWL 
+    return averageWL
 }
 
-async function GetGameWinner(gameid){
-    //This function will get the username of the winner in a specific game
+async function GetGameWinner(gameid) {
+    //This function will get the username of the winner in a specific game'
     const query = {
         text: 'SELECT winner FROM public.game WHERE gameid = $1;',
         values: [gameid]
     }
     let result = await pool.query(query)
-    let winner = null
+    if (result.rows.length > 0) {
+        let playerid = result.rows[0].winner
+        let winner = await GetUsernamesFromPlayerID(playerid)
+
+        if (winner === undefined || winner === null) {
+            return null
+        }
+        else {
+            return winner
+        }
+    }
+    else { return null }
 }
 
 async function Top25WL(gameid) {
@@ -546,13 +565,13 @@ async function Top25WL(gameid) {
     }
     let result = await pool.query(query)
     for (let index = 0; index < result.rows.length; index++) {
-         let indexWL = (result.rows[index].wins / result.rows[index].losses)
-         if(isNaN(indexWL)){
-             indexWL = 0
-         }
-         indexWL = indexWL.toFixed(2) // rounds up to two decimals
-         result.rows[index].wl = indexWL //Adds new property to store calculated W/L
-         result.rows[index].username = await GetUsername(result.rows[index].userid) //Adds new property to store username
+        let indexWL = (result.rows[index].wins / result.rows[index].losses)
+        if (isNaN(indexWL)) {
+            indexWL = 0
+        }
+        indexWL = indexWL.toFixed(2) // rounds up to two decimals
+        result.rows[index].wl = indexWL //Adds new property to store calculated W/L
+        result.rows[index].username = await GetUsername(result.rows[index].userid) //Adds new property to store username
     }
     return result.rows
 }
@@ -573,5 +592,5 @@ module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
     fetchUsernamesInGame, IsUserInAGame, GetPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
-    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL, GetUsername
+    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL, GetUsername, GetGameWinner
 }

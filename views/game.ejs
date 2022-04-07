@@ -46,7 +46,16 @@
 						<img class ="img-inactive" src="/img/pooltable.png" width="1280" height="731" alt="">
 						<!--Bilde er funnet på google-->
 						<div class="centered-text">
-							<h3>Could not find any active games with ID: <%=locals.gameid%></h3>
+
+							<% if(locals.winner){ %>
+								<h3>The game with gameID: <%=locals.gameid %> has ended.</h3>
+								<h3>The winner was: <%=locals.winner %> </h3>
+							  <% } else{ %>  
+								<h3>No data was found related to gameID: <%=locals.gameid %>.</h3>
+								<h3>Maybe you typed the wrong gameID?</h3>
+							 <% } %>
+							
+							
 						</div>
 						<% } %>
 			</div>
