@@ -46,6 +46,7 @@ function ballColor(color) {
 
 
 function renderballs(Balls) {
+    //This function gets the x, y coordinates from the database and generates an image representing the pool table 
     return new Promise((resolve, reject) => {
         const billiardboard = createCanvas(1280, 731)
         const billiardballs = createCanvas(1280, 731)
