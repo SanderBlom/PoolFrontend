@@ -518,11 +518,29 @@ app.get("/tournament/new", checkAuth, (req, res) => {
 
 })
 
-app.post("/tournament/new", checkAuth, (req, res) => {
+app.post("/tournament/new", checkAuth, async (req, res) => {
 
-    let test = req.body
-    console.log('Name: ' + test.name + ' User1: ' + test.)
+    let tournament = req.body //Gets body from POST
+    let tournamentName = tournament.TournamentName //storing tournament name
+    let usernames = tournament.usernames //array of usernames to add to tournament
+    let tournamentID = await db.CreateNewTournament(tournamentName)
+    let invalidusernames = []
+    for (let index = 0; index < usernames.length; index++) {
+        const username = usernames[index];
+        let validation = await db.ValidateUniqueUsername(username) //Checks if the username exist in the db
 
+        if(validation == true){
+            //If username is not found in the db is added to the invalidusername array
+            invalidusernames.push(username)
+        }
+        
+    }
+    console.log(invalidusernames)
+
+    if(invalidusernames.length != 0){
+        //Cheks that we dont have any invalid usernames
+    }
+    
 })
 app.post("/livegame", async (req, res) => {
     //This just forwards the users search to the correct page.

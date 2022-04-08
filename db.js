@@ -5,7 +5,7 @@ const moment = require('moment'); //Used to generate timestamps
 const res = require("express/lib/response");
 
 async function ValidateUniqueUsername(username) {
-    //This function returns true if the username exist in the database.
+    //This function returns false if the username exist in the database.
     let result
     const query = {
         text: 'SELECT * FROM public.users WHERE username = $1',
@@ -586,11 +586,26 @@ async function GetUsername(userid) {
 
     return result.rows[0].username
 }
+async function CreateNewTournament(tournamentName){
+    //This function creates a new tournament and returns the tournament ID
+    const query = {
+        text: 'INSERT INTO public.Tournament(TournamentName) VALUES ($1) RETURNING *;',
+        values: [tournamentName]
+    }
+    let result = await pool.query(query)
+    if(result.rows.length > 0 ){
+        let tournamentid = result.rows[0].tournamentid
+        return tournamentid
+    }
+    else{return null}
+
+}
 
 //Exporting all the functions so they can be access by server.js
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
     fetchUsernamesInGame, IsUserInAGame, GetPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
-    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL, GetUsername, GetGameWinner
+    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL, 
+    GetUsername, GetGameWinner, CreateNewTournament
 }

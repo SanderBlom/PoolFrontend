@@ -13,8 +13,8 @@ function convertCoordinatesX(inputX) {
 }
 function convertCoordinatesY(inputY) {
     var ballRadius = 20 //Defining the ball radius. 
-    var tableHeight = 569 - ballRadius
-    var lengtdiff = 85//Diffrence in pixels between the edge of the table and the cloth where the balls exist.
+    var tableHeight = 569 - ballRadius //old = 569
+    var lengtdiff = 100//Diffrence in pixels between the edge of the table and the cloth where the balls exist.
     var y = (tableHeight * inputY) + lengtdiff
     y = Math.trunc(y)
     return y;

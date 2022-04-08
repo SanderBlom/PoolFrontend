@@ -27,11 +27,11 @@
 
 					<div>
 						<h4>Give the tournament a name</h4>
-						<input type="text" name="name" class="survey_options" size="50"
+						<input type="text" name="TournamentName" class="survey_options" size="50"
 								placeholder="Tournament Name" required> <br><br>
 						<div id="survey_options">
 							<h4>Please add all the usernames of all the players</h4>
-							<input type="text" name="survey_options[]" class="survey_options" size="50"
+							<input type="text" name="usernames" class="survey_options" size="50"
 								placeholder="Username0" value="<%= locals.username %>" id="firstuser" required>
 						</div>
 						<div class="controls">
@@ -67,7 +67,7 @@
 			if(count <= 12){
 			var newField = document.createElement('input');
 			newField.setAttribute('type', 'text');
-			newField.setAttribute('name', 'survey_options[]');
+			newField.setAttribute('name', 'usernames');
 			newField.setAttribute('class', 'survey_options');
 			newField.setAttribute('siz', 50);
 			newField.setAttribute('placeholder', `Username${count}`);
