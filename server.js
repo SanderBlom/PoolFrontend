@@ -508,29 +508,20 @@ app.get("/rules", (req, res) => {
 })
 
 app.get("/tournament/new", checkAuth, (req, res) => {
+    let username = req.user.username
+    var userid = null //need this for some reason
+    console.log(username)
+    res.render('tournamentWizard', { message: req.flash('message'), username: username, user: userid, title: 'tournament' }) //Renderes the index websites and passes title for the navbar
 
-    try {
-        if (req.user) {
-            var userid = req.user.userid
-            var username = req.user.username
-            res.render('tournamentWizard', { message: req.flash('message'), username, user: userid, title: 'tournament' }) //Renderes the index websites and passes title for the navbar
-        }
-        else {
-            var userid = null
-            var username = null
-            res.render('tournamentWizard', { message: req.flash('message'), username: username, user: userid, title: 'tournament' }) //Renderes the index websites and passes title for the navbar
-        }
 
-    } catch (error) {
-        console.log('User is not probably not logged in' + error)
-    }
+
 
 })
 
 app.post("/tournament/new", checkAuth, (req, res) => {
 
     let test = req.body
-        console.log(test)
+    console.log('Name: ' + test.name + ' User1: ' + test.)
 
 })
 app.post("/livegame", async (req, res) => {
@@ -558,21 +549,21 @@ app.get("/livegame/:id", async (req, res) => {
         balls = await db.latestBallPosition(gameid) //Fetches last ball positions from the database
         time = await db.TimePlayed(gameid) //Fetches minutes since game started
         gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
-        
+
         if (gamestatus == true) {
             usernames = await db.fetchUsernamesInGame(gameid)
             player1Username = usernames[0]
             player2Username = usernames[1]
         }
 
-    } catch (err) {   
+    } catch (err) {
         error = err
 
     }
     if (error) {
         res.status(400).send(`Problems fetching gamedata. <a href="/">Go back</a> ` + error)
     }
-    
+
     else {
         try {
             if (req.user) {
