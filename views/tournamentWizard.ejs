@@ -17,7 +17,7 @@
 	<div class="container-medium">
 		<form id="boxed" action="/tournament/new" method="POST">
 			<h3>Create new tournament</h3>
-			<h4>Please add all the usernames of all the players</h4>
+			
 			<!--Yellow message for a unsuccessful function-->
 			<% if(messages.error) { %>
 				<div class="alert alert-warning">
@@ -26,9 +26,13 @@
 				<% }%>
 
 					<div>
+						<h4>Give the tournament a name</h4>
+						<input type="text" name="name" class="survey_options" size="50"
+								placeholder="Tournament Name" required> <br><br>
 						<div id="survey_options">
+							<h4>Please add all the usernames of all the players</h4>
 							<input type="text" name="survey_options[]" class="survey_options" size="50"
-								placeholder="Username0" required>
+								placeholder="Username0" value="<%= locals.username %>" id="firstuser" required>
 						</div>
 						<div class="controls">
 							<button type="button" id="add" name="button" class="btn btn-primary mb-2" onclick="addnew()">+</button>
@@ -39,7 +43,7 @@
 					</div>
 					
 					<div class="submit-div">
-						<button name="submit" type="submit" id="boxed-submit" onclick="submitBtn()">+</button>
+						<button name="submit" type="submit" id="boxed-submit" onclick="submitBtn()">Create tournament</button>
 					</div>
 					<div>
 						<label name="limitlabel" id="limitlabel">This gamemode is limited to 12 players</label>
