@@ -445,9 +445,6 @@ async function JoinGame(gameid, userid) {
     }
     else { return false }
 
-    $(document).ready(function() {
-        $('.mdb-select').materialSelect();
-        });
 }
 
 async function IsGameActive(gameid) {
