@@ -99,16 +99,27 @@
 		</div>
 		<div class="row">
 			<div class="col-md-4">
-				<h2>
-					Stats about your last game
-				</h2>
-				<p>
-				<div>
-					<canvas id="lastgame"></canvas>
-				</div>
-				</p>
+				<div class="jumbotron">
+					<h2>
+						Show previous games
+					</h2>
+					<p>
+					<h6>Here you can see a playthrough of your previous matches</h6>
+					</p>
 
+					<form class="form-inline" action="/game/previous/:id" method="GET">
+						<select id="gamelist" class="form-control" searchable="Search here..">
+							<% for(var i=0; i < gamelist.length; i++) { %>
+								<option value="<%= gamelist[i]%>">GameID: <%= gamelist[i] %>
+								</option>
+								<% } %>
+						</select>
+						<br>
+						<button type="submit" class="btn btn-primary mb-2">Show</button>
+					</form>
+				</div>
 			</div>
+
 			<div class="col-md-4">
 				<h2>
 					Your win/loss ratio
@@ -163,6 +174,8 @@
 
 	<script src="/js/jquery.min.js"></script>
 	<script>
+
+		//This script will generate a chart with the users win/loss ratio.
 		const ctx = document.getElementById('overall').getContext('2d');
 		const lastgameCharts = new Chart(ctx, {
 			type: 'bar',
@@ -197,52 +210,6 @@
 				plugins: { legend: { display: false }, } //Removes the dataset label
 			}
 		});
-
-
-
-
-	</script>
-	<script>
-		const ctx2 = document.getElementById('lastgame').getContext('2d');
-		const overallChart = new Chart(ctx2, {
-			type: 'bar',
-			data: {
-				labels: ['Time played', 'Your average playtime', 'Score', 'Your average score'],
-				datasets: [{
-					label: 'x',
-					data: [12, 19, 3, 5, 2, 3],
-					backgroundColor: [
-						'rgba(255, 99, 132, 0.2)',
-						'rgba(255, 99, 132, 0.2)',
-						'rgba(255, 206, 86, 0.2)',
-						'rgba(255, 206, 86, 0.2)'
-					],
-					borderColor: [
-						'rgba(255, 99, 132, 1)',
-						'rgba(255, 99, 132, 1)',
-						'rgba(255, 206, 86, 1)',
-						'rgba(255, 206, 86, 1)'
-					],
-					borderWidth: 1
-				}]
-			},
-			options: {
-				indexAxis: 'y',
-				scales: {
-					y: {
-						beginAtZero: true
-					}
-				},
-				plugins: { legend: { display: false }, } //Removes the dataset label
-			}
-		});
-
-
-
-
-	</script>
-	<script>
-
 	</script>
 	<script src="/js/bootstrap.min.js"></script>
 </body>

@@ -445,7 +445,9 @@ async function JoinGame(gameid, userid) {
     }
     else { return false }
 
-
+    $(document).ready(function() {
+        $('.mdb-select').materialSelect();
+        });
 }
 
 async function IsGameActive(gameid) {
@@ -492,6 +494,27 @@ async function TimePlayed(gameid) {
     else {
         return null
     }
+
+}
+
+async function GetPreviousGameList(userid){
+    //This will return all the gameids for a spesific user.
+    let playerid = await GetPlayerIDFromUserID(userid)
+  
+        const query = {
+            text: 'SELECT gameid FROM public.game WHERE winner = $1 OR loser = $1;',
+            values: [playerid]
+        }
+        let result = await pool.query(query)
+        let object = result.rows
+        let gamearry = []
+
+        for (let index = 0; index < object.length; index++) {
+            let element = object[index].gameid;
+            gamearry.push(element)
+            
+        }
+        return gamearry
 
 }
 
@@ -601,11 +624,26 @@ async function CreateNewTournament(tournamentName){
 
 }
 
+async function GetPlayerIDFromUserID(userid){
+    //This function will return the playerid correlating to the playerid
+    const query = {
+        text: 'SELECT playerid from player WHERE userid = $1',
+        values: [userid]
+    }
+    let result = await pool.query(query)
+    if(result.rows.length > 0){
+        return result.rows[0].playerid
+    }
+    else{return null}
+    
+
+}
+
 //Exporting all the functions so they can be access by server.js
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
     fetchUsernamesInGame, IsUserInAGame, GetPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
     JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL, 
-    GetUsername, GetGameWinner, CreateNewTournament
+    GetUsername, GetGameWinner, CreateNewTournament, GetPreviousGameList
 }

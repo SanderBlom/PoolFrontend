@@ -183,17 +183,19 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
     var email = req.user.email
     let wl = await db.PersonalStatsWL(userid) //Fetches your win/loss ratio form the database
     let avwl = await db.AvrageStatsWL()//Fetches the average win/loss ratio form the database
-    var ingame = await db.IsUserInAGame(userid)
+    var ingame = await db.IsUserInAGame(userid) //Checks if the user is in an active game
+    let previousgames = await db.GetPreviousGameList(userid) //Get an array of gameids where the user has played 
     var gameid = null
     if (ingame == true) {
         gameid = await db.GetGameIDForActiveGame(userid)
-        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'), personalWL: wl, averagewl: avwl })
+        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'), 
+        personalWL: wl, averagewl: avwl, gamelist: previousgames })
 
     }
     else {
-        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'), personalWL: wl, averagewl: avwl })
+        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'), 
+        personalWL: wl, averagewl: avwl, gamelist: previousgames })
     }
-
 })
 
 app.post("/user/dashboard", checkAuth, async (req, res) => {
