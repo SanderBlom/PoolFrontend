@@ -204,7 +204,6 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
 
 app.post("/game/previous/", checkAuth, async (req, res) => {
     let { gameid } = req.body
-    console.log(gameid)
     const userid = await req.user.userid
 
     let validate = await db.ValidateGameAccess(userid, gameid) //We validate that the user has access to the requested game
@@ -220,9 +219,9 @@ app.post("/game/previous/", checkAuth, async (req, res) => {
 
 app.get("/game/previous/:id", checkAuth, async (req, res) => {
     let gameid = req.params.id.trim()
-    let userid = await req.user.userid
-    let username = req.user.username
-    let validate = db.ValidateGameAccess(userid, gameid)
+    const userid = await req.user.userid
+    const username = req.user.username
+    let validate = await db.ValidateGameAccess(userid, gameid)
     let player1Username = null//This stores player1 name 
     let player2Username = null//This stores player2 name 
     let error

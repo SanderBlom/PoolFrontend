@@ -48,9 +48,8 @@ function ballColor(color) {
 
 async function renderwholegame(balls){
 
-    //let balls = await db.GetAllBallPositions(gameid)
-
-    let ballarray = []
+    let ballarray = [] //New array to store the sorted rows
+    let images = [] //Creating an array to store the generated images (base64 strings)
     let max = 0
     //Finding the lagrest playcount from the array
     for (let index = 0; index < balls.length; index++) {
@@ -74,7 +73,7 @@ async function renderwholegame(balls){
       ballarray[playcount].push({x_pos: x_pos, y_pos: y_pos, ballcoulor: ballcoulor })
     }
 
-    let images = [] //Creating array to store the pool images (base64 strings)
+    
     for (let index = 0; index < ballarray.length; index++) {
         const row = ballarray[index];
         await renderballs(row).then((image => {

@@ -220,7 +220,6 @@ async function GetGameIDForActiveGame(userid) {
         return gameid
     }
     else {
-        console.log('No game if found')
         return null
     }
 }
@@ -232,14 +231,16 @@ async function GetPlayerID(userid) {
         values: [userid]
     }
     let result = await pool.query(query) //Returns the amount of players in the game
-    var playerid = result.rows[0].playerid
-
-    if (playerid != 0) {
+    if(result.rows.length > 0){
+        const playerid = result.rows[0].playerid
+        console.log('jeg kjørte')
         return playerid
     }
-    else { console.log('No playerid found for userid= ' + userid); return null }
-}
+    else{
+        console.log('invalid')
+        return null}
 
+}
 async function GetTableID(gameid) {
     //This function finds the table if given the gameid
     const query = {
@@ -694,16 +695,23 @@ async function ValidateGameAccess(userid, gameid){
     //This checks if the userid has played a game matching the gameid. Will return true if the user has played a game matching the gameid
     let playerid = await GetPlayerID(userid)
 
-    const query = {
-        text: 'SELECT gameid from game WHERE winner = $1 OR loser = $1 AND gameid = $2',
-        values: [playerid, gameid]
+    if(playerid != null){
+        const query = {
+            text: 'SELECT * from game WHERE gameid = $2 AND (winner = $1 OR loser = $1)',
+            values: [playerid, gameid]
+        }
+        let result = await pool.query(query)
+    
+        if(result.rows.length > 0){
+            return true
+        }
+        else{return false}
     }
-    let result = await pool.query(query)
+    else{
+        return false
+    }
 
-    if(result.rows.length > 0){
-        return true
-    }
-    else{return false}
+
 }
 
 async function GetAllBallPositions(gameid){
