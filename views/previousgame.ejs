@@ -30,8 +30,10 @@
 					</th>
 				</tr>
 				<tr>
-					<th> Winner: <%= locals.winner %> </th>
-					<th> Loser: <%= locals.loser %> </th>
+					<th> Winner: <%= locals.winner %>
+					</th>
+					<th> Loser: <%= locals.loser %>
+					</th>
 				</tr>
 		</table>
 	</div>
@@ -39,28 +41,47 @@
 	<div class="container">
 		<form id="boxed">
 			<div class="container2">
-				<h3 class="center">Latest ball positions</h3>
-				<% for(let count = 0; images.lenght; count++ ){ %>
-					<br><%= count %>
-					<%#  will output the numbers 1-100 %>
-				<% } %>
-					<img class="object-fit-cover" src="<%=locals.images[0]  %>" width="1280" height="731" alt="">
-					<img class="object-fit-cover" src="<%=locals.images[1]  %>" width="1280" height="731" alt="">
-				
+				<h3 class="center" id="pooltitle"></h3>
+				<button class="btn btn-secondary" onclick="plusDivs(-1)">&#10094;</button>
+				<button class="btn btn-primary" onclick="plusDivs(+1)">&#10095;</button>
+				<% for(var i=0; i < images.length; i++) { %>
+					<img class="object-fit-cover" src="<%=locals.images[i]  %>" width="1280" height="731" alt="">
+
+					<% } %>
+
 			</div>
 		</form>
 	</div>
-
-	<script>
-		let images = '<%=locals.images  %>'
-	</script>
 
 
 	<div>
 		<!-- Henter fram footer fra partials mappen -->
 		<%- include('partials/footer') %>
 	</div>
+	<script>
 
+		//Ref: https://www.w3schools.com/w3css/w3css_slideshow.asp
+		var slideIndex = 1;
+		showDivs(slideIndex);
+
+		function plusDivs(n) {
+			showDivs(slideIndex += n);
+			
+		}
+
+		function showDivs(n) {
+			var i;
+			var x = document.getElementsByClassName("object-fit-cover");
+			if (n > x.length) { slideIndex = 1 }
+			if (n < 1) { slideIndex = x.length };
+			for (i = 0; i < x.length; i++) {
+				x[i].style.display = "none";
+			}
+			x[slideIndex - 1].style.display = "block";
+			
+			
+		}
+	</script>
 	<script src="/js/jquery.min.js"></script>
 	<script src="/js/bootstrap.min.js"></script>
 </body>
