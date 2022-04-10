@@ -107,8 +107,8 @@
 					<h6>Here you can see a playthrough of your previous matches</h6>
 					</p>
 
-					<form class="form-inline" action="/game/previous/:id" method="GET">
-						<select id="gamelist" class="form-control" searchable="Search here..">
+					<form class="form-inline" action="/game/previous/" method="POST">
+						<select id="gameid" name="gameid" class="form-control" searchable="Search here..">
 							<% for(var i=0; i < gamelist.length; i++) { %>
 								<option value="<%= gamelist[i]%>">GameID: <%= gamelist[i] %>
 								</option>

@@ -188,14 +188,89 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
     var gameid = null
     if (ingame == true) {
         gameid = await db.GetGameIDForActiveGame(userid)
-        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'), 
-        personalWL: wl, averagewl: avwl, gamelist: previousgames })
+        res.render("profile", {
+            username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'),
+            personalWL: wl, averagewl: avwl, gamelist: previousgames
+        })
 
     }
     else {
-        res.render("profile", { username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'), 
-        personalWL: wl, averagewl: avwl, gamelist: previousgames })
+        res.render("profile", {
+            username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'),
+            personalWL: wl, averagewl: avwl, gamelist: previousgames
+        })
     }
+})
+
+app.post("/game/previous/", checkAuth, async (req, res) => {
+    let { gameid } = req.body
+    console.log(gameid)
+    const userid = await req.user.userid
+
+    let validate = await db.ValidateGameAccess(userid, gameid) //We validate that the user has access to the requested game
+    if (validate) {
+        console.log('You have access')
+        res.redirect(`/game/previous/${gameid}`)
+    }
+    else {
+        console.log('You dont have access to watch other users games')
+    }
+
+})
+
+app.get("/game/previous/:id", checkAuth, async (req, res) => {
+    let gameid = req.params.id.trim()
+    let userid = await req.user.userid
+    let username = req.user.username
+    let validate = db.ValidateGameAccess(userid, gameid)
+    let player1Username = null//This stores player1 name 
+    let player2Username = null//This stores player2 name 
+    let error
+    let time
+    let balls = []
+    let usernames
+    let winner = null
+    let loser = null
+    if (validate) {
+
+        try {
+            winner = await db.GetGameWinner(gameid) //Gets the winner of the game. Return null if no winner is found
+            loser = await db.GetGameLoser(gameid) //Gets the loser of the game. Return null if no loser is found
+            balls = await db.GetAllBallPositions(gameid) //Fetches all the ball positions from the database
+            time = await db.TotalGameTime(gameid) //Fetches minutes since game started
+            gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
+            usernames = await db.fetchUsernamesInGame(gameid)
+            player1Username = usernames[0]
+            player2Username = usernames[1]
+
+
+        } catch (err) {
+            error = err
+
+        }
+        if (error) {
+            res.status(400).send(`Problems fetching gamedata. <a href="/">Go back</a> ` + error)
+        }
+        
+        else {
+            try {
+                let images = await game.renderwholegame(balls)
+                    res.render('previousgame', {
+                        message: req.flash('message'), username, user: userid, title: 'test', images: images, gameid: gameid,
+                        constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time, winner: winner, loser: loser
+                    })
+
+            } catch (error) {
+                console.log('User is not probably not logged in' + error)
+            }
+        }
+
+    }
+    else {
+        req.flash('gamemessage', `Looks like you dont have access to this game.`)
+        res.redirect("/user/dashboard")
+    }
+
 })
 
 app.post("/user/dashboard", checkAuth, async (req, res) => {
@@ -531,18 +606,18 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
         const username = usernames[index];
         let validation = await db.ValidateUniqueUsername(username) //Checks if the username exist in the db
 
-        if(validation == true){
+        if (validation == true) {
             //If username is not found in the db is added to the invalidusername array
             invalidusernames.push(username)
         }
-        
+
     }
     console.log(invalidusernames)
 
-    if(invalidusernames.length != 0){
+    if (invalidusernames.length != 0) {
         //Cheks that we dont have any invalid usernames
     }
-    
+
 })
 app.post("/livegame", async (req, res) => {
     //This just forwards the users search to the correct page.
@@ -554,8 +629,6 @@ app.get("/livegame/:id", async (req, res) => {
     var gameid = req.params.id.trim(); //Fetches game id from url
     var userid = null
     var username = null
-    //var player1Score = null//This stores the int of how many balls the player has left on the table
-    //var player2Score = null//This stores the int of how many balls the player has left on the table
     var player1Username = null//This stores player1 name 
     var player2Username = null//This stores player2 name 
     let error

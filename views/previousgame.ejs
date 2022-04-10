@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Tables</title>
+	<link href="/css/main.css" rel="stylesheet">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+	<div>
+		<!-- Henter fram navbaren fra partials mappen -->
+		<%- include('partials/navbar') %>
+	</div>
+
+	<div class="container">
+		<table class="table">
+			<tbody id="boxed">
+				<tr>
+					<th>Player 1 (Whole): <%= locals.player1Name %>
+					</th>
+					<th>Player 2 (Half): <%= locals.player2Name %>
+					</th>
+				</tr>
+				<tr>
+					<th>Minutes played: <%= locals.minutes %>
+					</th>
+					<th>Game ID: <%= locals.gameid %>
+					</th>
+				</tr>
+				<tr>
+					<th> Winner: <%= locals.winner %> </th>
+					<th> Loser: <%= locals.loser %> </th>
+				</tr>
+		</table>
+	</div>
+	</div>
+	<div class="container">
+		<form id="boxed">
+			<div class="container2">
+				<h3 class="center">Latest ball positions</h3>
+				<% for(let count = 0; images.lenght; count++ ){ %>
+					<br><%= count %>
+					<%#  will output the numbers 1-100 %>
+				<% } %>
+					<img class="object-fit-cover" src="<%=locals.images[0]  %>" width="1280" height="731" alt="">
+					<img class="object-fit-cover" src="<%=locals.images[1]  %>" width="1280" height="731" alt="">
+				
+			</div>
+		</form>
+	</div>
+
+	<script>
+		let images = '<%=locals.images  %>'
+	</script>
+
+
+	<div>
+		<!-- Henter fram footer fra partials mappen -->
+		<%- include('partials/footer') %>
+	</div>
+
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+</body>
+
+</html>

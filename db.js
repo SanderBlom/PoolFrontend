@@ -494,6 +494,38 @@ async function TimePlayed(gameid) {
 
 }
 
+async function TotalGameTime(gameid) {
+    //This will return a timestamp object with hours, minutes and seconds from the database. We then format the data and return an integer representing the time in minutes 
+    const query = {
+        text: 'SELECT endtime - starttime as now FROM game WHERE (endtime is not null) AND (starttime is not null) AND gameid = $1;',
+        values: [gameid]
+    }
+    let result = await pool.query(query)
+    let time = null
+
+    if (result.rows.length > 0) {
+        let minutes = result.rows[0].now.minutes
+        let hours = result.rows[0].now.hours
+
+        if (hours >= 1) {
+            time = (hours * 60) + minutes // Make the time in minutes instead of hours + minutes
+        }
+        else {
+            if (minutes < 1) {
+                time = 0 // Make the time in minutes instead of hours + minutes
+            }
+            else {
+                time = minutes // Make the time in minutes instead of hours + minutes
+            }
+        }
+        return time
+    }
+    else {
+        return null
+    }
+
+}
+
 async function GetPreviousGameList(userid){
     //This will return all the gameids for a spesific user.
     let playerid = await GetPlayerIDFromUserID(userid)
@@ -578,6 +610,28 @@ async function GetGameWinner(gameid) {
     else { return null }
 }
 
+async function GetGameLoser(gameid) {
+    //This function will get the username of the winner in a specific game'
+    const query = {
+        text: 'SELECT loser FROM public.game WHERE gameid = $1;',
+        values: [gameid]
+    }
+    let result = await pool.query(query)
+    if (result.rows.length > 0) {
+        let playerid = result.rows[0].loser
+        let loser = await GetUsernamesFromPlayerID(playerid)
+
+        if (loser === undefined || loser === null) {
+            return null
+        }
+        else {
+            return loser
+        }
+    }
+    else { return null }
+}
+
+
 async function Top25WL(gameid) {
     //This will return an array with the top 25 players based on win/loss ratio
     const query = {
@@ -636,11 +690,43 @@ async function GetPlayerIDFromUserID(userid){
 
 }
 
+async function ValidateGameAccess(userid, gameid){
+    //This checks if the userid has played a game matching the gameid. Will return true if the user has played a game matching the gameid
+    let playerid = await GetPlayerID(userid)
+
+    const query = {
+        text: 'SELECT gameid from game WHERE winner = $1 OR loser = $1 AND gameid = $2',
+        values: [playerid, gameid]
+    }
+    let result = await pool.query(query)
+
+    if(result.rows.length > 0){
+        return true
+    }
+    else{return false}
+}
+
+async function GetAllBallPositions(gameid){
+    //This will fetch all the x, y coordinates of the balls for an entire game
+    const query = {
+        text: `SELECT x_pos, y_pos, playcount, ballcoulor 
+        FROM public.billiardball
+        WHERE gameid = $1
+        ORDER by playcount`,
+        values: [gameid]
+    }
+    let result = await pool.query(query)
+
+    return result.rows
+
+}
+
 //Exporting all the functions so they can be access by server.js
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
     fetchUsernamesInGame, IsUserInAGame, GetPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
     JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL, 
-    GetUsername, GetGameWinner, CreateNewTournament, GetPreviousGameList
+    GetUsername, GetGameWinner, CreateNewTournament, GetPreviousGameList, ValidateGameAccess, GetGameLoser,
+    TotalGameTime, GetAllBallPositions
 }

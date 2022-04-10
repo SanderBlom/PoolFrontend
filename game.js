@@ -1,5 +1,6 @@
 const { createCanvas, loadImage } = require('canvas') //Used to draw images
 const fs = require('fs') //used to access local files
+let db = require("./db.js") //Used to access the database functions
 //Based on https://blog.logrocket.com/creating-saving-images-node-canvas/
 
 
@@ -44,6 +45,47 @@ function ballColor(color) {
     return findcolor.color;
 }
 
+
+async function renderwholegame(balls){
+
+    //let balls = await db.GetAllBallPositions(gameid)
+
+    let ballarray = []
+    let max = 0
+    //Finding the lagrest playcount from the array
+    for (let index = 0; index < balls.length; index++) {
+      const row = balls[index];
+      if(row.playcount > max){
+        max = row.playcount
+      }
+    }
+  
+    //Creating rows in the new array
+    for (let x = 1; x < max + 1; x++) {
+        ballarray.push([])
+  
+    } 
+    //Adding x, y and color to correct place in array
+    for (let index = 0; index < balls.length; index++) {
+      const playcount = balls[index].playcount - 1
+      const x_pos = balls[index].x_pos
+      const y_pos = balls[index].y_pos
+      const ballcoulor = balls[index].ballcoulor
+      ballarray[playcount].push({x_pos: x_pos, y_pos: y_pos, ballcoulor: ballcoulor })
+    }
+
+    let images = [] //Creating array to store the pool images (base64 strings)
+    for (let index = 0; index < ballarray.length; index++) {
+        const row = ballarray[index];
+        await renderballs(row).then((image => {
+            images.push(image)
+        
+
+        }))
+
+    }
+    return images
+}
 
 function renderballs(Balls) {
     //This function gets the x, y coordinates from the database and generates an image representing the pool table 
@@ -121,15 +163,12 @@ function renderballs(Balls) {
             else {
                 reject('Image could not be generated')
             }
-
         })
-
-        //console.log('Buffer : ' + buffer  
-        //fs.writeFileSync('./test.png', buffer)
     })
 
 }
 
 
 
-module.exports = { renderballs }
+
+module.exports = { renderballs, renderwholegame }
