@@ -67,7 +67,7 @@ async function RegisterNewUser(username, firstname, lastname, email, password) {
 
     resultUserTable = await pool.query(queryUserTable, valuesUserTable)
 
-    var userid = await resultUserTable.rows[0].userid
+    let userid = await resultUserTable.rows[0].userid
 
 
     const queryPlayerTable = 'INSERT INTO public.player(userid) VALUES ($1) RETURNING *;'
@@ -104,7 +104,7 @@ async function CreateNewGame(tableid) {
     const valueGame = [timestampFormated, tableid]
 
     let resultgame = await pool.query(queryGame, valueGame) //Inserting the data into the database.
-    var gameid = resultgame.rows[0].gameid //Fetching the game ID from the response from the db
+    let gameid = resultgame.rows[0].gameid //Fetching the game ID from the response from the db
 
     return gameid //Returning the gameid 
 
@@ -142,17 +142,17 @@ async function AddPlayerToGame(gameid, userid) {
         values: [userid]
     }
     let fetchplayerid = await pool.query(query2)
-    var playerid = fetchplayerid.rows[0].playerid //Fetching playerid from the object
+    let playerid = fetchplayerid.rows[0].playerid //Fetching playerid from the object
     let playerids = await GetPlayerIDinGame(gameid)
 
 
     if (playerids == null) {
-        var playerid1 = null
-        var playerid2 = null
+        let playerid1 = null
+        let playerid2 = null
     }
     else {
-        var playerid1 = playerids[0]
-        var playerid2 = playerids[1]
+        let playerid1 = playerids[0]
+        let playerid2 = playerids[1]
     }
 
     //If gameid is valid then add user
@@ -164,7 +164,7 @@ async function AddPlayerToGame(gameid, userid) {
                 text: 'INSERT INTO public.game_players(gameid, playerid) VALUES ($1, $2) RETURNING *;',
                 values: [gameid, playerid]
             }
-            var result = await pool.query(query3)
+            let result = await pool.query(query3)
             if (result.rows.length != 0) { return true }
             else { return false }
         }
@@ -175,7 +175,7 @@ async function AddPlayerToGame(gameid, userid) {
                 text: 'UPDATE public.game_players SET playerid2 = $2 WHERE gameid = $1 RETURNING *;',
                 values: [gameid, playerid]
             }
-            var result = await pool.query(query4)
+            let result = await pool.query(query4)
             if (result.rows.length != 0) { return true }
             else { return false }
         }
@@ -195,8 +195,8 @@ async function CheckPlayerCountInGame(gameid) {
         return 0
     }
     else {
-        var player1 = result.rows[0].playerid
-        var player2 = result.rows[0].playerid2
+        let player1 = result.rows[0].playerid
+        let player2 = result.rows[0].playerid2
         //returns the amount of players
         if (player1 == null && player2 == null) { return 0 }
         else if (player1 != null && player2 == null) { return 1 }
@@ -253,7 +253,7 @@ async function GetTableID(gameid) {
         return null
     }
     else {
-        var tableid = result.rows[0].tableid
+        let tableid = result.rows[0].tableid
         if (tableid > 0) {
             return tableid
         }
@@ -270,11 +270,11 @@ async function fetchUsernamesInGame(gameid) {
         values: [gameid]
     }
     let result = await pool.query(query) //Returns the amount of players in the game
-    var playerid1 = result.rows[0].playerid
-    var playerid2 = result.rows[0].playerid2
+    let playerid1 = result.rows[0].playerid
+    let playerid2 = result.rows[0].playerid2
 
-    var username1 = await GetUsernamesFromPlayerID(playerid1)
-    var username2 = await GetUsernamesFromPlayerID(playerid2)
+    let username1 = await GetUsernamesFromPlayerID(playerid1)
+    let username2 = await GetUsernamesFromPlayerID(playerid2)
     let usernames = []
     usernames.push(username1, username2)
 
@@ -292,7 +292,7 @@ async function GetUsernamesFromPlayerID(playerid) {
         return null
     }
     else {
-        var userid = result.rows[0].userid
+        let userid = result.rows[0].userid
 
         if (userid != null) {
             const query = {
@@ -300,7 +300,7 @@ async function GetUsernamesFromPlayerID(playerid) {
                 values: [userid]
             }
             let result = await pool.query(query) //Returns the amount of players in the game
-            var username = result.rows[0].username
+            let username = result.rows[0].username
             if (username != null) {
                 return username
             }
@@ -334,7 +334,7 @@ async function IsUserInAGame(userid) {
         values: [userid]
     }
     let result = await pool.query(query) //Returns the playerid from player table
-    var playerid = result.rows[0].playerid
+    let playerid = result.rows[0].playerid
 
     if (playerid != null) {
         const query = {
@@ -365,8 +365,8 @@ async function GetPlayerIDinGame(gameid) {
         return null
     }
     else {
-        var playerid = result.rows[0].playerid
-        var playerid2 = result.rows[0].playerid2
+        let playerid = result.rows[0].playerid
+        let playerid2 = result.rows[0].playerid2
         playerids.push(playerid, playerid2)
         return playerids
     }
@@ -438,10 +438,10 @@ async function GetTableIPWithGameID(gameid) {
 
 
 async function JoinGame(gameid, userid) {
-    var playercount = await CheckPlayerCountInGame(gameid) //Returns and integer of players inside the game.
+    let playercount = await CheckPlayerCountInGame(gameid) //Returns and integer of players inside the game.
 
     if (playercount < 2) {
-        var result = await AddPlayerToGame(gameid, userid) //Adds the the playerid to the game 
+        let result = await AddPlayerToGame(gameid, userid) //Adds the the playerid to the game 
         return result
     }
     else { return false }
@@ -636,7 +636,7 @@ async function GetGameLoser(gameid) {
 async function Top25WL(gameid) {
     //This will return an array with the top 25 players based on win/loss ratio
     const query = {
-        text: 'SELECT wins, losses, userid FROM public.player;'
+        text: 'SELECT wins, losses, userid FROM public.player WHERE losses > 0;'
     }
     let result = await pool.query(query)
     for (let index = 0; index < result.rows.length; index++) {

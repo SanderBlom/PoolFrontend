@@ -5,18 +5,18 @@ let db = require("./db.js") //Used to access the database functions
 
 
 function convertCoordinatesX(inputX) {
-    var ballRadius = 20 //Defining the ball radius. 
-    var tableLength = 1114 - ballRadius
-    var lengtdiff = 85//Diffrence in pixels between the edge of the table and the cloth where the balls exist.
-    var x = (tableLength * inputX) + lengtdiff
+    let ballRadius = 20 //Defining the ball radius. 
+    let tableLength = 1114 - ballRadius
+    let lengtdiff = 85//Diffrence in pixels between the edge of the table and the cloth where the balls exist.
+    let x = (tableLength * inputX) + lengtdiff
     x = Math.trunc(x)
     return x;
 }
 function convertCoordinatesY(inputY) {
-    var ballRadius = 20 //Defining the ball radius. 
-    var tableHeight = 569 - ballRadius //old = 569
-    var lengtdiff = 100//Diffrence in pixels between the edge of the table and the cloth where the balls exist.
-    var y = (tableHeight * inputY) + lengtdiff
+    let ballRadius = 20 //Defining the ball radius. 
+    let tableHeight = 569 - ballRadius //old = 569
+    let lengtdiff = 100//Diffrence in pixels between the edge of the table and the cloth where the balls exist.
+    let y = (tableHeight * inputY) + lengtdiff
     y = Math.trunc(y)
     return y;
 }
@@ -91,8 +91,8 @@ function renderballs(Balls) {
     return new Promise((resolve, reject) => {
         const billiardboard = createCanvas(1280, 731)
         const billiardballs = createCanvas(1280, 731)
-        var context = billiardboard.getContext('2d')
-        var context2 = billiardballs.getContext('2d')
+        let context = billiardboard.getContext('2d')
+        let context2 = billiardballs.getContext('2d')
         loadImage('views/img/pooltable.png').then(image => {
             context.clearRect(0, 0, 1280, 731)
             context.drawImage(image, 0, 0, 1280, 731)//draws the pooltable to the canvas
