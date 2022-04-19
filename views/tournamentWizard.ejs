@@ -32,7 +32,14 @@
 						<div id="survey_options">
 							<h4>Please add all the usernames of all the players</h4>
 							<input type="text" name="usernames" class="survey_options" size="50"
-								placeholder="Username0" value="<%= locals.username %>" id="firstuser" required>
+								placeholder="Username0" id="firstuser" required>
+								<input type="text" name="usernames" class="survey_options" size="50"
+								placeholder="Username1"   required>
+								<input type="text" name="usernames" class="survey_options" size="50"
+								placeholder="Username2"   required>
+								<input type="text" name="usernames" class="survey_options" size="50"
+								placeholder="Username3"  required>
+
 						</div>
 						<div class="controls">
 							<button type="button" id="add" name="button" class="btn btn-primary mb-2" onclick="addnew()">+</button>
@@ -62,7 +69,7 @@
 	<script src="/js/bootstrap.min.js"></script>
 	<script>
 		var survey_options = document.getElementById('survey_options');
-		var count = 1
+		var count = 4
 		var addnew = function(){
 			if(count <= 12){
 			var newField = document.createElement('input');
@@ -83,7 +90,8 @@
 		}
 		
 		var delold = function(){
-			var input_tags = survey_options.getElementsByTagName('input');
+			if(count > 4) {
+				var input_tags = survey_options.getElementsByTagName('input');
 			if (input_tags.length > 1) {
 				survey_options.removeChild(input_tags[(input_tags.length) - 1]);
 				if(count >= 12){
@@ -91,6 +99,8 @@
 				}
 				count = count - 1
 			}
+			}
+			
 		}
 
 		var submitBtn = function(){

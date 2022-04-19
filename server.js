@@ -253,7 +253,7 @@ app.get("/game/previous/:id", checkAuth, async (req, res) => {
         
         else {
             try {
-                let images = await game.renderwholegame(balls)
+                let images = await game.renderwholegame(balls) //Function returns an array with images of the selected game.
                     res.render('previousgame', {
                         message: req.flash('message'), username, user: userid, title: 'test', images: images, gameid: gameid,
                         constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time, winner: winner, loser: loser
