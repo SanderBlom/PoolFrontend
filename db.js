@@ -233,11 +233,9 @@ async function GetPlayerID(userid) {
     let result = await pool.query(query) //Returns the amount of players in the game
     if(result.rows.length > 0){
         const playerid = result.rows[0].playerid
-        console.log('jeg kjørte')
         return playerid
     }
     else{
-        console.log('invalid')
         return null}
 
 }
@@ -564,7 +562,6 @@ async function PersonalStatsWL(userid) {
     else {
         wl = result.rows[0].wins / result.rows[0].losses
         wl = wl.toFixed(2)
-        console.log(wl)
         return wl
     }
 }
