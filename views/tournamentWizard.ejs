@@ -17,7 +17,7 @@
 	<div class="container-medium">
 		<form id="boxed" action="/tournament/new" method="POST">
 			<h3>Create new tournament</h3>
-			
+
 			<!--Yellow message for a unsuccessful function-->
 			<% if(messages.error) { %>
 				<div class="alert alert-warning">
@@ -28,34 +28,35 @@
 					<div>
 						<h4>Give the tournament a name</h4>
 						<input type="text" name="TournamentName" class="survey_options" size="50"
-								placeholder="Tournament Name" required> <br><br>
+							placeholder="Tournament Name" required> <br><br>
 						<div id="survey_options">
 							<h4>Please add all the usernames of all the players</h4>
-							<input type="text" name="usernames" class="survey_options" size="50"
-								placeholder="Username0" id="firstuser" required>
-								<input type="text" name="usernames" class="survey_options" size="50"
-								placeholder="Username1"   required>
-								<input type="text" name="usernames" class="survey_options" size="50"
-								placeholder="Username2"   required>
-								<input type="text" name="usernames" class="survey_options" size="50"
-								placeholder="Username3"  required>
+							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username0"
+								id="firstuser" required>
+							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username1"
+								required>
+							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username2"
+								required>
+							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username3"
+								required>
 
 						</div>
 						<div class="controls">
-							<button type="button" id="add" name="button" class="btn btn-primary mb-2" onclick="addnew()">+</button>
-							<button style="float: right " type="button" id="del" name="button" class="btn btn-danger" onclick="delold()">-</button> <br>
-							<!-- <a href="#" id="add_more_fields"><i class="fa fa-plus"></i>Add More</a>
-							<a href="#" id="remove_fields"><i class="fa fa-plus"></i>Remove Field</a> -->
+							<button type="button" id="add" name="button" class="btn btn-primary mb-2"
+								onclick="addnew()">+</button>
+							<button style="float: right " type="button" id="del" name="button" class="btn btn-danger"
+								onclick="delold()">-</button> <br>
 						</div>
 					</div>
-					
+
 					<div class="submit-div">
-						<button name="submit" type="submit" id="boxed-submit" onclick="submitBtn()">Create tournament</button>
+						<button name="submit" type="submit" id="boxed-submit" onclick="submitBtn()">Create
+							tournament</button>
 					</div>
 					<div>
 						<label name="limitlabel" id="limitlabel">This gamemode is limited to 12 players</label>
 					</div>
-					
+
 		</form>
 
 	</div>
@@ -70,44 +71,44 @@
 	<script>
 		var survey_options = document.getElementById('survey_options');
 		var count = 4
-		var addnew = function(){
-			if(count <= 12){
-			var newField = document.createElement('input');
-			newField.setAttribute('type', 'text');
-			newField.setAttribute('name', 'usernames');
-			newField.setAttribute('class', 'survey_options');
-			newField.setAttribute('siz', 50);
-			newField.setAttribute('placeholder', `Username${count}`);
-			newField.required = true;
-			survey_options.appendChild(newField);
-			var limittext = document.getElementById('limitlabel').style.color = 'black';
-			count = count + 1
+		var addnew = function () {
+			if (count <= 12) {
+				var newField = document.createElement('input');
+				newField.setAttribute('type', 'text');
+				newField.setAttribute('name', 'usernames');
+				newField.setAttribute('class', 'survey_options');
+				newField.setAttribute('siz', 50);
+				newField.setAttribute('placeholder', `Username${count}`);
+				newField.required = true;
+				survey_options.appendChild(newField);
+				var limittext = document.getElementById('limitlabel').style.color = 'black';
+				count = count + 1
 			}
-			else{
+			else {
 				var limittext = document.getElementById('limitlabel').style.color = 'red';
 			}
-			
-		}
-		
-		var delold = function(){
-			if(count > 4) {
-				var input_tags = survey_options.getElementsByTagName('input');
-			if (input_tags.length > 1) {
-				survey_options.removeChild(input_tags[(input_tags.length) - 1]);
-				if(count >= 12){
-					var limittext = document.getElementById('limitlabel').style.color = 'black';
-				}
-				count = count - 1
-			}
-			}
-			
+
 		}
 
-		var submitBtn = function(){
+		var delold = function () {
+			if (count > 4) {
+				var input_tags = survey_options.getElementsByTagName('input');
+				if (input_tags.length > 1) {
+					survey_options.removeChild(input_tags[(input_tags.length) - 1]);
+					if (count >= 12) {
+						var limittext = document.getElementById('limitlabel').style.color = 'black';
+					}
+					count = count - 1
+				}
+			}
+
+		}
+
+		var submitBtn = function () {
 			document.getElementById("boxed").submit();
 		}
-		
-		
+
+
 	</script>
 
 </body>

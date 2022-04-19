@@ -599,7 +599,6 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
     let tournament = req.body //Gets body from POST
     let tournamentName = tournament.TournamentName //storing tournament name
     let usernames = tournament.usernames //array of usernames to add to tournament
-    let tournamentID = await db.CreateNewTournament(tournamentName)
     let invalidusernames = []
     for (let index = 0; index < usernames.length; index++) {
         const username = usernames[index];
@@ -613,8 +612,12 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
     }
     console.log(invalidusernames)
 
-    if (invalidusernames.length != 0) {
+    if (invalidusernames.length == 0) {
         //Cheks that we dont have any invalid usernames
+        console.log('Valid')
+    }
+    else{
+        res.redirect('back');
     }
 
 })
