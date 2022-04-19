@@ -14,6 +14,7 @@
 		<!-- Henter fram navbaren fra partials mappen -->
 		<%- include('partials/navbar', {username:username}) %>
 	</div>
+
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-md-4">
@@ -115,12 +116,18 @@
 								<% } %>
 						</select>
 						<br>
-						<button type="submit" class="btn btn-primary mb-2">Show</button>
-						
+						<button onclick="show()" id="submitbutton" type="submit"
+							class="btn btn-primary mb-2">Show</button>
+						<div id="loadinganimation" class="spinner-border text-primary" role="status">
+							<span class="sr-only">Loading...</span>
+							
+						</div>
+						<br>
+						<div id="loadingtext">
+							<h7>Loading... This can take up to 10 seconds</h7>
+						</div>
+
 					</form>
-					<div class="spinner-border" role="status">
-						<span class="sr-only">Loading...</span>
-					  </div>
 				</div>
 			</div>
 
@@ -164,7 +171,8 @@
 								<lable for="email">Email addres:</lable>
 								<input type="email" id="email" name="email" value="<%=locals.email%>" required />
 							</div>
-							<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Update user
+							<button name="submit" type="submit" id="boxed-submit"
+								data-submit="...Sending">Update user
 								details</button>
 				</form>
 				</p>
@@ -175,7 +183,14 @@
 		<!-- Henter fram footer fra partials mappen -->
 		<%- include('partials/footer') %>
 	</div>
+	<script>
+		function hideloading() {
+			document.getElementById("loadinganimation").style.display = "none"; //Hiding loading wheel
+			document.getElementById("loadingtext").style.display = "none"; //Hiding loading text
+		}
 
+
+		window.onload = hideloading() </script>
 	<script src="/js/jquery.min.js"></script>
 	<script>
 
@@ -214,6 +229,17 @@
 				plugins: { legend: { display: false }, } //Removes the dataset label
 			}
 		});
+	</script>
+	<script>
+		function show() {
+			var loading = document.getElementById("loadinganimation").style.display = "block"; //Shows loading circle
+			var loading = document.getElementById("loadingtext").style.display = "block"; //Shows text that we are loading
+
+			var button = document.getElementById("submitbutton").style.display = 'none'; //Hiding the submit button
+			
+		}
+
+
 	</script>
 
 	<script src="/js/bootstrap.min.js"></script>
