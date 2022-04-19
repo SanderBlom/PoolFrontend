@@ -117,7 +117,7 @@ app.post("/register", checkNotAuth, async function (req, res) {
             emailresponse = await db.ValidateUniqueEmail(email)
             usernameresponse = await db.ValidateUniqueUsername(username)
 
-        } catch (error) {
+        } catch (err) {
             res.send(404, 'Could not check username and email validity')
         }
         if ((usernameresponse == true) && (emailresponse == true)) {
@@ -208,7 +208,6 @@ app.post("/game/previous/", checkAuth, async (req, res) => {
 
     let validate = await db.ValidateGameAccess(userid, gameid) //We validate that the user has access to the requested game
     if (validate) {
-        console.log('You have access')
         res.redirect(`/game/previous/${gameid}`)
     }
     else {
@@ -364,7 +363,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
             tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
             tablestatus = await vision.CheckTableAvailability(tableid) //Checks that nobody has started a game on the same table.
             if (tablestatus == true) {
-                //console.log('Gameid= ' + gameid + ' pID 1= ' + playerid1 + ' pID 2=' + playerid2 + ' usrName1= ' + username1 + ' usrName2= ' + username2 + 'timestamp ' + timestampFormated)
+        
                 let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check. Returns HTTP status codes
 
                 if (result == 200) {
@@ -396,7 +395,6 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
 
         else {
             //If the user trying to start the game is not one of the users that plays. Redirect him back to his profile.
-            console.log('Dont active')
             req.flash('gamemessage', 'Looks like your not a part on the game...')
             res.redirect("/user/dashboard")
         }
@@ -439,7 +437,6 @@ app.get("/game/:id", checkAuth, async (req, res) => {
     }
     else {
         if (username1 == null && username2 == null) {
-            console.log('User is not logged in or is not a member of the gameid')
             res.redirect("/login")
         }
         else if (req.user) {
@@ -464,7 +461,6 @@ app.get("/game/:id", checkAuth, async (req, res) => {
 //This page loads after you have picked a table and the system has checked that its not in use.
 app.get("/game/create/:id", checkAuth, (req, res) => {
     let tableid = req.params.id.trim();
-    console.log("test")
     let player2Username
     try {
         if (req.user) {
@@ -488,7 +484,6 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
 
     //Validate that the game exsist and has not been started or ended
     let players = await db.CheckPlayerCountInGame(gameid)
-    console.log('Amout of players in requested game:' + players)
 
     if (players >= 2) {
         req.flash('gamemessage', "Looks like the game is full")
@@ -586,7 +581,6 @@ app.get("/rules", (req, res) => {
 app.get("/tournament/new", checkAuth, (req, res) => {
     let username = req.user.username
     let userid = req.user.userid
-    console.log(username)
     res.render('tournamentWizard', { message: req.flash('message'), username: username, user: userid, title: 'tournament' }) //Renderes the index websites and passes title for the navbar
 
 
