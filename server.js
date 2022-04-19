@@ -6,7 +6,7 @@ const methodOverride = require('method-override') //Used to override methods.
 const passport = require('passport') //Lib to keep track of logged in users
 const bcrypt = require('bcrypt'); //This is used to hash password and check hashes so we dont store the passwords in plain text
 require('dotenv').config(); //Used to store passwords. This should not be uploaded to github :) 
-var app = express();
+let app = express();
 const PORT = 3000 //Ports that the server will listen to.
 app.set('view engine', 'ejs'); // Changing the view engine to ejs
 let vision = require("./VisionSystem")
@@ -33,7 +33,7 @@ app.use(
 );
 // Funtion inside passport which initializes passport
 app.use(passport.initialize()); //Starting passport to keep track of our users
-app.use(passport.session());// Store our variables to be persisted across the whole session. Works with app.use(Session) above
+app.use(passport.session());// Store our letiables to be persisted across the whole session. Works with app.use(Session) above
 app.use(flash()); //Used for to display flash messages to the frontend
 app.use(methodOverride('_method')) //used for triggering .delete functions with posts function in html
 
@@ -80,13 +80,13 @@ app.post("/login", checkNotAuth, passport.authenticate('local', {
 app.get("/", async (req, res) => {
     //Checks if user is logged in or not
     if (req.user) {
-        var userid = req.user.userid
-        var username = req.user.username
+        let userid = req.user.userid
+        let username = req.user.username
         res.render('index', { message: req.flash('message'), username, user: userid, title: 'index' }) //Renderes the index websites and passes title for the navbar
     }
     else {
-        var userid = null
-        var username = null
+        let userid = null
+        let username = null
         res.render('index', { message: req.flash('message'), username: username, user: userid, title: 'index' }) //Renderes the index websites and passes title for the navbar
     }
 })
@@ -94,14 +94,14 @@ app.get("/", async (req, res) => {
 //function to get the register page
 app.get("/register", checkNotAuth, (req, res) => {
 
-    res.render('register', { message: req.flash('message'), title: 'register' }) //Renders the register websites and passes different variables for flash message and title for navbar
+    res.render('register', { message: req.flash('message'), title: 'register' }) //Renders the register websites and passes different letiables for flash message and title for navbar
 })
 
 app.post("/register", checkNotAuth, async function (req, res) {
     let { username, firstname, lastname, email, pwd, repwd } = req.body
-    var usernameresponse //Calling function to check if the username is not taken.
-    var emailresponse //Calling function to check if the email is not taken.
-    var InsertUserResult // Calling function to insert data into the database
+    let usernameresponse //Calling function to check if the username is not taken.
+    let emailresponse //Calling function to check if the email is not taken.
+    let InsertUserResult // Calling function to insert data into the database
 
     //Checks that the email passes the regex in const emailRegexp.
     //Found the expression at: https://stackoverflow.com/questions/52456065/how-to-format-and-validate-email-node-js
@@ -141,9 +141,9 @@ app.post("/register", checkNotAuth, async function (req, res) {
         }
         //Checks if email or username is unique.
         else if ((usernameresponse != true) || (emailresponse != true)) {
-            var emailerror = 'Looks like your email is already in use'
-            var usernameerror = 'Looks like your username is already in use'
-            var usernameandemailerror = 'Looks like both email and username is already in use'
+            let emailerror = 'Looks like your email is already in use'
+            let usernameerror = 'Looks like your username is already in use'
+            let usernameandemailerror = 'Looks like both email and username is already in use'
 
             if (usernameresponse == false && emailresponse == false) {
                 //This should be triggered if both username and email is already in use. 
@@ -176,16 +176,16 @@ app.post("/register", checkNotAuth, async function (req, res) {
 })
 
 app.get("/user/dashboard", checkAuth, async (req, res) => {
-    var userid = req.user.userid
-    var username = req.user.username
-    var firstname = req.user.firstname
-    var lastname = req.user.lastname
-    var email = req.user.email
+    let userid = req.user.userid
+    let username = req.user.username
+    let firstname = req.user.firstname
+    let lastname = req.user.lastname
+    let email = req.user.email
     let wl = await db.PersonalStatsWL(userid) //Fetches your win/loss ratio form the database
     let avwl = await db.AvrageStatsWL()//Fetches the average win/loss ratio form the database
-    var ingame = await db.IsUserInAGame(userid) //Checks if the user is in an active game
+    let ingame = await db.IsUserInAGame(userid) //Checks if the user is in an active game
     let previousgames = await db.GetPreviousGameList(userid) //Get an array of gameids where the user has played 
-    var gameid = null
+    let gameid = null
     if (ingame == true) {
         gameid = await db.GetGameIDForActiveGame(userid)
         res.render("profile", {
@@ -294,8 +294,8 @@ app.post("/user/dashboard", checkAuth, async (req, res) => {
 app.post("/game/create", checkAuth, async (req, res) => {
     const tableid = await req.body.tableid.trim()
     const userid = await req.user.userid
-    var tableAvailability = false;
-    var gameid = null
+    let tableAvailability = false;
+    let gameid = null
 
     try {
         tableAvailability = await vision.CheckTableAvailability(tableid)  //Checks the tableid the user has submited, and ask the visionsystem if the table is available 
@@ -313,7 +313,7 @@ app.post("/game/create", checkAuth, async (req, res) => {
     }
 
     if (gameid != null) {
-        var result = await db.JoinGame(gameid, userid)
+        let result = await db.JoinGame(gameid, userid)
         if (result == true) {
             req.flash('message', `Please give your opponent the game ID so they can join.`)
             res.redirect(`/game/${gameid}`)
@@ -328,7 +328,7 @@ app.post("/game/create", checkAuth, async (req, res) => {
 app.post("/game/cancel/:id", checkAuth, async (req, res) => {
     //This should only be trigged while waiting for a game start.
     //Here we should add some validation that only users in the game can cancel the game!!
-    var gameid = req.params.id.trim();
+    let gameid = req.params.id.trim();
     try {
         db.CancelGame(gameid)
     } catch (error) {
@@ -342,11 +342,11 @@ app.post("/game/cancel/:id", checkAuth, async (req, res) => {
 })
 
 app.post("/game/start/:id", checkAuth, async (req, res) => {
-    var gameid = req.params.id.trim(); //Getting gameid from url
+    let gameid = req.params.id.trim(); //Getting gameid from url
     let { username1, username2 } = req.body //Getting usernames from post request.
-    var username = await req.user.username //Getting logged in users username
-    var tablestatus //Stores the table status. This should be true if there are no active games on the table.
-    var tableid
+    let username = await req.user.username //Getting logged in users username
+    let tablestatus //Stores the table status. This should be true if there are no active games on the table.
+    let tableid
 
     //Checks that the game is not allready started
     let gamestatus = await db.IsGameActive(gameid)
@@ -355,8 +355,8 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     }
     else {
         let playerids = await db.GetPlayerIDinGame(gameid)
-        var playerid1 = playerids[0]
-        var playerid2 = playerids[1]
+        let playerid1 = playerids[0]
+        let playerid2 = playerids[1]
         if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
         {
             const timestamp = moment() //Creating timestamp in millisec
@@ -368,7 +368,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
                 let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check. Returns HTTP status codes
 
                 if (result == 200) {
-                    var creategame = await db.StartGame(gameid)
+                    let creategame = await db.StartGame(gameid)
                     if (creategame == true) {
                         res.redirect(`/livegame/${gameid}`)
                     }
@@ -408,14 +408,14 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
 
 })
 app.get("/game/:id", checkAuth, async (req, res) => {
-    var gameid = req.params.id.trim();
-    var gamestartedstatus
-    var username1 = null
-    var username2 = null
-    var username = req.user.username // fetching username to use in the navbar
+    let gameid = req.params.id.trim();
+    let gamestartedstatus
+    let username1 = null
+    let username2 = null
+    let username = req.user.username // fetching username to use in the navbar
     let error = null
     try {
-        var tableid = await db.GetTableID(gameid)
+        let tableid = await db.GetTableID(gameid)
         let usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
 
         if (usernames == null) {
@@ -448,7 +448,7 @@ app.get("/game/:id", checkAuth, async (req, res) => {
                 res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
             }
             else {
-                var userid = req.user.userid
+                let userid = req.user.userid
                 res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid, gamestatus: gamestartedstatus })
             }
 
@@ -463,13 +463,13 @@ app.get("/game/:id", checkAuth, async (req, res) => {
 
 //This page loads after you have picked a table and the system has checked that its not in use.
 app.get("/game/create/:id", checkAuth, (req, res) => {
-    var tableid = req.params.id.trim();
+    let tableid = req.params.id.trim();
     console.log("test")
-    var player2Username
+    let player2Username
     try {
         if (req.user) {
-            var userid = req.user.userid
-            var username = req.user.username
+            let userid = req.user.userid
+            let username = req.user.username
             res.render('gameWizard', { message: req.flash('message'), username, player2Username, user: userid, title: 'game', tableid })
         }
         else {
@@ -483,11 +483,11 @@ app.get("/game/create/:id", checkAuth, (req, res) => {
 })
 
 app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
-    var gameid = req.body.gameid
-    var userid = req.user.userid
+    let gameid = req.body.gameid
+    let userid = req.user.userid
 
     //Validate that the game exsist and has not been started or ended
-    var players = await db.CheckPlayerCountInGame(gameid)
+    let players = await db.CheckPlayerCountInGame(gameid)
     console.log('Amout of players in requested game:' + players)
 
     if (players >= 2) {
@@ -497,7 +497,7 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
 
 
     else {
-        var result = await db.AddPlayerToGame(gameid, userid)
+        let result = await db.AddPlayerToGame(gameid, userid)
         if (result == true) {
             res.redirect(`/game/${gameid}`)
 
@@ -519,7 +519,7 @@ app.get("/scoreboard", async (req, res) => {
     let wl = []
     for (let index = 0; index < data.length; index++) {
         //Adds usernames and win/loss ratio to two arrays
-        var name = data[index].username
+        let name = data[index].username
         //name = await addQuotes(name)
         usernames.push(name)
         wl.push(data[index].wl)
@@ -527,7 +527,7 @@ app.get("/scoreboard", async (req, res) => {
     }
     //Sorting array from high to low
     //Adding the data into one array
-    var Data = [];
+    let Data = [];
     for (let i = 0; i < usernames.length; ++i) {
         Data.push({
             label: usernames[i],
@@ -539,20 +539,20 @@ app.get("/scoreboard", async (req, res) => {
     Data.sort((a, b) => parseFloat(b.data) - parseFloat(a.data));
 
     //Splittng the data into two arrays.
-    var sortedLabels = Data.map(e => e.label);
-    var sortedData = Data.map(e => e.data);
+    let sortedLabels = Data.map(e => e.label);
+    let sortedData = Data.map(e => e.data);
 
     try {
         if (req.user) {
-            var userid = req.user.userid
-            var username = req.user.username
-            var firstname = req.user.firstname
-            var lastname = req.user.lastname
+            let userid = req.user.userid
+            let username = req.user.username
+            let firstname = req.user.firstname
+            let lastname = req.user.lastname
             res.render('statistics', { message: req.flash('message'), username, user: userid, title: 'scoreboard', Usernames: sortedLabels, WL: sortedData }) //Renderes the statistic websites and passes title for the navbar
         }
         else {
-            var userid = null
-            var username = null
+            let userid = null
+            let username = null
             res.render('statistics', { message: req.flash('message'), username: username, user: userid, title: 'scoreboard', Usernames: sortedLabels, WL: sortedData }) //Renderes the statistic websites and passes title for the navbar
         }
 
@@ -567,13 +567,13 @@ app.get("/rules", (req, res) => {
 
     try {
         if (req.user) {
-            var userid = req.user.userid
-            var username = req.user.username
+            let userid = req.user.userid
+            let username = req.user.username
             res.render('rules', { message: req.flash('message'), username, user: userid, title: 'rules' }) //Renderes the index websites and passes title for the navbar
         }
         else {
-            var userid = null
-            var username = null
+            let userid = null
+            let username = null
             res.render('rules', { message: req.flash('message'), username: username, user: userid, title: 'rules' }) //Renderes the index websites and passes title for the navbar
         }
 
@@ -585,7 +585,7 @@ app.get("/rules", (req, res) => {
 
 app.get("/tournament/new", checkAuth, (req, res) => {
     let username = req.user.username
-    var userid = null //need this for some reason
+    let userid = req.user.userid
     console.log(username)
     res.render('tournamentWizard', { message: req.flash('message'), username: username, user: userid, title: 'tournament' }) //Renderes the index websites and passes title for the navbar
 
@@ -628,11 +628,11 @@ app.post("/livegame", async (req, res) => {
 })
 
 app.get("/livegame/:id", async (req, res) => {
-    var gameid = req.params.id.trim(); //Fetches game id from url
-    var userid = null
-    var username = null
-    var player1Username = null//This stores player1 name 
-    var player2Username = null//This stores player2 name 
+    let gameid = req.params.id.trim(); //Fetches game id from url
+    let userid = null
+    let username = null
+    let player1Username = null//This stores player1 name 
+    let player2Username = null//This stores player2 name 
     let error
     let time
     let balls
@@ -662,8 +662,8 @@ app.get("/livegame/:id", async (req, res) => {
     else {
         try {
             if (req.user) {
-                var userid = req.user.userid
-                var username = req.user.username
+                let userid = req.user.userid
+                let username = req.user.username
                 game.renderballs(balls)
                     .then((image) => res.render('game', {
                         message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
@@ -672,8 +672,8 @@ app.get("/livegame/:id", async (req, res) => {
 
             }
             else {
-                var userid = null
-                var username = null
+                let userid = null
+                let username = null
                 game.renderballs(balls)
                     .then((image) => res.render('game', {
                         message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
