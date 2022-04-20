@@ -411,10 +411,12 @@ app.get("/game/:id", checkAuth, async (req, res) => {
     let username1 = null
     let username2 = null
     let username = req.user.username // fetching username to use in the navbar
+    let usernames = null
     let error = null
+    let tableid
     try {
-        let tableid = await db.GetTableID(gameid)
-        let usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
+        tableid = await db.GetTableID(gameid)
+        usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
 
         if (usernames == null) {
             username1 == null
