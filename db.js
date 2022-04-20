@@ -232,18 +232,19 @@ async function GetPlayerID(userid) {
         values: [userid]
     }
     let result = await pool.query(query) //Returns the amount of players in the game
-    if(result.rows.length > 0){
+    if (result.rows.length > 0) {
         const playerid = result.rows[0].playerid
         return playerid
     }
-    else{
-        return null}
+    else {
+        return null
+    }
 
 }
 async function GetTableID(gameid) {
     //This function finds the table if given the gameid
     const query = {
-        text: 'SELECT tableid FROM game WHERE gameid = $1;',
+        text: 'SELECT tableid FROM game WHERE gameid = $1 AND active = true;',
         values: [gameid]
     }
     let result = await pool.query(query) //Fetches tableid from game table
@@ -526,24 +527,24 @@ async function TotalGameTime(gameid) {
 
 }
 
-async function GetPreviousGameList(userid){
+async function GetPreviousGameList(userid) {
     //This will return all the gameids for a spesific user.
     let playerid = await GetPlayerIDFromUserID(userid)
-  
-        const query = {
-            text: 'SELECT gameid FROM public.game WHERE winner = $1 OR loser = $1;',
-            values: [playerid]
-        }
-        let result = await pool.query(query)
-        let object = result.rows
-        let gamearry = []
 
-        for (let index = 0; index < object.length; index++) {
-            let element = object[index].gameid;
-            gamearry.push(element)
-            
-        }
-        return gamearry
+    const query = {
+        text: 'SELECT gameid FROM public.game WHERE winner = $1 OR loser = $1;',
+        values: [playerid]
+    }
+    let result = await pool.query(query)
+    let object = result.rows
+    let gamearry = []
+
+    for (let index = 0; index < object.length; index++) {
+        let element = object[index].gameid;
+        gamearry.push(element)
+
+    }
+    return gamearry
 
 }
 
@@ -659,60 +660,60 @@ async function GetUsername(userid) {
 
     return result.rows[0].username
 }
-async function CreateNewTournament(tournamentName){
+async function CreateNewTournament(tournamentName) {
     //This function creates a new tournament and returns the tournament ID
     const query = {
         text: 'INSERT INTO public.Tournament(TournamentName) VALUES ($1) RETURNING *;',
         values: [tournamentName]
     }
     let result = await pool.query(query)
-    if(result.rows.length > 0 ){
+    if (result.rows.length > 0) {
         let tournamentid = result.rows[0].tournamentid
         return tournamentid
     }
-    else{return null}
+    else { return null }
 
 }
 
-async function GetPlayerIDFromUserID(userid){
+async function GetPlayerIDFromUserID(userid) {
     //This function will return the playerid correlating to the playerid
     const query = {
         text: 'SELECT playerid from player WHERE userid = $1',
         values: [userid]
     }
     let result = await pool.query(query)
-    if(result.rows.length > 0){
+    if (result.rows.length > 0) {
         return result.rows[0].playerid
     }
-    else{return null}
-    
+    else { return null }
+
 
 }
 
-async function ValidateGameAccess(userid, gameid){
+async function ValidateGameAccess(userid, gameid) {
     //This checks if the userid has played a game matching the gameid. Will return true if the user has played a game matching the gameid
     let playerid = await GetPlayerID(userid)
 
-    if(playerid != null){
+    if (playerid != null) {
         const query = {
             text: 'SELECT * from game WHERE gameid = $2 AND (winner = $1 OR loser = $1)',
             values: [playerid, gameid]
         }
         let result = await pool.query(query)
-    
-        if(result.rows.length > 0){
+
+        if (result.rows.length > 0) {
             return true
         }
-        else{return false}
+        else { return false }
     }
-    else{
+    else {
         return false
     }
 
 
 }
 
-async function GetAllBallPositions(gameid){
+async function GetAllBallPositions(gameid) {
     //This will fetch all the x, y coordinates of the balls for an entire game
     const query = {
         text: `SELECT x_pos, y_pos, playcount, ballcoulor 
@@ -727,12 +728,205 @@ async function GetAllBallPositions(gameid){
 
 }
 
+async function GetUsersActiveState(username) {
+    //This will check if the user is disabled or not
+    const query = {
+        text: `SELECT active FROM users WHERE username = $1`,
+        values: [username]
+    }
+    let result = await pool.query(query) //Getting the data from the database
+    console.log(result.rows)
+
+    if (result.rows[0].active == true) {
+        return true
+    }
+    else { return false }
+}
+
+async function DeactivateUser(username) {
+    //This will deactivate a useraccount.
+    const query = {
+        text: `UPDATE users SET active = false WHERE username = $1 RETURNING *`,
+        values: [username]
+    }
+    let result = await pool.query(query) //Getting the data from the database
+
+
+    if (result) {
+        return true
+    }
+    else { return false }
+}
+async function ActivateUser(username) {
+    //This will deactivate a useraccount.
+    const query = {
+        text: `UPDATE users SET active = true WHERE username = $1 RETURNING *`,
+        values: [username]
+    }
+    let result = await pool.query(query) //Getting the data from the database
+
+
+    if (result) {
+        return true
+    }
+    else { return false }
+}
+
+
+
+async function GetAllUserNames() {
+    //This will fetch all usernames from the database
+    const query = {
+        text: `SELECT username FROM users WHERE username NOT LIKE 'admin' AND active = true ORDER BY username ASC`
+    }
+    let result = await pool.query(query) //Getting the data from the database
+
+    let object = result.rows //object with the usernames
+    let usernamearray = []
+
+    for (let index = 0; index < object.length; index++) {
+        let element = object[index].username;
+        usernamearray.push(element)
+
+    }
+
+    return usernamearray
+}
+async function GetAllInactiveUserNames() {
+    //This will fetch all usernames from the database
+    const query = {
+        text: `SELECT username FROM users WHERE username NOT LIKE 'admin' AND active = false ORDER BY username ASC`
+    }
+    let result = await pool.query(query) //Getting the data from the database
+
+    let object = result.rows //object with the usernames
+    let usernamearray = []
+
+    for (let index = 0; index < object.length; index++) {
+        let element = object[index].username;
+        usernamearray.push(element)
+
+    }
+    return usernamearray
+}
+
+
+async function GetAllActiveGames() {
+    //This will fetch all active games
+    const query = {
+        text: `SELECT gameid, TO_CHAR(starttime, 'HH24:MI:SS') as starttime, TO_CHAR(createtime, 'HH24:MI:SS') as createtime, tableid, playerid, playerid2 FROM game NATURAL JOIN game_players WHERE (endtime is null )`
+    }
+    let result = await pool.query(query) //Getting the data from the database
+
+    return result.rows
+
+}
+
+async function GetAllTables() {
+    //This will fetch all tables from the database
+    const query = {
+        text: `SELECT * FROM tables WHERE active = true`
+    }
+    let result = await pool.query(query) //Getting the data from the database
+
+    return result.rows
+}
+
+async function GetAllActiveTableIds() {
+    //This will fetch all tables from the database
+    const query = {
+        text: `SELECT tableid FROM tables WHERE active = true`
+    }
+    let array = await pool.query(query) //Getting the data from the database
+    let tableids = [] //Arry to store all the ids
+    for (let index = 0; index < array.rows.length; index++) {
+        const element = array.rows[index].tableid
+        tableids.push(element)
+        
+    }
+    return tableids
+}
+async function GetAllInActiveTableIds() {
+    //This will fetch all tables from the database
+    const query = {
+        text: `SELECT tableid FROM tables WHERE active = false`
+    }
+    let array = await pool.query(query) //Getting the data from the database
+    let tableids = [] //Arry to store all the ids
+    for (let index = 0; index < array.rows.length; index++) {
+        const element = array.rows[index].tableid
+        tableids.push(element)
+        
+    }
+    return tableids
+}
+
+async function AddNewTable(ip) {
+    //This will fetch all tables from the database
+    //Checks if the IP is allready in the database
+    const query = {
+        text: `SELECT * FROM tables WHERE ipaddress = $1`,
+        values: [ip]
+    }
+    let valid = await pool.query(query) //Getting the data from the database
+
+    if(valid.rows.length > 0){
+        //Returns false if there IP allready exists in the db
+        console.log('There is allready an IP like that in the db')
+        return false
+    }
+    else{
+        //Inserts the new ip address into the table 
+    const query2 = {
+        text: `INSERT INTO public.tables(ipaddress) VALUES ($1) RETURNING *`,
+        values: [ip]
+    }
+
+    let result = await pool.query(query2) //Getting the data from the database
+    if(result.rows.length > 0){
+        return result.rows[0].tableid
+    }
+    else{
+        return null
+    }
+    }
+}
+
+async function DeactivateTable(tableid) {
+    //This will deactiavte a table
+    //Checks if the IP is allready in the database
+    const query = {
+        text: `UPDATE tables SET active = false WHERE tableid = $1 RETURNING *`,
+        values: [tableid]
+    }
+    let result = await pool.query(query) //Getting the data from the database
+    if(result.rows[0].active == false){
+        return true
+    }
+    else{return false}
+}
+async function ActivateTable(tableid) {
+    //This will deactiavte a table
+    //Checks if the IP is allready in the database
+    const query = {
+        text: `UPDATE tables SET active = true WHERE tableid = $1 RETURNING *`,
+        values: [tableid]
+    }
+    let result = await pool.query(query) //Getting the data from the database
+    if(result.rows[0].active == false){
+        return true
+    }
+    else{return false}
+}
+
+
 //Exporting all the functions so they can be access by server.js
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
     fetchUsernamesInGame, IsUserInAGame, GetPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
-    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL, 
+    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL,
     GetUsername, GetGameWinner, CreateNewTournament, GetPreviousGameList, ValidateGameAccess, GetGameLoser,
-    TotalGameTime, GetAllBallPositions
+    TotalGameTime, GetAllBallPositions, GetAllUserNames, GetUsersActiveState, ActivateUser, DeactivateUser,
+    GetAllActiveGames, GetAllTables, AddNewTable, DeactivateTable, ActivateTable, GetAllActiveTableIds, GetAllInActiveTableIds, GetAllInactiveUserNames
 }

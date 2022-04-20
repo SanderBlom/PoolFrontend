@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Your profile</title>
+	<link href="/css/main.css" rel="stylesheet">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+</head>
+
+<body>
+	<div>
+		<!-- Henter fram navbaren fra partials mappen -->
+		<%- include('partials/navbar', {username:username}) %>
+	</div>
+
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3">
+				<div class="jumbotron">
+					<h2 style="text-align: center">Manage tables</h2>
+					<h6>Add a new table to the system</h6>
+					<form class="form-inline" action="/admin/addtable" method="POST">
+						<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+						<div class="form-group mx-sm-3 mb-2">
+							<input type="text" class="form-control" name="ip" id="ip"
+								placeholder="VPN IP, Eks: 10.8.0.100" required>
+						</div>
+						<button type="submit" class="btn btn-primary mb-2">Add table</button>
+					</form>
+					<br>
+					<table class="table table-bordered">
+						<% if(locals.ipmessage.length> 0) { %>
+							<div class="alert alert-success">
+								<%= ipmessage %>
+							</div>
+							<% }%>
+
+								<tbody id="contact">
+									<tr>
+										<th>Table ID</th>
+										<th>IP address</th>
+									</tr>
+
+									<% if(tables.length!=0){ var i=1; tables.forEach(function(data){ %>
+										<tr>
+											<td>
+												<%=data.tableid %>
+											</td>
+											<td>
+												<%=data.ipaddress %>
+											</td>
+										</tr>
+										<% i++; }) %>
+											<% } else{ %>
+												<tr>
+													<td colspan="7">No active tables found</td>
+												</tr>
+												<% } %>
+
+								</tbody>
+					</table>
+					<form class="form-inline" action="/admin/deactivatetable" method="POST">
+						<% if (tableids.length > 0) { %>
+						<select id="tableid" name="tableid" class="form-control">
+							<% for(var i=0; i < tableids.length; i++) { %>
+								<option value="<%= tableids[i]%>">TableID: <%= tableids[i] %>
+								</option>
+								<% } %>
+						</select>
+						<button id="deleteuserbutton" type="submit" class="btn btn-danger mb-2">Deactivate table</button>
+						<%} else { %>
+							<select class="form-control">
+								<option value="" disabled selected>No active tables found</option>
+							</select>
+							<% } %>
+					</form>
+					<br>
+					<h6>Activate table:</h6>
+					<form class="form-inline" action="/admin/activatetable" method="POST">
+						<% if (inactivetableids.length > 0) { %>
+						<select id="tableid" name="tableid" class="form-control">
+							<% for(var i=0; i < inactivetableids.length; i++) { %>
+								<option value="<%= inactivetableids[i]%>">TableID: <%= inactivetableids[i] %>
+								</option>
+								<% } %>
+						</select>
+						<button id="deleteuserbutton" type="submit" class="btn btn-primary mb-2">Activate table</button>
+						<%} else { %>
+							<select class="form-control">
+								<option value="" disabled selected>No deactivated tables found</option>
+							</select>
+							<% } %>
+					</form>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="jumbotron">
+					<% if(locals.message.length> 0) { %>
+						<div class="alert alert-success">
+							<%= message %>
+						</div>
+						<% }%>
+							<h2 style="text-align: center">
+								Manage users
+							</h2>
+							<p>
+							<h6>Deactivate users:</h6>
+							<form class="form-inline" action="/admin/deactivateuser" method="POST">
+								<select id="usernames" name="usernames" class="form-control">
+									<% for(var i=0; i < usernames.length; i++) { %>
+										<% if(usernames.length==0) { %>
+											<option value="" disabled selected>No active users</option>
+											<% }%>
+												<option value="<%= usernames[i]%>">Username: <%= usernames[i] %>
+												</option>
+												<% } %>
+								</select>
+								<button id="deleteuserbutton" type="submit" class="btn btn-danger mb-2">Deactivate
+									user</button>
+							</form>
+							<br>
+							<h6>Activate users:</h6>
+							<form class="form-inline" action="/admin/activateuser" method="POST">
+								<% if (inactiveusersnames.length > 0) { %>
+								<select id="usernames" name="usernames" class="form-control">
+									<% for(var i=0; i < inactiveusersnames.length; i++) { %>
+
+										<option value="<%= inactiveusersnames[i]%>">Username: <%= inactiveusersnames[i] %>
+										</option>
+										
+										<% } %>
+								</select>
+								<button id="deleteuserbutton" type="submit" class="btn btn-primary mb-2">Activate user</button>
+								<%} else { %>
+									<select class="form-control">
+										<option value="" disabled selected>No deactivated users found</option>
+									</select>
+									<% } %>
+									
+
+							</form>
+
+
+
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="jumbotron">
+					<h2 style="text-align: center">
+						Manage active games
+					</h2>
+					<table class="table table-bordered">
+
+						<tbody id="contact">
+							<tr>
+								<th>GameID</th>
+								<th>Start Time</th>
+								<th>Create Time</th>
+								<th>TableID</th>
+								<th>Player 1</th>
+								<th>Player 2</th>
+								<th>Cancel game</th>
+							</tr>
+
+							<% if(activegames.length!=0){ var i=1; activegames.forEach(function(data){ %>
+								<tr>
+									<td>
+										<%=data.gameid %>
+									</td>
+									<td>
+										<%=data.starttime %>
+									</td>
+									<td>
+										<%=data.createtime %>
+									</td>
+									<td>
+										<%=data.tableid %>
+									</td>
+									<td>
+										<%=data.playerid %>
+									</td>
+									<td>
+										<%=data.playerid2 %>
+									</td>
+									<td><a href="/game/cancel/<%=data.gameid %>">
+											Cancel game
+										</a></td>
+								</tr>
+								<% i++; }) %>
+									<% } else{ %>
+										<td style="text-align: center" colspan="7">No active games found</td>
+										<% } %>
+
+
+						</tbody>
+					</table>
+				</div>
+
+			</div>
+		</div>
+
+
+	</div>
+
+
+
+	</div>
+
+	<div>
+		<!-- Henter fram footer fra partials mappen -->
+		<%- include('partials/footer') %>
+	</div>
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+</body>
+
+</html>

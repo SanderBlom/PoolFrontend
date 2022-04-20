@@ -10,7 +10,7 @@ function initialize(passport) {
   
     const authUser = (username, password, done) => {
       pool.query(
-        `SELECT userid, username, password FROM users WHERE username = $1`,
+        `SELECT userid, username, password, active FROM users WHERE username = $1`,
         [username],
         (err, results) => {
           if (err) {
@@ -25,7 +25,16 @@ function initialize(passport) {
                 console.log(err);
               }
               if (isMatch) {
-                return done(null, user);
+                if(user.active){
+                  return done(null, user);
+                }
+                else{
+                  //User is deactivated
+                  return done(null, false, {
+                    message: "User is deactivated."
+                  })
+                }
+                
               } else {
                 //password is incorrect
                 return done(null, false, {

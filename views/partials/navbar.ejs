@@ -42,16 +42,30 @@
         </ul>
         
         <% if (locals.user) { %>
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <%=username%>
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="/user/dashboard">Your profile</a> <!--user dashboard-->
-              <a class="dropdown-item"><form action="/logout?_method=DELETE" method="POST"><button class="btn btn-link" type="submit">Log out</button></form></a>
-              
-            </div>
+          <% if (locals.username == 'admin') { %>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <%=username%>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="/user/dashboard">Your profile</a> <!--user dashboard-->
+                <a class="dropdown-item" href="/admin">Admin dashboard</a> <!--Admin dashboard-->
+                <a class="dropdown-item"><form action="/logout?_method=DELETE" method="POST"><button class="btn btn-link" type="submit">Log out</button></form></a>
+                
+              </div>
+              <% } else { %>
+                <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <%=username%>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="/user/dashboard">Your profile</a> <!--user dashboard-->
+                    <a class="dropdown-item"><form action="/logout?_method=DELETE" method="POST"><button class="btn btn-link" type="submit">Log out</button></form></a>
+                    
+                  </div>
+                  <% } %>
             <% } else { %>
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
