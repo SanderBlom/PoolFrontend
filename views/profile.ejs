@@ -104,29 +104,35 @@
 					<h2>
 						Show previous games
 					</h2>
-					<p>
-					<h6>Here you can see a playthrough of your previous matches</h6>
-					</p>
+					<% if (gamelist.length !=0) { %>
+						<p>
+							<h6>Here you can see a playthrough of your previous matches.  Just select a gameID from the list<br>
+							</h6>
+						</p>
+							<% } %>
 
 					<form class="form-inline" action="/game/previous/" method="POST">
-						<select id="gameid" name="gameid" class="form-control" searchable="Search here..">
-							<% for(var i=0; i < gamelist.length; i++) { %>
-								<option value="<%= gamelist[i]%>">GameID: <%= gamelist[i] %>
-								</option>
-								<% } %>
-						</select>
-						<br>
-						<button onclick="show()" id="submitbutton" type="submit"
-							class="btn btn-primary mb-2">Show</button>
-						<div id="loadinganimation" class="spinner-border text-primary" role="status">
-							<span class="sr-only">Loading...</span>
-							
-						</div>
-						<br>
-						<div id="loadingtext">
-							<h7>Loading... This can take up to 10 seconds</h7>
-						</div>
+						<% if (gamelist.length !=0) { %>
+							<select id="gameid" name="gameid" class="form-control" searchable="Search here..">
+								<% for(var i=0; i < gamelist.length; i++) { %>
+									<option value="<%= gamelist[i]%>">GameID: <%= gamelist[i] %>
+									</option>
+									<% } %>
+							</select>
+							<br>
+							<button onclick="show()" id="submitbutton" type="submit"
+								class="btn btn-primary mb-2">Show</button>
+							<div id="loadinganimation" class="spinner-border text-primary" role="status">
+								<span class="sr-only">Loading...</span>
 
+							</div>
+							<div id="loadingtext">
+								<h7>Loading... This can take up to 10 seconds</h7>
+							</div>
+							<% } else { %>
+
+								<h5> No games found</h5>
+								<% } %>
 					</form>
 				</div>
 			</div>
@@ -171,8 +177,7 @@
 								<lable for="email">Email addres:</lable>
 								<input type="email" id="email" name="email" value="<%=locals.email%>" required />
 							</div>
-							<button name="submit" type="submit" id="boxed-submit"
-								data-submit="...Sending">Update user
+							<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Update user
 								details</button>
 				</form>
 				</p>
@@ -236,7 +241,7 @@
 			var loading = document.getElementById("loadingtext").style.display = "block"; //Shows text that we are loading
 
 			var button = document.getElementById("submitbutton").style.display = 'none'; //Hiding the submit button
-			
+
 		}
 
 

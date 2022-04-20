@@ -28,7 +28,7 @@ app.use(
         secret: process.env.SESSION_SECRET,//Encryption key for our sessions.
         resave: false,
         saveUninitialized: false,
-        cookie: { maxAge: 60000 }
+        cookie: { maxAge: 3600000 }
     })
 );
 // Funtion inside passport which initializes passport
@@ -102,6 +102,7 @@ app.post("/register", checkNotAuth, async function (req, res) {
     let usernameresponse //Calling function to check if the username is not taken.
     let emailresponse //Calling function to check if the email is not taken.
     let InsertUserResult // Calling function to insert data into the database
+    let emailerror
 
     //Checks that the email passes the regex in const emailRegexp.
     //Found the expression at: https://stackoverflow.com/questions/52456065/how-to-format-and-validate-email-node-js
@@ -118,28 +119,32 @@ app.post("/register", checkNotAuth, async function (req, res) {
             usernameresponse = await db.ValidateUniqueUsername(username)
 
         } catch (err) {
-            res.send(404, 'Could not check username and email validity')
+            err = emailerror
         }
-        if ((usernameresponse == true) && (emailresponse == true)) {
-            //Both email and username are unique. Lets let the user create the account.
-
-            try {
-                const hashedPassword = await bcrypt.hash(pwd, 10) //Hashing the password
-                InsertUserResult = await db.RegisterNewUser(username, firstname, lastname, email, hashedPassword)
-            }
-            catch (error) {
-                console.log(error)
-            }
-            if (InsertUserResult) {
-                req.flash('message', `You are now registered and can login!`)
-                res.redirect("register")
-            }
-            else {
-                req.flash('message', `Ops, something went wrong..`)
-                res.redirect("register")
-            }
+        if(emailerror){
+            res.sendStatus(400).send(`Could not check username and email validity..<a href="/">Go back</a> Error: ` + emailerror)
         }
-        //Checks if email or username is unique.
+        else{
+            if ((usernameresponse == true) && (emailresponse == true)) {
+                //Both email and username are unique. Lets let the user create the account.
+    
+                try {
+                    const hashedPassword = await bcrypt.hash(pwd, 10) //Hashing the password
+                    InsertUserResult = await db.RegisterNewUser(username, firstname, lastname, email, hashedPassword)
+                }
+                catch (error) {
+                    console.log(error)
+                }
+                if (InsertUserResult) {
+                    req.flash('message', `You are now registered and can login!`)
+                    res.redirect("register")
+                }
+                else {
+                    req.flash('message', `Ops, something went wrong..`)
+                    res.redirect("register")
+                }
+            }
+            //Checks if email or username is unique.
         else if ((usernameresponse != true) || (emailresponse != true)) {
             let emailerror = 'Looks like your email is already in use'
             let usernameerror = 'Looks like your username is already in use'
@@ -167,6 +172,9 @@ app.post("/register", checkNotAuth, async function (req, res) {
                 res.redirect("register")
             }
         }
+        }
+    
+        
     }
     else {
         req.flash('message', 'The password entered did not match.')
