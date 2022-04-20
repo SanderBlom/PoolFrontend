@@ -25,10 +25,10 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use(
     session({
-
         secret: process.env.SESSION_SECRET,//Encryption key for our sessions.
         resave: false,
-        saveUninitialized: false
+        saveUninitialized: false,
+        cookie: { maxAge: 60000 }
     })
 );
 // Funtion inside passport which initializes passport

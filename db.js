@@ -144,15 +144,16 @@ async function AddPlayerToGame(gameid, userid) {
     let fetchplayerid = await pool.query(query2)
     let playerid = fetchplayerid.rows[0].playerid //Fetching playerid from the object
     let playerids = await GetPlayerIDinGame(gameid)
-
+    let playerid1 = null
+    let playerid2 = null
 
     if (playerids == null) {
-        let playerid1 = null
-        let playerid2 = null
+        playerid1 = null
+        playerid2 = null
     }
     else {
-        let playerid1 = playerids[0]
-        let playerid2 = playerids[1]
+        playerid1 = playerids[0]
+        playerid2 = playerids[1]
     }
 
     //If gameid is valid then add user
