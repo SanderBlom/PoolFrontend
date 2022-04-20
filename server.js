@@ -17,6 +17,7 @@ const moment = require('moment'); //Used to generate timestamps
 
 
 const initializePassport = require("./passport-config");
+const { use } = require('passport/lib');
 initializePassport(passport);
 
 app.use(express.static('views'));//Gives express access to views folder 
@@ -47,6 +48,7 @@ function checkAuth(req, res, next) {
         res.redirect("/login")
     }
 }
+
 //If user is logged in and tries to access login or register they will be redirected to their homepage
 function checkNotAuth(req, res, next) {
     if (req.user) {
@@ -121,13 +123,13 @@ app.post("/register", checkNotAuth, async function (req, res) {
         } catch (err) {
             err = emailerror
         }
-        if(emailerror){
+        if (emailerror) {
             res.sendStatus(400).send(`Could not check username and email validity..<a href="/">Go back</a> Error: ` + emailerror)
         }
-        else{
+        else {
             if ((usernameresponse == true) && (emailresponse == true)) {
                 //Both email and username are unique. Lets let the user create the account.
-    
+
                 try {
                     const hashedPassword = await bcrypt.hash(pwd, 10) //Hashing the password
                     InsertUserResult = await db.RegisterNewUser(username, firstname, lastname, email, hashedPassword)
@@ -145,36 +147,36 @@ app.post("/register", checkNotAuth, async function (req, res) {
                 }
             }
             //Checks if email or username is unique.
-        else if ((usernameresponse != true) || (emailresponse != true)) {
-            let emailerror = 'Looks like your email is already in use'
-            let usernameerror = 'Looks like your username is already in use'
-            let usernameandemailerror = 'Looks like both email and username is already in use'
+            else if ((usernameresponse != true) || (emailresponse != true)) {
+                let emailerror = 'Looks like your email is already in use'
+                let usernameerror = 'Looks like your username is already in use'
+                let usernameandemailerror = 'Looks like both email and username is already in use'
 
-            if (usernameresponse == false && emailresponse == false) {
-                //This should be triggered if both username and email is already in use. 
-                req.flash('message', usernameandemailerror)
-                res.redirect("register")
-            }
+                if (usernameresponse == false && emailresponse == false) {
+                    //This should be triggered if both username and email is already in use. 
+                    req.flash('message', usernameandemailerror)
+                    res.redirect("register")
+                }
 
-            else if (usernameresponse == false) {
-                //This should be triggered if the username is already in use.
-                req.flash('message', usernameerror)
-                res.redirect("register")
-            }
+                else if (usernameresponse == false) {
+                    //This should be triggered if the username is already in use.
+                    req.flash('message', usernameerror)
+                    res.redirect("register")
+                }
 
-            else if (emailresponse == false) {
-                //This should be triggered if the email is already in use.
-                req.flash('message', emailerror)
-                res.redirect("register")
-            }
-            else {
-                req.flash('message', 'Not sure what you did but something broke')
-                res.redirect("register")
+                else if (emailresponse == false) {
+                    //This should be triggered if the email is already in use.
+                    req.flash('message', emailerror)
+                    res.redirect("register")
+                }
+                else {
+                    req.flash('message', 'Not sure what you did but something broke')
+                    res.redirect("register")
+                }
             }
         }
-        }
-    
-        
+
+
     }
     else {
         req.flash('message', 'The password entered did not match.')
@@ -182,7 +184,7 @@ app.post("/register", checkNotAuth, async function (req, res) {
     }
 
 })
-
+//Gets the users profile page
 app.get("/user/dashboard", checkAuth, async (req, res) => {
     let userid = req.user.userid
     let username = req.user.username
@@ -257,14 +259,14 @@ app.get("/game/previous/:id", checkAuth, async (req, res) => {
         if (error) {
             res.status(400).send(`Problems fetching gamedata. <a href="/">Go back</a> ` + error)
         }
-        
+
         else {
             try {
                 let images = await game.renderwholegame(balls) //Function returns an array with images of the selected game.
-                    res.render('previousgame', {
-                        message: req.flash('message'), username, user: userid, title: 'test', images: images, gameid: gameid,
-                        constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time, winner: winner, loser: loser
-                    })
+                res.render('previousgame', {
+                    message: req.flash('message'), username, user: userid, title: 'test', images: images, gameid: gameid,
+                    constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time, winner: winner, loser: loser
+                })
 
             } catch (error) {
                 console.log('User is not probably not logged in' + error)
@@ -297,6 +299,171 @@ app.post("/user/dashboard", checkAuth, async (req, res) => {
     }
 })
 
+app.post("/admin/activateuser", checkAuth, async (req, res) => {
+    //This post is used to activate users from the admin panel 
+    let { usernames } = req.body
+    const usr = await req.user.username
+    let result = null
+    let error = null
+    console.log('Username: ' + usernames + ' Admin: ' + usr)
+    if (usr == 'admin') {
+        try {
+            result = await db.ActivateUser(usernames)
+        }
+        catch (err) {
+            err = error
+        }
+        if (error) {
+            console.log(error)
+            req.flash('message', `Could not activate user. Check the logs for more details`)
+            res.redirect("/admin")
+        }
+        else {
+            if (result == true) {
+                req.flash('message', `Activated user: ` + usernames)
+                res.redirect("/admin")
+            }
+            else {
+                req.flash('message', `Could not activate user. No response from database`)
+                res.redirect("/admin")
+            }
+        }
+    }
+    else {
+        req.flash('message', `You don't have access to this page`)
+        res.redirect("/")
+    }
+
+})
+
+app.post("/admin/deactivateuser", checkAuth, async (req, res) => {
+    //This post is used to activate users from the admin panel 
+    let { usernames } = req.body
+    const usr = await req.user.username
+    let result = null
+    let error = null
+    if (usr == 'admin') {
+        try {
+            result = await db.DeactivateUser(usernames)
+        }
+        catch (err) {
+            err = error
+        }
+        if (error) {
+            console.log(error)
+            req.flash('message', `Could not deactivate user. Check the logs for more details`)
+            res.redirect("/admin")
+        }
+        else {
+            if (result == true) {
+                req.flash('message', `Deactivated user: ` + usernames)
+                res.redirect("/admin")
+            }
+            else {
+                req.flash('message', `Could not deactivate user. No response from database`)
+                res.redirect("/admin")
+            }
+        }
+    }
+    else {
+        req.flash('message', `You don't have access to this page`)
+        res.redirect("/")
+    }
+
+})
+app.post("/admin/addtable", checkAuth, async (req, res) => {
+    //This post is used to activate users from the admin panel 
+    let { ip } = req.body
+    const usr = await req.user.username
+    let tableid
+    if (usr == 'admin') {
+        try {
+            tableid = await db.AddNewTable(ip)
+        }
+        catch (err) {
+            console.log(err)
+        }
+        req.flash('ipmessage', `Added new table with ID: ${tableid}`)
+        res.redirect("/admin")
+    }
+
+    else {
+        req.flash('message', `You don't have access to this page`)
+        res.redirect("/")
+    }
+
+})
+app.post("/admin/deactivatetable", checkAuth, async (req, res) => {
+    //This post is used to deactivate a table in the database
+    let { tableid } = req.body
+    const usr = await req.user.username
+    let result = null
+    let error = null
+    if (usr == 'admin') {
+        try {
+            result = await db.DeactivateTable(tableid)
+        }
+        catch (err) {
+            err = error
+        }
+        if (error) {
+            console.log(error)
+            req.flash('ipmessage', `Could not deactivate the table. Check the logs for more details`)
+            res.redirect("/admin")
+        }
+        else {
+            if (result == true) {
+                req.flash('ipmessage', `Deactivated table: ` + tableid)
+                res.redirect("/admin")
+            }
+            else {
+                req.flash('ipmessage', `Could not deactivate the table.. No response from database`)
+                res.redirect("/admin")
+            }
+        }
+    }
+    else {
+        req.flash('message', `You don't have access to this page`)
+        res.redirect("/")
+    }
+
+})
+
+app.post("/admin/activatetable", checkAuth, async (req, res) => {
+    //This post is used to deactivate a table in the database
+    let { tableid } = req.body
+    const usr = await req.user.username
+    let result = null
+    let error = null
+    if (usr == 'admin') {
+        try {
+            result = await db.ActivateTable(tableid)
+        }
+        catch (err) {
+            err = error
+        }
+        if (error) {
+            console.log(error)
+            req.flash('ipmessage', `Could not activate table. Check the logs for more details`)
+            res.redirect("/admin")
+        }
+        else {
+            if (result == true) {
+                req.flash('ipmessage', `Activated table: ` + tableid)
+                res.redirect("/admin")
+            }
+            else {
+                req.flash('ipmessage', `Could not activate table. No response from database`)
+                res.redirect("/admin")
+            }
+        }
+    }
+    else {
+        req.flash('message', `You don't have access to this page`)
+        res.redirect("/")
+    }
+
+})
 //This is taking the submitted tableid from users dashboard and checks if the table is free. If its free user will be redirected the new game page.
 app.post("/game/create", checkAuth, async (req, res) => {
     const tableid = await req.body.tableid.trim()
@@ -304,8 +471,9 @@ app.post("/game/create", checkAuth, async (req, res) => {
     let tableAvailability = false;
     let gameid = null
 
+
     try {
-        tableAvailability = await vision.CheckTableAvailability(tableid)  //Checks the tableid the user has submited, and ask the visionsystem if the table is available 
+        tableAvailability = await vision.CheckTableAvailability(tableid)  //Checks the tableid the user has submitted, and ask the visionsystem if the table is available 
     } catch (error) {
         console.log(error)
     }
@@ -333,8 +501,6 @@ app.post("/game/create", checkAuth, async (req, res) => {
 })
 
 app.post("/game/cancel/:id", checkAuth, async (req, res) => {
-    //This should only be trigged while waiting for a game start.
-    //Here we should add some validation that only users in the game can cancel the game!!
     let gameid = req.params.id.trim();
     try {
         db.CancelGame(gameid)
@@ -371,7 +537,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
             tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
             tablestatus = await vision.CheckTableAvailability(tableid) //Checks that nobody has started a game on the same table.
             if (tablestatus == true) {
-        
+
                 let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check. Returns HTTP status codes
 
                 if (result == 200) {
@@ -620,7 +786,7 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
         //Cheks that we dont have any invalid usernames
         console.log('Valid')
     }
-    else{
+    else {
         res.redirect('back');
     }
 
@@ -691,6 +857,40 @@ app.get("/livegame/:id", async (req, res) => {
         }
     }
 
+
+})
+
+app.get("/admin", checkAuth, async (req, res) => {
+    //Checks that the user is 
+    let userid = req.user.userid
+    let username = req.user.username
+    let usernames = [] //Array to store the usernames
+    let error = []
+    let activegames = []
+    let tables = []
+    let tableids = []
+    let inactivetableids = []
+    let inactiveusersnames = []
+
+    if (username == "admin") {
+
+        try {
+            usernames = await db.GetAllUserNames()
+            activegames = await db.GetAllActiveGames()
+            tables = await db.GetAllTables()
+            tableids = await db.GetAllActiveTableIds()
+            inactivetableids = await db.GetAllInActiveTableIds()
+            inactiveusersnames = await db.GetAllInactiveUserNames()
+        } catch (err) {
+            error = err
+        }
+        res.render('admin', { message: req.flash('message'), ipmessage: req.flash('ipmessage'), username, user: userid, title: 'admin', usernames, activegames, 
+        tables, tableids, inactivetableids, inactiveusersnames })
+    }
+    else {
+        req.flash('message', "You don't have access to this page")
+        res.redirect("/")
+    }
 
 })
 
