@@ -200,14 +200,14 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
         gameid = await db.GetGameIDForActiveGame(userid)
         res.render("profile", {
             username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'),
-            personalWL: wl, averagewl: avwl, gamelist: previousgames
+            personalWL: wl, averagewl: avwl, gamelist: previousgames, title: 'profile'
         })
 
     }
     else {
         res.render("profile", {
             username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'),
-            personalWL: wl, averagewl: avwl, gamelist: previousgames
+            personalWL: wl, averagewl: avwl, gamelist: previousgames, title: 'profile'
         })
     }
 })

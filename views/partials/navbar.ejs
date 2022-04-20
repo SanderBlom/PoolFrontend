@@ -16,21 +16,16 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-          <li class="nav-item">
-            <a class="nav-link active" href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/scoreboard">Scoreboard</a>
-          </li>
+          <li <% if (locals.title === 'index') { %>class="nav-item active" <% } else { %>class="nav-item" <% }  %> ><a class="nav-link" href="/">Home</a></li>
+          <li <% if (locals.title === 'scoreboard') { %>class="nav-item active" <% } else { %>class="nav-item" <% }  %> ><a class="nav-link" href="/scoreboard">Scoreboard</a></li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-              aria-expanded="false">FAQ</a>
+            <li <% if (locals.title === 'about' || locals.title === 'rules' || locals.title === 'tutorial') { %>class="nav-item dropdown active" <% } else { %>class="nav-item dropdown" <% }  %>>
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">FAQ</a>
             <div class="dropdown-menu">
-              <a class="dropdown-item" href="#">Our game rules</a>
+              <a <% if (locals.title === 'rules') { %>class="dropdown-item active" <% } else { %>class="dropdown-item" <% }  %>  href="/rules">Our game rules</a>
               <a class="dropdown-item" href="#">How to start a game</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="#"></a>
+              <a <% if (locals.title === 'about') { %>class="dropdown-item active" <% } else { %>class="dropdown-item" <% }  %>  href="/about">About us</a>
             </div>
           </li>
           <li>
@@ -48,9 +43,10 @@
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <%=username%>
               </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="/user/dashboard">Your profile</a> <!--user dashboard-->
-                <a class="dropdown-item" href="/admin">Admin dashboard</a> <!--Admin dashboard-->
+              <div class="dropdown-menu">
+              <!-- <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"> -->
+                <a <% if (locals.title === 'profile') { %>class="dropdown-item active" <% } else { %>class="dropdown-item" <% }  %>  href="/user/dashboard">Your profile</a> 
+                <a <% if (locals.title === 'admin') { %>class="dropdown-item active" <% } else { %>class="dropdown-item" <% }  %>  href="/admin">Admin panel</a> 
                 <a class="dropdown-item"><form action="/logout?_method=DELETE" method="POST"><button class="btn btn-link" type="submit">Log out</button></form></a>
                 
               </div>
