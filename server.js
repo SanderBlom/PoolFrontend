@@ -305,7 +305,6 @@ app.post("/admin/activateuser", checkAuth, async (req, res) => {
     const usr = await req.user.username
     let result = null
     let error = null
-    console.log('Username: ' + usernames + ' Admin: ' + usr)
     if (usr == 'admin') {
         try {
             result = await db.ActivateUser(usernames)
