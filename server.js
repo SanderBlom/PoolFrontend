@@ -859,6 +859,26 @@ app.get("/livegame/:id", async (req, res) => {
 
 })
 
+app.get("/about", (req, res) => {
+
+    try {
+        if (req.user) {
+            let userid = req.user.userid
+            let username = req.user.username
+            res.render('about', { message: req.flash('message'), username, user: userid, title: 'about' }) //Renderes the index websites and passes title for the navbar
+        }
+        else {
+            let userid = null
+            let username = null
+            res.render('about', { message: req.flash('message'), username: username, user: userid, title: 'about' }) //Renderes the index websites and passes title for the navbar
+        }
+
+    } catch (error) {
+        console.log('User is not probably not logged in' + error)
+    }
+
+})
+
 app.get("/admin", checkAuth, async (req, res) => {
     //Checks that the user is 
     let userid = req.user.userid
