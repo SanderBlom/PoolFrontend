@@ -248,12 +248,15 @@ async function GetTableID(gameid) {
         values: [gameid]
     }
     let result = await pool.query(query) //Fetches tableid from game table
+    
+    let tableid = result.rows[0].tableid
+    console.log('Tableid active: ' + result.rows[0].tableid)
 
     if (result.rows.length == 0) {
         return null
     }
     else {
-        let tableid = result.rows[0].tableid
+        
         if (tableid > 0) {
             return tableid
         }
@@ -265,18 +268,26 @@ async function GetTableID(gameid) {
 }
 
 async function fetchUsernamesInGame(gameid) {
+    let usernames = []
     const query = {
         text: 'SELECT playerid, playerid2 FROM public.game_players WHERE gameid = $1;',
         values: [gameid]
     }
-    let result = await pool.query(query) //Returns the amount of players in the game
+
+    try {
+        let result = await pool.query(query) //Returns the amount of players in the game
     let playerid1 = result.rows[0].playerid
     let playerid2 = result.rows[0].playerid2
 
     let username1 = await GetUsernamesFromPlayerID(playerid1)
     let username2 = await GetUsernamesFromPlayerID(playerid2)
-    let usernames = []
     usernames.push(username1, username2)
+        
+    } catch (error) {
+        console.log(error)
+    }
+    
+    console.log(usernames)
 
     return usernames
 }
