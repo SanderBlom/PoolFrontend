@@ -486,8 +486,8 @@ app.post("/game/create", checkAuth, async (req, res) => {
 
     else {
         console.log('Table is in use')
-        /* req.flash('gamemessage', `Looks like the table is already in use or does not exsist.`)
-        res.redirect("/user/dashboard") */
+        req.flash('gamemessage', `Looks like the table is already in use or does not exsist.`)
+        res.redirect("/user/dashboard")
     }
 
     if (gameid != null) {
