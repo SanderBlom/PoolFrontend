@@ -244,7 +244,7 @@ async function GetPlayerID(userid) {
 async function GetTableID(gameid) {
     //This function finds the table if given the gameid
     const query = {
-        text: 'SELECT tableid FROM game WHERE gameid = $1 AND active = true;',
+        text: 'SELECT tableid FROM game WHERE gameid = $1;',
         values: [gameid]
     }
     let result = await pool.query(query) //Fetches tableid from game table
