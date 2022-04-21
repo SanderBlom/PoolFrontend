@@ -272,11 +272,12 @@ async function fetchUsernamesInGame(gameid) {
     }
     let username1
     let username2
-
+    let playerid1
+    let playerid2
     try {
         let result = await pool.query(query) //Returns the amount of players in the game
-    let playerid1 = result.rows[0].playerid
-    let playerid2 = result.rows[0].playerid2
+    playerid1 = result.rows[0].playerid
+    playerid2 = result.rows[0].playerid2
 
     [username1, username2] = await Promise.all([GetUsernamesFromPlayerID(playerid1), GetUsernamesFromPlayerID(playerid2)]); 
     usernames.push(username1, username2)
