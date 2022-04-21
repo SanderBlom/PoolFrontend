@@ -595,6 +595,8 @@ app.get("/game/:id", checkAuth, async (req, res) => {
     let usernames = null
     let error = null
     let tableid
+
+
     try {
         tableid = await db.GetTableID(gameid)
         usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
@@ -616,6 +618,7 @@ app.get("/game/:id", checkAuth, async (req, res) => {
         error = err
     }
     if (error) {
+        console.log('Error... getting game details')
         res.sendStatus(404).send(`Could not get the game details..<a href="/">Go back</a> `)
     }
     else {
@@ -625,7 +628,8 @@ app.get("/game/:id", checkAuth, async (req, res) => {
         else if (req.user) {
             if (username != username1 && username != username2) {
                 //If user is not a part of the game they should be redirected 
-                res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
+                console.log('Her gikk noe galt')
+                //res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
             }
             else {
                 let userid = req.user.userid
