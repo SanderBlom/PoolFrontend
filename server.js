@@ -894,12 +894,8 @@ app.get("/admin", checkAuth, async (req, res) => {
     if (username == "admin") {
 
         try {
-            usernames = await db.GetAllUserNames()
-            activegames = await db.GetAllActiveGames()
-            tables = await db.GetAllTables()
-            tableids = await db.GetAllActiveTableIds()
-            inactivetableids = await db.GetAllInActiveTableIds()
-            inactiveusersnames = await db.GetAllInactiveUserNames()
+            [usernames, activegames, tables, tableids, inactivetableids, inactiveusersnames] = await Promise.all([db.GetAllUserNames(), db.GetAllActiveGames(), db.GetAllTables(), 
+                db.GetAllActiveTableIds(), db.GetAllInActiveTableIds(), db.GetAllInactiveUserNames()]); //This runns all the functions in parallel to save execution time
         } catch (err) {
             error = err
         }
