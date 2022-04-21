@@ -619,6 +619,7 @@ app.get("/game/:id", checkAuth, async (req, res) => {
     }
     if (error) {
         console.log('Error... getting game details')
+        console.log(error)
         res.sendStatus(404).send(`Could not get the game details..<a href="/">Go back</a> `)
     }
     else {
