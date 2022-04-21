@@ -906,8 +906,7 @@ async function DeactivateTable(tableid) {
     else{return false}
 }
 async function ActivateTable(tableid) {
-    //This will deactiavte a table
-    //Checks if the IP is allready in the database
+    //This will actiavte a table
     const query = {
         text: `UPDATE tables SET active = true WHERE tableid = $1 RETURNING *`,
         values: [tableid]
@@ -920,7 +919,17 @@ async function ActivateTable(tableid) {
 }
 
 
-//Exporting all the functions so they can be access by server.js
+async function GetTablelActiveState(tableid) {
+    //This will return the active status of a table.
+    const query = {
+        text: `SELECT active from tables WHERE tableid = $1`,
+        values: [tableid]
+    }
+    let result = await pool.query(query) //Getting the data from the database
+    return result.rows[0].active
+}
+
+//Exporting all the functions so they can be access by other files
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
@@ -928,5 +937,6 @@ module.exports = {
     JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL,
     GetUsername, GetGameWinner, CreateNewTournament, GetPreviousGameList, ValidateGameAccess, GetGameLoser,
     TotalGameTime, GetAllBallPositions, GetAllUserNames, GetUsersActiveState, ActivateUser, DeactivateUser,
-    GetAllActiveGames, GetAllTables, AddNewTable, DeactivateTable, ActivateTable, GetAllActiveTableIds, GetAllInActiveTableIds, GetAllInactiveUserNames
+    GetAllActiveGames, GetAllTables, AddNewTable, DeactivateTable, ActivateTable, GetAllActiveTableIds, GetAllInActiveTableIds, 
+    GetAllInactiveUserNames, GetTablelActiveState
 }
