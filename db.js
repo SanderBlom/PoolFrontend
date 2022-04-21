@@ -270,16 +270,13 @@ async function fetchUsernamesInGame(gameid) {
         text: 'SELECT playerid, playerid2 FROM public.game_players WHERE gameid = $1;',
         values: [gameid]
     }
-    let username1
-    let username2
-    let playerid1
-    let playerid2
+
     try {
         let result = await pool.query(query) //Returns the amount of players in the game
-    playerid1 = result.rows[0].playerid
-    playerid2 = result.rows[0].playerid2
+    let playerid1 = result.rows[0].playerid
+    let playerid2 = result.rows[0].playerid2
 
-    [username1, username2] = await Promise.all([GetUsernamesFromPlayerID(playerid1), GetUsernamesFromPlayerID(playerid2)]); 
+    let [username1, username2] = await Promise.all([GetUsernamesFromPlayerID(playerid1), GetUsernamesFromPlayerID(playerid2)]); 
     usernames.push(username1, username2)
         
     } catch (error) {
