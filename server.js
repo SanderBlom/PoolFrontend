@@ -470,7 +470,7 @@ app.post("/game/create", checkAuth, async (req, res) => {
     let tableAvailability = false;
     let gameid = null
 
-    console.log('Tableid:' + tableid, + 'userid: ' + userid)
+    console.log('Tableid:' + tableid + 'userid: ' + userid)
 
 
     try {
@@ -501,6 +501,9 @@ app.post("/game/create", checkAuth, async (req, res) => {
             req.flash('gamemessage', `Could not create a new game. Please contact staff`)
             res.redirect("/user/dashboard")
         }
+    }
+    else{
+        console.log('Something broke')
     }
 })
 
