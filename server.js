@@ -470,13 +470,15 @@ app.post("/game/create", checkAuth, async (req, res) => {
     let tableAvailability = false;
     let gameid = null
 
+    console.log('Tableid:' + tableid, + 'userid: ' + userid)
+
 
     try {
         tableAvailability = await vision.CheckTableAvailability(tableid)  //Checks the tableid the user has submitted, and ask the visionsystem if the table is available 
     } catch (error) {
         console.log(error)
     }
-    console.log()
+    console.log('Tablestatus: ' + tableAvailability)
 
     if (tableAvailability == true) {
         gameid = await db.CreateNewGame(tableid) //Creating a game and returning the game id.
@@ -484,11 +486,12 @@ app.post("/game/create", checkAuth, async (req, res) => {
 
     else {
         console.log('Table is in use')
-        req.flash('gamemessage', `Looks like the table is already in use or does not exsist.`)
-        res.redirect("/user/dashboard")
+        /* req.flash('gamemessage', `Looks like the table is already in use or does not exsist.`)
+        res.redirect("/user/dashboard") */
     }
 
     if (gameid != null) {
+        console.log('GameID: ' + gameid)
         let result = await db.JoinGame(gameid, userid)
         if (result == true) {
             req.flash('message', `Please give your opponent the game ID so they can join.`)
