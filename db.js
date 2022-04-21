@@ -913,7 +913,7 @@ async function ActivateTable(tableid) {
         values: [tableid]
     }
     let result = await pool.query(query) //Getting the data from the database
-    if(result.rows[0].active == false){
+    if(result.rows[0].active == true){
         return true
     }
     else{return false}

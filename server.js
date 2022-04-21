@@ -432,8 +432,8 @@ app.post("/admin/activatetable", checkAuth, async (req, res) => {
     //This post is used to deactivate a table in the database
     let { tableid } = req.body
     const usr = await req.user.username
-    let result = null
-    let error = null
+    let result
+    let error
     if (usr == 'admin') {
         try {
             result = await db.ActivateTable(tableid)
