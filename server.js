@@ -469,16 +469,11 @@ app.post("/game/create", checkAuth, async (req, res) => {
     const userid = await req.user.userid
     let tableAvailability = false;
     let gameid = null
-
-    console.log('Tableid:' + tableid + 'userid: ' + userid)
-
-
     try {
         tableAvailability = await vision.CheckTableAvailability(tableid)  //Checks the tableid the user has submitted, and ask the visionsystem if the table is available 
     } catch (error) {
         console.log(error)
     }
-    console.log('Tablestatus: ' + tableAvailability)
 
     if (tableAvailability == true) {
         gameid = await db.CreateNewGame(tableid) //Creating a game and returning the game id.
@@ -491,7 +486,6 @@ app.post("/game/create", checkAuth, async (req, res) => {
     }
 
     if (gameid != null) {
-        console.log('GameID: ' + gameid)
         let result = await db.JoinGame(gameid, userid)
         if (result == true) {
             req.flash('message', `Please give your opponent the game ID so they can join.`)
@@ -509,16 +503,46 @@ app.post("/game/create", checkAuth, async (req, res) => {
 
 app.get("/game/cancel/:id", checkAuth, async (req, res) => {
     let gameid = req.params.id.trim();
-    try {
-        db.CancelGame(gameid)
-    } catch (error) {
-        req.flash('gamemessage', 'Could not cancel your game with gameID:' + gameid)
-        res.redirect("/user/dashboard")
+    const usr = await req.user.username
+    let error
+
+    if (usr == 'admin'){
+        try {
+            db.CancelGame(gameid)
+        } catch (err) {
+            err = error
+        }
+
+        if(error){
+            req.flash('mgmtmessage', 'Could not cancel your game with gameID:' + gameid)
+            res.redirect("/admin")
+        }
+        else{
+            req.flash('mgmtmessage', 'Canceled game with gameid:' + gameid)
+            res.redirect("/admin")    
+        }
+    
+
+    }
+    else{
+        try {
+            db.CancelGame(gameid)
+        } catch (error) {
+            err = error
+        }
+
+        if(error){
+            req.flash('gamemessage', 'Could not cancel your game with gameID:' + gameid)
+            res.redirect("/user/dashboard")
+        }
+        else{
+            req.flash('gamemessage', 'Canceled game with gameid:' + gameid)
+            res.redirect("/user/dashboard")
+        }   
+    
+
     }
 
-
-    req.flash('gamemessage', 'Canceled game with gameid:' + gameid)
-    res.redirect("/user/dashboard")
 })
 
 app.post("/game/start/:id", checkAuth, async (req, res) => {
@@ -629,8 +653,9 @@ app.get("/game/:id", checkAuth, async (req, res) => {
         else if (req.user) {
             if (username != username1 && username != username2) {
                 //If user is not a part of the game they should be redirected 
+                res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
                 console.log('Her gikk noe galt')
-                //res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
+                
             }
             else {
                 let userid = req.user.userid
@@ -792,7 +817,6 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
         }
 
     }
-    console.log(invalidusernames)
 
     if (invalidusernames.length == 0) {
         //Cheks that we dont have any invalid usernames
@@ -912,7 +936,7 @@ app.get("/admin", checkAuth, async (req, res) => {
         } catch (err) {
             error = err
         }
-        res.render('admin', { message: req.flash('message'), ipmessage: req.flash('ipmessage'), username, user: userid, title: 'admin', usernames, activegames, 
+        res.render('admin', { message: req.flash('message'), ipmessage: req.flash('ipmessage'), mgmtmessage: req.flash('mgmtmessage'), username, user: userid, title: 'admin', usernames, activegames, 
         tables, tableids, inactivetableids, inactiveusersnames })
     }
     else {
