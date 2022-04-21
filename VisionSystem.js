@@ -44,11 +44,12 @@ async function CheckTableAvailability(tableid) {
     error = err
   }
   if (error) {
-
+    console.log(error)
   }
 
   
   else {
+    console.log('Trying to check the table')
     const API = `http://${ipaddress}/checktable`
 
     if(tablestatus == true){
