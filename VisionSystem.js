@@ -31,31 +31,55 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
 
 async function CheckTableAvailability(tableid) {
   let responseJson
+  let tablestatus
+  let error
+  let ipaddress
 
-  var ipaddress = await db.GetTableIPWithTableID(tableid) //We get the ip address of the system by asking the database with the correct tableid
 
-  const API = `http://${ipaddress}/checktable`
 
   try {
-    const response = await fetch(API, {
-      timeout: '5000'
-    })
-    responseJson = await response.json()
-
-  } catch (error) {
-    console.log(error)
+    tablestatus = await db.GetTablelActiveState(tableid) //We get the active state of the table (true or false). 
+    ipaddress = await db.GetTableIPWithTableID(tableid) //We get the ip address of the system by asking the database with the correct tableid
+  } catch (err) {
+    error = err
   }
-  console.log('This is the table status: ' + responseJson)
+  if (error) {
 
-  if (responseJson == true) {
-
-    return responseJson
   }
 
+  
   else {
+    const API = `http://${ipaddress}/checktable`
 
-    return false
-  }
+    if(tablestatus == true){
+      try {
+        const response = await fetch(API, {
+          timeout: '5000'
+        })
+        responseJson = await response.json()
+  
+      } catch (error) {
+        console.log(error)
+      }
+  
+      if (responseJson == true) {
+  
+        return true
+      }
+  
+      else {
+  
+        return false
+      }
+    }
+    else{
+      //If table is not active we return false
+      return false
+    }
+
+    }
+    
+
 }
 
 
