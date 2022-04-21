@@ -1,8 +1,6 @@
 //This file is used to store functions related to fetching data from the pool table. 
-const { user } = require("pg/lib/defaults");
 const { pool } = require("./dbConfig");
 const moment = require('moment'); //Used to generate timestamps
-const res = require("express/lib/response");
 
 async function ValidateUniqueUsername(username) {
     //This function returns false if the username exist in the database.
@@ -249,8 +247,7 @@ async function GetTableID(gameid) {
     }
     let result = await pool.query(query) //Fetches tableid from game table
     
-    let tableid = result.rows[0].tableid
-    console.log('Tableid active: ' + result.rows[0].tableid)
+    const tableid = result.rows[0].tableid
 
     if (result.rows.length == 0) {
         return null
@@ -273,21 +270,21 @@ async function fetchUsernamesInGame(gameid) {
         text: 'SELECT playerid, playerid2 FROM public.game_players WHERE gameid = $1;',
         values: [gameid]
     }
+    let username1
+    let username2
 
     try {
         let result = await pool.query(query) //Returns the amount of players in the game
     let playerid1 = result.rows[0].playerid
     let playerid2 = result.rows[0].playerid2
 
-    let username1 = await GetUsernamesFromPlayerID(playerid1)
-    let username2 = await GetUsernamesFromPlayerID(playerid2)
+    [username1, username2] = await Promise.all([GetUsernamesFromPlayerID(playerid1), GetUsernamesFromPlayerID(playerid2)]); 
     usernames.push(username1, username2)
         
     } catch (error) {
         console.log(error)
     }
     
-    console.log(usernames)
 
     return usernames
 }

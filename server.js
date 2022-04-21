@@ -242,16 +242,11 @@ app.get("/game/previous/:id", checkAuth, async (req, res) => {
     if (validate) {
 
         try {
-            winner = await db.GetGameWinner(gameid) //Gets the winner of the game. Return null if no winner is found
-            loser = await db.GetGameLoser(gameid) //Gets the loser of the game. Return null if no loser is found
-            balls = await db.GetAllBallPositions(gameid) //Fetches all the ball positions from the database
-            time = await db.TotalGameTime(gameid) //Fetches minutes since game started
-            gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
-            usernames = await db.fetchUsernamesInGame(gameid)
+            [winner, loser, balls, time, gamestatus, usernames] = await Promise.all([db.GetGameWinner(gameid),db.GetGameLoser(gameid), db.GetAllBallPositions(gameid),
+                db.TotalGameTime(gameid),db.IsGameActive(gameid), db.fetchUsernamesInGame(gameid)]); //This runs all the functions in parallel to reduce execution time
             player1Username = usernames[0]
             player2Username = usernames[1]
-
-
+            
         } catch (err) {
             error = err
 
@@ -385,7 +380,6 @@ app.post("/admin/addtable", checkAuth, async (req, res) => {
         req.flash('ipmessage', `Added new table with ID: ${tableid}`)
         res.redirect("/admin")
     }
-
     else {
         req.flash('message', `You don't have access to this page`)
         res.redirect("/")
@@ -512,7 +506,6 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
         } catch (err) {
             err = error
         }
-
         if(error){
             req.flash('mgmtmessage', 'Could not cancel your game with gameID:' + gameid)
             res.redirect("/admin")
@@ -521,9 +514,8 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
             req.flash('mgmtmessage', 'Canceled game with gameid:' + gameid)
             res.redirect("/admin")    
         }
-    
-
     }
+
     else{
         try {
             db.CancelGame(gameid)
@@ -539,8 +531,6 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
             req.flash('gamemessage', 'Canceled game with gameid:' + gameid)
             res.redirect("/user/dashboard")
         }   
-    
-
     }
 
 })
@@ -581,7 +571,6 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
                         req.flash('gamemessage', 'Could not start the game')
                         res.redirect("/user/dashboard")
                     }
-
                 }
                 else {
                     req.flash('gamemessage', 'Error in response from API')
@@ -603,12 +592,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
             req.flash('gamemessage', 'Looks like your not a part on the game...')
             res.redirect("/user/dashboard")
         }
-
-
-
     }
-
-
 })
 app.get("/game/:id", checkAuth, async (req, res) => {
     let gameid = req.params.id.trim();
@@ -635,7 +619,6 @@ app.get("/game/:id", checkAuth, async (req, res) => {
         }
         if (username1 != null && username2 != null) {
             gamestartedstatus = await db.IsGameActive(gameid)
-
         }
     }
     catch (err) {
@@ -644,7 +627,7 @@ app.get("/game/:id", checkAuth, async (req, res) => {
     if (error) {
         console.log('Error... getting game details')
         console.log(error)
-        res.sendStatus(404).send(`Could not get the game details..<a href="/">Go back</a> `)
+        res.sendStatus(404).send(`Could not get the game details..<a href="/">Go back</a>`)
     }
     else {
         if (username1 == null && username2 == null) {
@@ -708,16 +691,12 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
         let result = await db.AddPlayerToGame(gameid, userid)
         if (result == true) {
             res.redirect(`/game/${gameid}`)
-
         }
         else {
             req.flash('gamemessage', "Could not add you to the game. It's either full or does not exsist")
             res.redirect("/user/dashboard/")
         }
-
     }
-
-
 })
 
 //Fetches the scoreboard
@@ -835,10 +814,8 @@ app.post("/livegame", async (req, res) => {
 
 app.get("/livegame/:id", async (req, res) => {
     let gameid = req.params.id.trim(); //Fetches game id from url
-    let userid = null
-    let username = null
-    let player1Username = null//This stores player1 name 
-    let player2Username = null//This stores player2 name 
+    let player1Username = null
+    let player2Username = null
     let error
     let time
     let balls
@@ -846,10 +823,8 @@ app.get("/livegame/:id", async (req, res) => {
     let gamestatus
     let winner = null
     try {
-        winner = await db.GetGameWinner(gameid) //Gets the winner of the game. Return null if no winner is found
-        balls = await db.latestBallPosition(gameid) //Fetches last ball positions from the database
-        time = await db.TimePlayed(gameid) //Fetches minutes since game started
-        gamestatus = await db.IsGameActive(gameid)// Checking if the game is active. This returns true or false
+        [winner, balls, time, gamestatus] = await Promise.all([db.GetGameWinner(gameid), db.latestBallPosition(gameid), db.TimePlayed(gameid), 
+            db.IsGameActive(gameid)]); //This runns all the functions in parallel to save execution time
 
         if (gamestatus == true) {
             usernames = await db.fetchUsernamesInGame(gameid)
