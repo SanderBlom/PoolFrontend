@@ -476,12 +476,14 @@ app.post("/game/create", checkAuth, async (req, res) => {
     } catch (error) {
         console.log(error)
     }
+    console.log()
 
     if (tableAvailability == true) {
         gameid = await db.CreateNewGame(tableid) //Creating a game and returning the game id.
     }
 
     else {
+        console.log('Table is in use')
         req.flash('gamemessage', `Looks like the table is already in use or does not exsist.`)
         res.redirect("/user/dashboard")
     }
@@ -499,7 +501,7 @@ app.post("/game/create", checkAuth, async (req, res) => {
     }
 })
 
-app.post("/game/cancel/:id", checkAuth, async (req, res) => {
+app.get("/game/cancel/:id", checkAuth, async (req, res) => {
     let gameid = req.params.id.trim();
     try {
         db.CancelGame(gameid)
