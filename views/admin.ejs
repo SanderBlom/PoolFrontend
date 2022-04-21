@@ -153,6 +153,11 @@
 					<h2 style="text-align: center">
 						Manage active games
 					</h2>
+					<% if(locals.mgmtmessage.length> 0) { %>
+						<div class="alert alert-success">
+							<%= mgmtmessage %>
+						</div>
+						<% }%>
 					<table class="table table-bordered">
 
 						<tbody id="contact">
@@ -169,7 +174,7 @@
 							<% if(activegames.length!=0){ var i=1; activegames.forEach(function(data){ %>
 								<tr>
 									<td>
-										<%=data.gameid %>
+										<a href="/livegame/<%=data.gameid %>"><%=data.gameid %></a>
 									</td>
 									<td>
 										<%=data.starttime %>

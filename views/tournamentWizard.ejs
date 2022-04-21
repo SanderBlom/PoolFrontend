@@ -71,9 +71,19 @@
 	<script>
 		var survey_options = document.getElementById('survey_options');
 		var count = 4
-		var addnew = function () {
-			if (count <= 12) {
-				var newField = document.createElement('input');
+		var addnew = async function () {
+			if (count <= 10) {
+				await add()
+				await add()
+			}
+			else {
+				var limittext = document.getElementById('limitlabel').style.color = 'red';
+			}
+
+		}
+
+		var add = async function (){
+			var newField = document.createElement('input');
 				newField.setAttribute('type', 'text');
 				newField.setAttribute('name', 'usernames');
 				newField.setAttribute('class', 'survey_options');
@@ -83,16 +93,10 @@
 				survey_options.appendChild(newField);
 				var limittext = document.getElementById('limitlabel').style.color = 'black';
 				count = count + 1
-			}
-			else {
-				var limittext = document.getElementById('limitlabel').style.color = 'red';
-			}
-
 		}
 
-		var delold = function () {
-			if (count > 4) {
-				var input_tags = survey_options.getElementsByTagName('input');
+		var del = async function () {
+			var input_tags = survey_options.getElementsByTagName('input');
 				if (input_tags.length > 1) {
 					survey_options.removeChild(input_tags[(input_tags.length) - 1]);
 					if (count >= 12) {
@@ -100,6 +104,12 @@
 					}
 					count = count - 1
 				}
+		}
+
+		var delold = async function () {
+			if (count > 4) {
+				await del()
+				await del()
 			}
 
 		}
