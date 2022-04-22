@@ -9,6 +9,7 @@ function initialize(passport) {
     console.log("Passport Initialized");
   
     const authUser = (username, password, done) => {
+      username = username.toLowerCase()
       pool.query(
         `SELECT userid, username, password, active FROM users WHERE username = $1`,
         [username],

@@ -563,10 +563,15 @@ async function PersonalStatsWL(userid) {
     let result = await pool.query(query)
     let wl
 
-    if (result.rows[0].losses == 0) {
+    if (result.rows[0].losses == 0 && result.rows[0].wins == 0) {
+        return 1
+        
+    }
+    else if (result.rows[0].losses == 0) {
         wl = result.rows[0].wins / 1
         wl = wl.toFixed(2)
         return wl
+
     }
     else {
         wl = result.rows[0].wins / result.rows[0].losses

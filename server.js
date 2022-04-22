@@ -105,6 +105,7 @@ app.post("/register", checkNotAuth, async function (req, res) {
     let emailresponse //Calling function to check if the email is not taken.
     let InsertUserResult // Calling function to insert data into the database
     let emailerror
+    username = username.toLowerCase() //Makes the username lowercase
 
     //Checks that the email passes the regex in const emailRegexp.
     //Found the expression at: https://stackoverflow.com/questions/52456065/how-to-format-and-validate-email-node-js
