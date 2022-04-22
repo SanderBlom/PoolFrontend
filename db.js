@@ -246,14 +246,14 @@ async function GetTableID(gameid) {
         values: [gameid]
     }
     let result = await pool.query(query) //Fetches tableid from game table
-    
+
     const tableid = result.rows[0].tableid
 
     if (result.rows.length == 0) {
         return null
     }
     else {
-        
+
         if (tableid > 0) {
             return tableid
         }
@@ -272,17 +272,17 @@ async function fetchUsernamesInGame(gameid) {
     }
 
     try {
-    let result = await pool.query(query) 
-    let playerid1 = result.rows[0].playerid
-    let playerid2 = result.rows[0].playerid2
+        let result = await pool.query(query)
+        let playerid1 = result.rows[0].playerid
+        let playerid2 = result.rows[0].playerid2
 
-    let [username1, username2] = await Promise.all([GetUsernamesFromPlayerID(playerid1), GetUsernamesFromPlayerID(playerid2)]); 
-    usernames.push(username1, username2)
-        
+        let [username1, username2] = await Promise.all([GetUsernamesFromPlayerID(playerid1), GetUsernamesFromPlayerID(playerid2)]);
+        usernames.push(username1, username2)
+
     } catch (error) {
         console.log(error)
     }
-    
+
 
     return usernames
 }
@@ -564,7 +564,8 @@ async function PersonalStatsWL(userid) {
     let wl
 
     if (result.rows[0].losses == 0) {
-        wl = 0
+        wl = result.rows[0].wins / 1
+        wl = wl.toFixed(2)
         return wl
     }
     else {
@@ -577,15 +578,23 @@ async function PersonalStatsWL(userid) {
 async function AvrageStatsWL() {
     //This functions returns the average win/loss ratio for all the players 
     const query = {
-        text: 'SELECT wins, losses FROM player WHERE losses > 0'
+        text: 'SELECT wins, losses FROM player'
     }
     let result = await pool.query(query)
     let WL = []
     let sum = 0
 
     for (let index = 0; index < result.rows.length; index++) {
-        let indexWL = (result.rows[index].wins / result.rows[index].losses)
-        WL.push(indexWL) //Adding each WL to the array
+
+        if (result.rows[index].losses == 0) {
+            let indexWL = (result.rows[index].wins / 1)
+            WL.push(indexWL) //Adding each WL to the array
+        }
+        else {
+            let indexWL = (result.rows[index].wins / result.rows[index].losses)
+            WL.push(indexWL) //Adding each WL to the array
+        }
+
     }
     for (let index = 0; index < WL.length; index++) {
         sum += WL[index]; //Summing all the values in the array
@@ -641,17 +650,32 @@ async function GetGameLoser(gameid) {
 async function Top25WL(gameid) {
     //This will return an array with the top 25 players based on win/loss ratio
     const query = {
-        text: 'SELECT wins, losses, userid FROM public.player WHERE losses > 0;'
+        text: 'SELECT wins, losses, userid FROM public.player WHERE wins != 0 AND wins != 0;'
     }
     let result = await pool.query(query)
     for (let index = 0; index < result.rows.length; index++) {
-        let indexWL = (result.rows[index].wins / result.rows[index].losses)
-        if (isNaN(indexWL)) {
-            indexWL = 0
+
+        if(result.rows[index].losses == 0){
+            let indexWL = (result.rows[index].wins / 1)
+            if (isNaN(indexWL)) {
+                indexWL = 0
+            }
+            indexWL = indexWL.toFixed(2) // rounds up to two decimals
+            result.rows[index].wl = indexWL //Adds new property to store calculated W/L
+            result.rows[index].username = await GetUsername(result.rows[index].userid) //Adds new property to store username
+
         }
-        indexWL = indexWL.toFixed(2) // rounds up to two decimals
-        result.rows[index].wl = indexWL //Adds new property to store calculated W/L
-        result.rows[index].username = await GetUsername(result.rows[index].userid) //Adds new property to store username
+        else{
+            let indexWL = (result.rows[index].wins / result.rows[index].losses)
+            if (isNaN(indexWL)) {
+                indexWL = 0
+            }
+            indexWL = indexWL.toFixed(2) // rounds up to two decimals
+            result.rows[index].wl = indexWL //Adds new property to store calculated W/L
+            result.rows[index].username = await GetUsername(result.rows[index].userid) //Adds new property to store username
+
+        }
+
     }
     return result.rows
 }
@@ -848,7 +872,7 @@ async function GetAllActiveTableIds() {
     for (let index = 0; index < array.rows.length; index++) {
         const element = array.rows[index].tableid
         tableids.push(element)
-        
+
     }
     return tableids
 }
@@ -862,7 +886,7 @@ async function GetAllInActiveTableIds() {
     for (let index = 0; index < array.rows.length; index++) {
         const element = array.rows[index].tableid
         tableids.push(element)
-        
+
     }
     return tableids
 }
@@ -876,25 +900,25 @@ async function AddNewTable(ip) {
     }
     let valid = await pool.query(query) //Getting the data from the database
 
-    if(valid.rows.length > 0){
+    if (valid.rows.length > 0) {
         //Returns false if there IP allready exists in the db
         console.log('There is allready an IP like that in the db')
         return false
     }
-    else{
+    else {
         //Inserts the new ip address into the table 
-    const query2 = {
-        text: `INSERT INTO public.tables(ipaddress) VALUES ($1) RETURNING *`,
-        values: [ip]
-    }
+        const query2 = {
+            text: `INSERT INTO public.tables(ipaddress) VALUES ($1) RETURNING *`,
+            values: [ip]
+        }
 
-    let result = await pool.query(query2) //Getting the data from the database
-    if(result.rows.length > 0){
-        return result.rows[0].tableid
-    }
-    else{
-        return null
-    }
+        let result = await pool.query(query2) //Getting the data from the database
+        if (result.rows.length > 0) {
+            return result.rows[0].tableid
+        }
+        else {
+            return null
+        }
     }
 }
 
@@ -906,10 +930,10 @@ async function DeactivateTable(tableid) {
         values: [tableid]
     }
     let result = await pool.query(query) //Getting the data from the database
-    if(result.rows[0].active == false){
+    if (result.rows[0].active == false) {
         return true
     }
-    else{return false}
+    else { return false }
 }
 async function ActivateTable(tableid) {
     //This will actiavte a table
@@ -918,10 +942,10 @@ async function ActivateTable(tableid) {
         values: [tableid]
     }
     let result = await pool.query(query) //Getting the data from the database
-    if(result.rows[0].active == true){
+    if (result.rows[0].active == true) {
         return true
     }
-    else{return false}
+    else { return false }
 }
 
 
@@ -943,6 +967,6 @@ module.exports = {
     JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL,
     GetUsername, GetGameWinner, CreateNewTournament, GetPreviousGameList, ValidateGameAccess, GetGameLoser,
     TotalGameTime, GetAllBallPositions, GetAllUserNames, GetUsersActiveState, ActivateUser, DeactivateUser,
-    GetAllActiveGames, GetAllTables, AddNewTable, DeactivateTable, ActivateTable, GetAllActiveTableIds, GetAllInActiveTableIds, 
+    GetAllActiveGames, GetAllTables, AddNewTable, DeactivateTable, ActivateTable, GetAllActiveTableIds, GetAllInActiveTableIds,
     GetAllInactiveUserNames, GetTablelActiveState
 }
