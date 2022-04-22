@@ -559,9 +559,9 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
             tablestatus = await vision.CheckTableAvailability(tableid) //Checks that nobody has started a game on the same table.
             if (tablestatus == true) {
 
-                let result = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check. Returns HTTP status codes
+                let response = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check. Returns HTTP status codes
 
-                if (result == 200) {
+                if (response == 200) {
                     let creategame = await db.StartGame(gameid)
                     if (creategame == true) {
                         res.redirect(`/livegame/${gameid}`)
@@ -573,7 +573,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
                     }
                 }
                 else {
-                    req.flash('gamemessage', 'Error in response from API')
+                    req.flash('gamemessage', `Error in response from API. HTTP response: ${response}`)
                     res.redirect("/user/dashboard")
                 }
             }
