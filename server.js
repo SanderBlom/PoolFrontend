@@ -15,6 +15,7 @@ let game = require("./game.js") //Used to access the database functions
 const moment = require('moment'); //Used to generate timestamps
 const https = require('https')
 const fs = require('fs')
+const path = require('path')
 
 
 
@@ -939,8 +940,8 @@ app.get("/admin", checkAuth, async (req, res) => {
 //-------------------------------------Start server-------------------------------------//
 
 const sslServer = https.createServer({
-    key: '',
-    cert: ''
+    key: fs.readFileSync(path.join(__dirname, 'ssl', 'privkey.pem')),
+    cert: fs.readFileSync(path.join(__dirname, 'ssl', 'fullchain.pem'))
 }, app)
 //starts server on port 3000
 /* app.listen(PORT, () => {
