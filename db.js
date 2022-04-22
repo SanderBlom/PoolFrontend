@@ -272,7 +272,7 @@ async function fetchUsernamesInGame(gameid) {
     }
 
     try {
-        let result = await pool.query(query) //Returns the amount of players in the game
+    let result = await pool.query(query) 
     let playerid1 = result.rows[0].playerid
     let playerid2 = result.rows[0].playerid2
 
@@ -538,7 +538,7 @@ async function GetPreviousGameList(userid) {
     let playerid = await GetPlayerIDFromUserID(userid)
 
     const query = {
-        text: 'SELECT gameid FROM public.game WHERE winner = $1 OR loser = $1;',
+        text: 'SELECT gameid FROM public.game WHERE winner = $1 OR loser = $1 ORDER BY gameid DESC;',
         values: [playerid]
     }
     let result = await pool.query(query)
