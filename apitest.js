@@ -7,7 +7,7 @@ const { pool } = require("./dbConfig");
 
 
 
-async function CreateArray(){
+async function CreateArray() {
   let gameid = 84
   let array = await db.GetAllBallPositions(gameid)
   let balls = []
@@ -15,7 +15,7 @@ async function CreateArray(){
   //Finding the lagrest playcount from the array
   for (let index = 0; index < array.length; index++) {
     const row = array[index];
-    if(row.playcount > max){
+    if (row.playcount > max) {
       max = row.playcount
     }
   }
@@ -24,18 +24,53 @@ async function CreateArray(){
   for (let x = 1; x < max + 1; x++) {
     balls.push([])
 
-  } 
+  }
   //Adding x, y and color to correct place in object
   for (let index = 0; index < array.length; index++) {
     const playcount = array[index].playcount - 1
     const x_pos = array[index].x_pos
     const y_pos = array[index].y_pos
     const ballcoulor = array[index].ballcoulor
-    balls[playcount].push({x_pos: x_pos, y_pos: y_pos, ballcoulor: ballcoulor })
+    balls[playcount].push({ x_pos: x_pos, y_pos: y_pos, ballcoulor: ballcoulor })
   }
 
 }
 
 
-CreateArray()
+
+async function correctWinsnLosses() {
+  const query = {
+    text: 'SELECT playerid FROM public.player;'
+  }
+  let players = await pool.query(query)
+
+  for (let index = 0; index < players.rows.length; index++) {
+    const playerid = players.rows[index].playerid
+
+    const query1 = {
+      text: 'SELECT * FROM public.game WHERE winner = $1;',
+      values: [playerid]
+    }
+    let wins = await pool.query(query1)
+
+    const query2 = {
+      text: 'SELECT * FROM public.game WHERE loser = $1;',
+      values: [playerid]
+    }
+    let losses = await pool.query(query2)
+
+    const query3 = {
+      text: 'UPDATE public.player SET wins= $2, losses= $3 WHERE playerid = $1;',
+      values: [playerid, wins.rows.length, losses.rows.length]
+    }
+    pool.query(query3)
+
+  }
+
+
+}
+
+correctWinsnLosses()
+
+//CreateArray()
 
