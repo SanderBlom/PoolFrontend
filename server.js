@@ -938,16 +938,13 @@ app.get("/admin", checkAuth, async (req, res) => {
 })
 
 //-------------------------------------Start server-------------------------------------//
-
+//Loading the private key and the certificate
 const sslServer = https.createServer({
     key: fs.readFileSync(path.join(__dirname, 'ssl', 'privkey.pem')),
     cert: fs.readFileSync(path.join(__dirname, 'ssl', 'fullchain.pem'))
 }, app)
-//starts server on port 3000
-/* app.listen(PORT, () => {
-    console.log(`server is running on port ${PORT}. Time & Date = ` + new Date().toString());
-}); */
 
+//Starting server
 sslServer.listen(PORT, () => {
     console.log(`server is running on port ${PORT}. Time & Date = ` + new Date().toString());
 
