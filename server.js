@@ -65,20 +65,20 @@ app.delete('/logout', (req, res) => {
     res.redirect("/")
 })
 
-//function to get the login page
 app.get("/login", checkNotAuth, (req, res) => {
 
     res.render("login", { title: 'login', message: req.flash('message') })
 })
-//Function to fetch login credentials and potentially login the user.The checkNotAuth is middleware to check if the usr/pw is valid
+
 app.post("/login", checkNotAuth, passport.authenticate('local', {
+    //Function to fetch login credentials and potentially login the user.The checkNotAuth is middleware to check if the usr/pw is valid
     successRedirect: '/user/dashboard',
     failureRedirect: '/login',
     failureFlash: true
 
 }))
 
-//function to get the homepage 
+
 app.get("/", async (req, res) => {
     //Checks if user is logged in or not
     if (req.user) {
@@ -93,7 +93,7 @@ app.get("/", async (req, res) => {
     }
 })
 
-//function to get the register page
+
 app.get("/register", checkNotAuth, (req, res) => {
 
     res.render('register', { message: req.flash('message'), title: 'register' }) //Renders the register websites and passes different letiables for flash message and title for navbar
@@ -192,10 +192,9 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
     let firstname = req.user.firstname
     let lastname = req.user.lastname
     let email = req.user.email
-    let wl = await db.PersonalStatsWL(userid) //Fetches your win/loss ratio form the database
-    let avwl = await db.AvrageStatsWL()//Fetches the average win/loss ratio form the database
-    let ingame = await db.IsUserInAGame(userid) //Checks if the user is in an active game
-    let previousgames = await db.GetPreviousGameList(userid) //Get an array of gameids where the user has played 
+
+    let [wl, avwl, ingame, previousgames] = await Promise.all([db.PersonalStatsWL(userid), db.AvrageStatsWL(), 
+        db.IsUserInAGame(userid), db.GetPreviousGameList(userid)]); //Gets necessary data from the db (runs all the functions in parallel)
     let gameid = null
     if (ingame == true) {
         gameid = await db.GetGameIDForActiveGame(userid)

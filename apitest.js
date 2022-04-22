@@ -66,8 +66,6 @@ async function correctWinsnLosses() {
     pool.query(query3)
 
   }
-
-
 }
 
 correctWinsnLosses()
