@@ -13,6 +13,8 @@ let vision = require("./VisionSystem")
 let db = require("./db.js") //Used to access the database functions
 let game = require("./game.js") //Used to access the database functions
 const moment = require('moment'); //Used to generate timestamps
+const https = require('https')
+const fs = require('fs')
 
 
 
@@ -192,9 +194,20 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
     let firstname = req.user.firstname
     let lastname = req.user.lastname
     let email = req.user.email
+    let error
+    let wl, avwl, ingame, previousgames
 
-    let [wl, avwl, ingame, previousgames] = await Promise.all([db.PersonalStatsWL(userid), db.AvrageStatsWL(), 
+    try {
+        [wl, avwl, ingame, previousgames] = await Promise.all([db.PersonalStatsWL(userid), db.AvrageStatsWL(),
         db.IsUserInAGame(userid), db.GetPreviousGameList(userid)]); //Gets necessary data from the db (runs all the functions in parallel)
+    } catch (err) {
+        error = err
+    }
+
+    if (error) {
+
+    }
+
     let gameid = null
     if (ingame == true) {
         gameid = await db.GetGameIDForActiveGame(userid)
@@ -242,17 +255,17 @@ app.get("/game/previous/:id", checkAuth, async (req, res) => {
     if (validate) {
 
         try {
-            [winner, loser, balls, time, gamestatus, usernames] = await Promise.all([db.GetGameWinner(gameid),db.GetGameLoser(gameid), db.GetAllBallPositions(gameid),
-                db.TotalGameTime(gameid),db.IsGameActive(gameid), db.fetchUsernamesInGame(gameid)]); //This runs all the functions in parallel to reduce execution time
+            [winner, loser, balls, time, gamestatus, usernames] = await Promise.all([db.GetGameWinner(gameid), db.GetGameLoser(gameid), db.GetAllBallPositions(gameid),
+            db.TotalGameTime(gameid), db.IsGameActive(gameid), db.fetchUsernamesInGame(gameid)]); //This runs all the functions in parallel to reduce execution time
             player1Username = usernames[0]
             player2Username = usernames[1]
-            
+
         } catch (err) {
             error = err
 
         }
         if (error) {
-            res.status(400).send(`Problems fetching gamedata. <a href="/">Go back</a> ` + error)
+            res.sendStatus(404, `Something went wrong. Error: ${error}`)
         }
 
         else {
@@ -490,7 +503,7 @@ app.post("/game/create", checkAuth, async (req, res) => {
             res.redirect("/user/dashboard")
         }
     }
-    else{
+    else {
         console.log('Something broke')
     }
 })
@@ -500,37 +513,37 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
     const usr = await req.user.username
     let error
 
-    if (usr == 'admin'){
+    if (usr == 'admin') {
         try {
             db.CancelGame(gameid)
         } catch (err) {
             err = error
         }
-        if(error){
+        if (error) {
             req.flash('mgmtmessage', 'Could not cancel your game with gameID:' + gameid)
             res.redirect("/admin")
         }
-        else{
+        else {
             req.flash('mgmtmessage', 'Canceled game with gameid:' + gameid)
-            res.redirect("/admin")    
+            res.redirect("/admin")
         }
     }
 
-    else{
+    else {
         try {
             db.CancelGame(gameid)
         } catch (error) {
             err = error
         }
 
-        if(error){
+        if (error) {
             req.flash('gamemessage', 'Could not cancel your game with gameID:' + gameid)
             res.redirect("/user/dashboard")
         }
-        else{
+        else {
             req.flash('gamemessage', 'Canceled game with gameid:' + gameid)
             res.redirect("/user/dashboard")
-        }   
+        }
     }
 
 })
@@ -638,7 +651,7 @@ app.get("/game/:id", checkAuth, async (req, res) => {
                 //If user is not a part of the game they should be redirected 
                 res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
                 console.log('Her gikk noe galt')
-                
+
             }
             else {
                 let userid = req.user.userid
@@ -823,8 +836,8 @@ app.get("/livegame/:id", async (req, res) => {
     let gamestatus
     let winner = null
     try {
-        [winner, balls, time, gamestatus] = await Promise.all([db.GetGameWinner(gameid), db.latestBallPosition(gameid), db.TimePlayed(gameid), 
-            db.IsGameActive(gameid)]); //This runns all the functions in parallel to save execution time
+        [winner, balls, time, gamestatus] = await Promise.all([db.GetGameWinner(gameid), db.latestBallPosition(gameid), db.TimePlayed(gameid),
+        db.IsGameActive(gameid)]); //This runns all the functions in parallel to save execution time
 
         if (gamestatus == true) {
             usernames = await db.fetchUsernamesInGame(gameid)
@@ -906,13 +919,15 @@ app.get("/admin", checkAuth, async (req, res) => {
     if (username == "admin") {
 
         try {
-            [usernames, activegames, tables, tableids, inactivetableids, inactiveusersnames] = await Promise.all([db.GetAllUserNames(), db.GetAllActiveGames(), db.GetAllTables(), 
-                db.GetAllActiveTableIds(), db.GetAllInActiveTableIds(), db.GetAllInactiveUserNames()]); //This runns all the functions in parallel to save execution time
+            [usernames, activegames, tables, tableids, inactivetableids, inactiveusersnames] = await Promise.all([db.GetAllUserNames(), db.GetAllActiveGames(), db.GetAllTables(),
+            db.GetAllActiveTableIds(), db.GetAllInActiveTableIds(), db.GetAllInactiveUserNames()]); //This runns all the functions in parallel to save execution time
         } catch (err) {
             error = err
         }
-        res.render('admin', { message: req.flash('message'), ipmessage: req.flash('ipmessage'), mgmtmessage: req.flash('mgmtmessage'), username, user: userid, title: 'admin', usernames, activegames, 
-        tables, tableids, inactivetableids, inactiveusersnames })
+        res.render('admin', {
+            message: req.flash('message'), ipmessage: req.flash('ipmessage'), mgmtmessage: req.flash('mgmtmessage'), username, user: userid, title: 'admin', usernames, activegames,
+            tables, tableids, inactivetableids, inactiveusersnames
+        })
     }
     else {
         req.flash('message', "You don't have access to this page")
@@ -922,8 +937,18 @@ app.get("/admin", checkAuth, async (req, res) => {
 })
 
 //-------------------------------------Start server-------------------------------------//
+
+const sslServer = https.createServer({
+    key: '',
+    cert: ''
+}, app)
 //starts server on port 3000
-app.listen(PORT, () => {
+/* app.listen(PORT, () => {
     console.log(`server is running on port ${PORT}. Time & Date = ` + new Date().toString());
-});
+}); */
+
+sslServer.listen(PORT, () => {
+    console.log(`server is running on port ${PORT}. Time & Date = ` + new Date().toString());
+
+})
 //-------------------------------------End server-------------------------------------//
