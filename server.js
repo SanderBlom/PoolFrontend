@@ -689,8 +689,8 @@ app.get("/game/create/:id", checkAuth, (req, res) => {
 })
 
 app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
-    let gameid = req.body.gameid
-    let userid = req.user.userid
+    let gameid = await req.body.gameid
+    let userid = await req.user.userid
 
     //Validate that the game exsist and has not been started or ended
     let players = await db.CheckPlayerCountInGame(gameid)
