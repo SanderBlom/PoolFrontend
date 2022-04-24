@@ -104,6 +104,7 @@ function renderballs(Balls) {
                 ball.y = convertCoordinatesY(ball.y_pos)// Converting the coordinates to match the pooltable image
                 ball.color = ballColor(ball.ballcoulor) // Fetching correct color depending on the balls number 
                 ball.number = ball.ballcoulor
+                console.log(ball.number)
 
                     //Drawing the whole balls
                 if (ball.number > 0 && ball.number <= 8) {
@@ -119,7 +120,7 @@ function renderballs(Balls) {
                     context2.fill();
                     //Adding number
                     context2 = billiardballs.getContext("2d");
-                    context2.font = '12pt Calibri';
+                    //context2.font = '12pt Calibri';
                     context2.fillStyle = 'black';
                     context2.textAlign = 'center';
                     context2.fillText(ball.number, ball.x, ball.y + 5);
@@ -140,7 +141,7 @@ function renderballs(Balls) {
                     context2.fill();
                     //Adding number
                     context2 = billiardballs.getContext("2d");
-                    context2.font = '12pt Calibri';
+                    //context2.font = '12pt Calibri';
                     context2.fillStyle = 'black';
                     context2.textAlign = 'center';
                     context2.fillText(ball.number, ball.x, ball.y + 5);

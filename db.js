@@ -125,6 +125,7 @@ async function StartGame(gameid) {
 
 async function AddPlayerToGame(gameid, userid) {
     if (gameid == null || userid == null) {
+        console.log('Returning null since no gameid or userid is provided')
         return null
     }
     //Checks that the game is valid (the game id exists, the game has not started, and the game has not ended)
