@@ -86,7 +86,7 @@ async function renderwholegame(balls){
     return images
 }
 
-function renderballs(Balls) {
+async function renderballs(Balls) {
     //This function gets the x, y coordinates from the database and generates an image representing the pool table 
     return new Promise((resolve, reject) => {
         const billiardboard = createCanvas(1280, 731)
@@ -120,7 +120,7 @@ function renderballs(Balls) {
                     context2.fill();
                     //Adding number
                     context2 = billiardballs.getContext("2d");
-                    //context2.font = '12pt Calibri';
+                    context2.font = '12pt Calibri';
                     context2.fillStyle = 'black';
                     context2.textAlign = 'center';
                     context2.fillText(ball.number, ball.x, ball.y + 5);
@@ -141,7 +141,7 @@ function renderballs(Balls) {
                     context2.fill();
                     //Adding number
                     context2 = billiardballs.getContext("2d");
-                    //context2.font = '12pt Calibri';
+                    context2.font = '12pt Calibri';
                     context2.fillStyle = 'black';
                     context2.textAlign = 'center';
                     context2.fillText(ball.number, ball.x, ball.y + 5);
