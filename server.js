@@ -7,7 +7,7 @@ const passport = require('passport') //Lib to keep track of logged in users
 const bcrypt = require('bcrypt'); //This is used to hash password and check hashes so we dont store the passwords in plain text
 require('dotenv').config(); //Used to store passwords. This should not be uploaded to github :) 
 let app = express();
-const PORT = 3000 //Ports that the server will listen to.
+const PORT = 443 //Ports that the server will listen to.
 app.set('view engine', 'ejs'); // Changing the view engine to ejs
 let vision = require("./VisionSystem")
 let db = require("./db.js") //Used to access the database functions
