@@ -965,8 +965,12 @@ sslServer.listen(PORT, () => {
 
 })
 
-http.createServer(httpApp).listen(80, function() {
-    console.log("Express TTP server listening on port 80");
-});
+if(process.env.DEVELOPMENT == 'false'){
+    //Setting up a http server to redirect all requests to the https server
+    http.createServer(httpApp).listen(80, function() {
+        console.log("Express TTP server listening on port 80");
+    });
+}
+
 
 //-------------------------------------End server-------------------------------------//
