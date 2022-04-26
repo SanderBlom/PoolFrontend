@@ -6,9 +6,6 @@ const methodOverride = require('method-override') //Used to override methods.
 const passport = require('passport') //Lib to keep track of logged in users
 const bcrypt = require('bcrypt'); //This is used to hash password and check hashes so we dont store the passwords in plain text
 require('dotenv').config(); //Used to store passwords. This should not be uploaded to github :) 
-let app = express();
-const PORT = 443 //Ports that the server will listen to.
-app.set('view engine', 'ejs'); // Changing the view engine to ejs
 let vision = require("./VisionSystem")
 let db = require("./db.js") //Used to access the database functions
 let game = require("./game.js") //Used to access the database functions
@@ -16,22 +13,43 @@ const moment = require('moment'); //Used to generate timestamps
 const https = require('https')
 const fs = require('fs')
 const path = require('path')
-
-
-
 const initializePassport = require("./passport-config");
-const { use } = require('passport/lib');
-initializePassport(passport);
+const httpApp = express();
+const http = require('http');
 
+
+let app = express();
+
+const { use } = require('passport/lib');
+
+//Force redirect to https
+app.use (function (req, res, next) {
+    console.log('Hihi')
+    if(req.get("X-Forwarded-Proto")=="http") {
+            // request was via http, so redirect to https
+            res.redirect('https://' + req.headers.host + req.url);
+    } else {
+        console.log('Jeg kjørte')
+        next();
+    }
+});
+
+httpApp.get("*", function(req, res, next) {
+    res.redirect("https://" + req.headers.host + req.path);
+});
+
+app.set('view engine', 'ejs'); // Changing the view engine to ejs
 app.use(express.static('views'));//Gives express access to views folder 
-app.set("view engine", "ejs") //Using EJS av view engine 
 app.use(express.urlencoded({ extended: false }))
+
+
+initializePassport(passport);
 
 app.use(
     session({
         secret: process.env.SESSION_SECRET,//Encryption key for our sessions.
         resave: false,
-        saveUninitialized: false,
+        saveUninitialized: true,
         cookie: { maxAge: 3600000 }
     })
 );
@@ -40,6 +58,7 @@ app.use(passport.initialize()); //Starting passport to keep track of our users
 app.use(passport.session());// Store our letiables to be persisted across the whole session. Works with app.use(Session) above
 app.use(flash()); //Used for to display flash messages to the frontend
 app.use(methodOverride('_method')) //used for triggering .delete functions with posts function in html
+
 
 
 //Checks if user is logged in.
@@ -945,8 +964,20 @@ const sslServer = https.createServer({
 }, app)
 
 //Starting server
+let PORT
+if(process.env.DEVELOPMENT == 'false'){
+    PORT = 443 //Ports that the server will listen to.
+}
+else{
+    PORT = 3000 //Ports that the server will listen to.
+}
 sslServer.listen(PORT, () => {
     console.log(`server is running on port ${PORT}. Time & Date = ` + new Date().toString());
 
 })
+
+http.createServer(httpApp).listen(80, function() {
+    console.log("Express TTP server listening on port 80");
+});
+
 //-------------------------------------End server-------------------------------------//

@@ -104,7 +104,7 @@ async function renderballs(Balls) {
                 ball.y = convertCoordinatesY(ball.y_pos)// Converting the coordinates to match the pooltable image
                 ball.color = ballColor(ball.ballcoulor) // Fetching correct color depending on the balls number 
                 ball.number = ball.ballcoulor
-                console.log(ball.number)
+                
 
                     //Drawing the whole balls
                 if (ball.number > 0 && ball.number <= 8) {
