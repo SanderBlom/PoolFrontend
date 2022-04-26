@@ -23,17 +23,6 @@ let app = express();
 const { use } = require('passport/lib');
 
 //Force redirect to https
-app.use (function (req, res, next) {
-    console.log('Hihi')
-    if(req.get("X-Forwarded-Proto")=="http") {
-            // request was via http, so redirect to https
-            res.redirect('https://' + req.headers.host + req.url);
-    } else {
-        console.log('Jeg kjørte')
-        next();
-    }
-});
-
 httpApp.get("*", function(req, res, next) {
     res.redirect("https://" + req.headers.host + req.path);
 });
