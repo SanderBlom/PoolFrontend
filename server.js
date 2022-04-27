@@ -961,14 +961,14 @@ else{
     PORT = 3000 //Ports that the server will listen to.
 }
 sslServer.listen(PORT, () => {
-    console.log(`server is running on port ${PORT}. Time & Date = ` + new Date().toString());
+    console.log(`Server is running on port ${PORT}. Time & Date = ` + new Date().toString());
 
 })
 
 if(process.env.DEVELOPMENT == 'false'){
     //Setting up a http server to redirect all requests to the https server
     http.createServer(httpApp).listen(80, function() {
-        console.log("Express TTP server listening on port 80");
+        console.log("Redirect server listening on port 80");
     });
 }
 
