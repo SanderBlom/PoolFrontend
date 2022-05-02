@@ -29,7 +29,7 @@ async function SendStop(gameid) {
   //This function will stop a ongoing game
   const ipaddress = await db.GetTableIPWithGameID(gameid)
 
-  const response = await fetch(`http://${ipaddress}/gamedone`, {
+  const response = await fetch(`http://${ipaddress}/GameDone`, {
     method: 'post',
     timeout: '5000',
   });
