@@ -29,12 +29,9 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
 async function SendStop(gameid) {
   //This function will stop a ongoing game
   const ipaddress = await db.GetTableIPWithGameID(gameid)
-  const body = { gameid: gameid };
   const response = await fetch(`http://${ipaddress}/GameDone`, {
     method: 'put',
-    timeout: '5000',
-    //body: JSON.stringify(body),
-    //headers: { 'Content-Type': 'application/json' }
+    timeout: '5000'
   });
   console.log(response.status)
   return response.status //200 = ok, 400 = wrong format and 404 = no response
