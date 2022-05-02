@@ -95,6 +95,6 @@ async function CheckTableAvailability(tableid) {
 
 //Exporting all the functions so they can be access by server.js
 module.exports = {
-  CheckTableAvailability, SendStart
+  CheckTableAvailability, SendStart, SendStop
 
 }
