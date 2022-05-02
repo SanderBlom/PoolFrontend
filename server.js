@@ -549,7 +549,7 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
 
     else {
         try {
-            let result = vision.SendStop(gameid)
+            let result = await vision.SendStop(gameid)
 
             if(result == 200){
                 db.CancelGame(gameid)
