@@ -653,7 +653,7 @@ async function GetGameLoser(gameid) {
 }
 
 
-async function Top25WL(gameid) {
+async function Top25WL() {
     //This will return an array with the top 25 players based on win/loss ratio
     const query = {
         text: 'SELECT wins, losses, userid FROM public.player WHERE wins != 0 AND wins != 0;'

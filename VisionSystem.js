@@ -25,7 +25,17 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
 
 }
 
+async function SendStop(gameid) {
+  //This function will stop a ongoing game
+  const ipaddress = await db.GetTableIPWithGameID(gameid)
 
+  const response = await fetch(`http://${ipaddress}/gamedone`, {
+    method: 'post',
+    timeout: '5000',
+  });
+  return response.status //200 = ok, 400 = wrong format and 404 = no response
+
+}
 
 
 async function CheckTableAvailability(tableid) {
