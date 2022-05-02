@@ -553,11 +553,12 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
 
             if(result == 200){
                 db.CancelGame(gameid)
+                console.log('Canceled game. API response: ' + result )
             }
             else{
                 error = `Could not cancel the game. Bad response from API. Response: ${result} `
             }
-            
+
         } catch (error) {
             err = error
         }
