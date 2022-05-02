@@ -557,6 +557,7 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
             }
             else{
                 error = `Could not cancel the game. Bad response from API. Response: ${result} `
+                console.log('Could not cancel game. API response:' + result)
             }
 
         } catch (error) {
