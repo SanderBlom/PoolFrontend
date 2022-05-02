@@ -521,10 +521,19 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
     let gameid = req.params.id.trim();
     const usr = await req.user.username
     let error
+    
 
     if (usr == 'admin') {
         try {
-            db.CancelGame(gameid)
+            let result = vision.SendStop(gameid)
+
+            if(result == 200){
+                db.CancelGame(gameid)
+            }
+            else{
+                error = `Could not cancel the game. Bad response from API. Response: ${result} `
+            }
+            
         } catch (err) {
             err = error
         }
@@ -540,7 +549,15 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
 
     else {
         try {
-            db.CancelGame(gameid)
+            let result = vision.SendStop(gameid)
+
+            if(result == 200){
+                db.CancelGame(gameid)
+            }
+            else{
+                error = `Could not cancel the game. Bad response from API. Response: ${result} `
+            }
+            
         } catch (error) {
             err = error
         }
