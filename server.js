@@ -552,7 +552,7 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
             let result = await vision.SendStop(gameid)
 
             if(result == 200){
-                db.CancelGame(gameid)
+                await db.CancelGame(gameid)
                 console.log('Canceled game. API response: ' + result )
             }
             else{
