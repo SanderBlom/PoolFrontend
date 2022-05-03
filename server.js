@@ -86,6 +86,7 @@ app.post("/login", checkNotAuth, passport.authenticate('local', {
     successRedirect: '/user/dashboard',
     failureRedirect: '/login',
     failureFlash: true
+     
 
 }))
 
@@ -151,7 +152,7 @@ app.post("/register", checkNotAuth, async function (req, res) {
                 }
                 if (InsertUserResult) {
                     req.flash('message', `You are now registered and can login!`)
-                    res.redirect("register")
+                    res.redirect("login")
                 }
                 else {
                     req.flash('message', `Ops, something went wrong..`)

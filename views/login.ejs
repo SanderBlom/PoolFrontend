@@ -25,9 +25,16 @@
 				</div>
 				<% }%>
 
+			<!--Green message for a successful function-->
+			<% if(locals.message) { %>
+				<div class="alert alert-success">
+					<%= locals.message%>
+				</div>
+				<% }%>
+
 			<div>
 				<h4 for="username">
-					Username: <%= locals.message%>
+					Username: 
 				</h4>
 
 				<input type="text" id="username" name="username" placeholder="Your username and NOT email" required />
