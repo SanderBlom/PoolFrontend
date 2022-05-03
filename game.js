@@ -67,8 +67,16 @@ async function renderwholegame(balls){
     //Adding x, y and color to correct place in array
     for (let index = 0; index < balls.length; index++) {
       const playcount = balls[index].playcount - 1
-      const x_pos = balls[index].x_pos
-      const y_pos = balls[index].y_pos
+      let x_pos = balls[index].x_pos + 0.015
+      let y_pos = balls[index].y_pos
+
+      //Making a adjustments to align the balls better with the prossesed image. We should do this correction localy insted.....
+      if(y_pos >= 0.5){
+          y_pos = y_pos + 0.04
+      }
+      else{
+          y_pos = y_pos - 0.04
+      }
       const ballcoulor = balls[index].ballcoulor
       ballarray[playcount].push({x_pos: x_pos, y_pos: y_pos, ballcoulor: ballcoulor })
     }
