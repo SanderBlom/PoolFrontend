@@ -15,7 +15,7 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
     username1: username1, username2: username2
   };
 
-  const response = await fetch(`http://${ipaddress}/gamestart`, {
+  const response = await fetch(`http://${ipaddress}/GameStart`, {
     method: 'post',
     timeout: '5000',
     body: JSON.stringify(body),
@@ -27,13 +27,12 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
 }
 
 async function SendStop(gameid) {
-  //This function will stop a ongoing game
+  //This function will stop an ongoing game
   const ipaddress = await db.GetTableIPWithGameID(gameid)
   const response = await fetch(`http://${ipaddress}/GameDone`, {
-    method: 'put',
+    method: 'delete',
     timeout: '5000'
   });
-  console.log(response.status)
   return response.status //200 = ok, 400 = wrong format and 404 = no response
 
 }
@@ -59,8 +58,7 @@ async function CheckTableAvailability(tableid) {
 
   
   else {
-    console.log('Trying to check the table')
-    const API = `http://${ipaddress}/checktable`
+    const API = `http://${ipaddress}/CheckTableStatus`
 
     if(tablestatus == true){
       try {
