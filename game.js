@@ -22,6 +22,7 @@ function convertCoordinatesY(inputY) {
 }
 
 function ballColor(color) {
+    //Assigns the balls a color depending on their number.
     const colors = [
         { color: "white", number: 0 },
         { color: "yellow", number: 1 },
@@ -70,7 +71,8 @@ async function renderwholegame(balls){
       let x_pos = balls[index].x_pos + 0.015
       let y_pos = balls[index].y_pos
 
-      //Making a adjustments to align the balls better with the prossesed image. We should do this correction localy insted.....
+      //Making a adjustments to align the balls better with the prossesed image. The balls that was all the way to the right on the table was not all the way to the right in the generated image. 
+      //We should do this correction localy insted.....
       if(y_pos >= 0.5){
           y_pos = y_pos + 0.04
       }
@@ -81,7 +83,7 @@ async function renderwholegame(balls){
       ballarray[playcount].push({x_pos: x_pos, y_pos: y_pos, ballcoulor: ballcoulor })
     }
 
-    
+    //Foreach play we generate a base64 image and add it to the array.
     for (let index = 0; index < ballarray.length; index++) {
         const row = ballarray[index];
         await renderballs(row).then((image => {
@@ -91,6 +93,7 @@ async function renderwholegame(balls){
         }))
 
     }
+    //Returing the array with images
     return images
 }
 
