@@ -17,11 +17,7 @@ const initializePassport = require("./passport-config");
 const httpApp = express();
 const http = require('http');
 
-
 let app = express();
-
-const { use } = require('passport/lib');
-
 //Force redirect to https
 httpApp.get("*", function(req, res, next) {
     res.redirect("https://" + req.headers.host + req.path);

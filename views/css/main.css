@@ -18,7 +18,11 @@ body {
   font-size: 12px;
   line-height: 30px;
   color: #777;
-  background: #4CAF50;
+  min-height: 100vh; 
+  margin: 0; 
+  
+  display: grid;
+  grid-template-rows: auto 1fr auto;
 }
 ul {
   max-width: 600px;
@@ -79,19 +83,17 @@ select {
   margin: 0 0 5px;
   padding: 10px;
   width: 100%;
- 
   position: relative;
 }
 
 input {
- 
   width: 100%;
   border: 1px solid #ccc;
   background: #FFF;
   margin: 0 0 5px;
   padding: 10px;
   width: 100%;
- 
+  box-sizing:border-box;
   position: relative;
 }
 .container {
