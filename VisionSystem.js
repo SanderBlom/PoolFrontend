@@ -7,21 +7,46 @@ let db = require("./db.js"); //Gives us access to the db class to access data in
 
 async function SendStart(gameid, playerid1, playerid2, username1, username2, timestamp) {
   //This function will start send necessary data to start a game. Returns true or false depending if the game is started or not.
-  const ipaddress = await db.GetTableIPWithGameID(gameid)
+  let error1 = null
+  let error2 = null
+  let ipaddress
   const body = {
     gameid: gameid, playerid1: playerid1, playerid2: playerid2, timestamp: timestamp,
     username1: username1, username2: username2
-  };
+  }
 
-  const response = await fetch(`http://${ipaddress}/GameStart`, {
-    method: 'post',
-    timeout: '5000',
-    body: JSON.stringify(body),
-    headers: { 'Content-Type': 'application/json' }
-  });
+  try {
+     ipaddress = await db.GetTableIPWithGameID(gameid)
+  } catch (err) {
+    console.log('Could not get tableIP from database. Error:' + err)
+    err = error1
+  }
 
-  return response.status //200 = ok, 400 = wrong format and 404 = no response
+  if(error1){
+    //Retrun false if we could not get the table IP
+    console.log('Could not get tableIP. Returning false')
+    return null
+  }
+  else{
+    try {
+    
+      const response = await fetch(`http://${ipaddress}/GameStart`, {
+        method: 'post',
+        timeout: '5000',
+        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' }
+      });
+  
+      return response.status //200 = ok, 400 = wrong format and 404 = no response
+  
+    } catch (err) {
+      console.log('No response from API server. Error:' + err)
+      err = error2
+    }
 
+  }
+  
+  
 }
 
 async function SendStop(gameid) {
@@ -35,14 +60,11 @@ async function SendStop(gameid) {
 
 }
 
-
 async function CheckTableAvailability(tableid) {
   let responseJson
   let tablestatus
   let error
   let ipaddress
-
-
 
   try {
     tablestatus = await db.GetTablelActiveState(tableid) //We get the active state of the table (true or false). 
@@ -51,41 +73,32 @@ async function CheckTableAvailability(tableid) {
     error = err
   }
   if (error) {
-    console.log(error)
+    console.log('Could not get table info from the database. Error: ' + error)
   }
 
-  
+
   else {
     const API = `http://${ipaddress}/CheckTableStatus`
 
-    if(tablestatus == true){
+    if (tablestatus == true) {
       try {
         const response = await fetch(API, {
           timeout: '5000'
         })
         responseJson = await response.json()
-  
+
       } catch (error) {
-        console.log(error)
+        console.log('Could not fetch data from API. Error: ' + error)
       }
-  
-      if (responseJson == true) {
-  
-        return true
-      }
-  
-      else {
-  
-        return false
-      }
+      return responseJson //This will be either true or false
     }
-    else{
+    else {
       //If table is not active we return false
       return false
     }
 
-    }
-    
+  }
+
 
 }
 

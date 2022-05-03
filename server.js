@@ -742,7 +742,7 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
 
 //Fetches the scoreboard
 app.get("/scoreboard", async (req, res) => {
-    let data = await db.Top25WL()
+    let data = await db.GetWLSummary()
     let usernames = []
     let wl = []
     for (let index = 0; index < data.length; index++) {

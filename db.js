@@ -653,10 +653,10 @@ async function GetGameLoser(gameid) {
 }
 
 
-async function Top25WL() {
-    //This will return an array with the top 25 players based on win/loss ratio
+async function GetWLSummary() {
+    //This will return an array will the summary of all the WL data
     const query = {
-        text: 'SELECT wins, losses, userid FROM public.player WHERE wins != 0 AND wins != 0;'
+        text: 'SELECT wins, losses, userid FROM public.player WHERE wins != 0;'
     }
     let result = await pool.query(query)
     for (let index = 0; index < result.rows.length; index++) {
@@ -970,7 +970,7 @@ module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
     CreateNewGame, AddPlayerToGame, CheckPlayerCountInGame, GetTableID, GetUsernamesFromPlayerID,
     fetchUsernamesInGame, IsUserInAGame, GetPlayerIDinGame, CancelGame, GetGameIDForActiveGame, GetTableIPWithTableID,
-    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, Top25WL,
+    JoinGame, IsGameActive, StartGame, GetTableIPWithGameID, latestBallPosition, TimePlayed, PersonalStatsWL, AvrageStatsWL, GetWLSummary,
     GetUsername, GetGameWinner, CreateNewTournament, GetPreviousGameList, ValidateGameAccess, GetGameLoser,
     TotalGameTime, GetAllBallPositions, GetAllUserNames, GetUsersActiveState, ActivateUser, DeactivateUser,
     GetAllActiveGames, GetAllTables, AddNewTable, DeactivateTable, ActivateTable, GetAllActiveTableIds, GetAllInActiveTableIds,
