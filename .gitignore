@@ -3,3 +3,4 @@ node_modules/
 apitest.js
 ssl/fullchain.pem
 ssl/privkey.pem
+apitest.js
