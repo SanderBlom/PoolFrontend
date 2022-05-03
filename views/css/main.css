@@ -30,7 +30,7 @@ ul {
 .bg-image {
   background: url('../img/background.jpg') no-repeat;
   background-size:cover;
-  height: 100vh;
+  height: 85vh;
 }
 
 table, th, td {
