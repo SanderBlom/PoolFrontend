@@ -51,10 +51,15 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
 
 async function SendStop(gameid) {
   //This function will stop an ongoing game
+  const body = {
+    gameid: gameid
+  }
   const ipaddress = await db.GetTableIPWithGameID(gameid)
   const response = await fetch(`http://${ipaddress}/GameStop`, {
     method: 'put',
-    timeout: '5000'
+    timeout: '5000',
+    body: JSON.stringify(body),
+    headers: { 'Content-Type': 'application/json' }
   });
   console.log(response)
   return response.status //200 = ok, 400 = wrong format and 404 = no response
