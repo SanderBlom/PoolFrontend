@@ -35,7 +35,7 @@ app.use(
         secret: process.env.SESSION_SECRET,//Encryption key for our sessions.
         resave: false,
         saveUninitialized: true,
-        cookie: { maxAge: 3600000 }
+        cookie: { maxAge: 3600000 } //Session timeout.
     })
 );
 // Funtion inside passport which initializes passport
