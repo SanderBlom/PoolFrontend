@@ -522,17 +522,16 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
 
     if (usr == 'admin') {
         try {
-            try {
-                let result = await vision.SendStop(gameid)
-    
-                if(result == 200){
-                    await db.CancelGame(gameid)
-                    console.log('Canceled game. API response: ' + result )
-                }
-                else{
-                    error = `Could not cancel the game. Bad response from API. Response: ${result} `
-                    console.log('Could not cancel game. API response:' + result)
-                }
+            let result = await vision.SendStop(gameid)
+
+            if(result == 200){
+                await db.CancelGame(gameid)
+                console.log('Canceled game. API response: ' + result )
+            }
+            else{
+                error = `Could not cancel the game. Bad response from API. Response: ${result} `
+                console.log('Could not cancel game. API response:' + result)
+            }
             
         } catch (err) {
             err = error
