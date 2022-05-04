@@ -56,6 +56,7 @@ async function SendStop(gameid) {
     method: 'put',
     timeout: '5000'
   });
+  console.log(response)
   return response.status //200 = ok, 400 = wrong format and 404 = no response
 
 }
