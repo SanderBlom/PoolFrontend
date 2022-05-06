@@ -78,12 +78,20 @@
 			</div>
 			<div class="col-md-4">
 				<div class="jumbotron">
-					<% if (locals.ingame==false) { %>
+					<% if (locals.ingame==false && locals.tournamentid == null) { %>
 						<a class="btn btn-primary btn-large" href="/tournament/new">Start a tournament!</a>
 						<h5>Get your friends, family or colleagues and start your own tournament</h5>
-						<% } else { %>
+						<% } 
+						else if (locals.tournamentid) { %>
+						<h5>You have been assigned to tournament: <%= locals.tournamentname %></h5>
+						<form class="form-inline" action="/tournament/leave/<%= locals.tournamentid %>?_method=DELETE" method="POST">
+								<button type="submit" class="btn btn-danger mb-2">Leave tournament</button>
+							</form>
+						<% }
+						
+						else { %>
 							<form class="form-inline" action="/game/<%=locals.gameid%>" method="GET">
-								<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+								
 								<div class="form-group mx-sm-3 mb-2">
 									<h6>Looks like your already in a game</h6>
 

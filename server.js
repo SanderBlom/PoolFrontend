@@ -201,34 +201,40 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
     let lastname = req.user.lastname
     let email = req.user.email
     let error
-    let wl, avwl, ingame, previousgames
+    let wl, avwl, ingame, previousgames, gameid, tournamentdetails
 
     try {
-        [wl, avwl, ingame, previousgames] = await Promise.all([db.PersonalStatsWL(userid), db.AvrageStatsWL(),
-        db.IsUserInAGame(userid), db.GetPreviousGameList(userid)]); //Gets necessary data from the db (runs all the functions in parallel)
+        [wl, avwl, ingame, previousgames, tournamentdetails] = await Promise.all([db.PersonalStatsWL(userid), db.AvrageStatsWL(),
+        db.IsUserInAGame(userid), db.GetPreviousGameList(userid), db.GetTournamentDetails(userid)]); //Gets necessary data from the db (runs all the functions in parallel)
     } catch (err) {
         error = err
     }
 
     if (error) {
-
+        console.log(error)
+        res.sendStatus(404, `Something went wrong. Error: ${error}`)
+    }
+    else{
+        const tournamentname = tournamentdetails.name
+        const tournamentid = tournamentdetails.id
+        if (ingame == true) {
+            gameid = await db.GetGameIDForActiveGame(userid)
+            res.render("profile", {
+                username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'),
+                personalWL: wl, averagewl: avwl, gamelist: previousgames, tournamentname, tournamentid, title: 'profile'
+            })
+    
+        }
+        else {
+            res.render("profile", {
+                username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'),
+                personalWL: wl, averagewl: avwl, gamelist: previousgames, tournamentname, tournamentid, title: 'profile'
+            })
+        }
     }
 
-    let gameid = null
-    if (ingame == true) {
-        gameid = await db.GetGameIDForActiveGame(userid)
-        res.render("profile", {
-            username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'),
-            personalWL: wl, averagewl: avwl, gamelist: previousgames, title: 'profile'
-        })
 
-    }
-    else {
-        res.render("profile", {
-            username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'),
-            personalWL: wl, averagewl: avwl, gamelist: previousgames, title: 'profile'
-        })
-    }
+   
 })
 
 app.post("/game/previous/", checkAuth, async (req, res) => {
@@ -726,7 +732,6 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
         res.redirect("/user/dashboard/")
     }
 
-
     else {
         let result = await db.AddPlayerToGame(gameid, userid)
         if (result == true) {
@@ -826,6 +831,7 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
     let tournamentName = tournament.TournamentName //storing tournament name
     let usernames = tournament.usernames //array of usernames to add to tournament
     let invalidusernames = []
+    let usernamearray = []
     for (let index = 0; index < usernames.length; index++) {
         const username = usernames[index];
         let validation = await db.ValidateUniqueUsername(username) //Checks if the username exist in the db
@@ -835,15 +841,59 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
             invalidusernames.push(username)
         }
 
+
     }
 
     if (invalidusernames.length == 0) {
         //Cheks that we dont have any invalid usernames
         console.log('Valid')
+        let id = await db.CreateNewTournament(tournamentName)
+
+        let playerids = []
+
+        for (let index = 0; index < usernames.length; index++) {
+            const username = usernames[index]
+            let playerid = await db.GetPlayerIDFromUsername(username)
+            playerids.push(playerid)
+            
+        }
+
+        
+        await db.AddPlayersToTournament(id, playerids)
+
+
+
     }
     else {
         res.redirect('back');
     }
+
+})
+
+app.delete("/tournament/leave/:id", checkAuth, async (req, res) => {
+    //Removes user for requested tournament id
+    const tournamentid = req.params.id
+    const userid = await req.user.userid
+    let error
+    
+
+    try {
+        db.RemoveUserFromTournament(userid, tournamentid)
+    } catch (err) {
+        console.log(err)
+        error = err
+    }
+
+    if(error){
+        req.flash('message', 'Could not delete your from the tournament')
+        res.redirect("/user/dashboard")
+    }
+
+    else{
+        req.flash('message', 'Deleted you from the tournament')
+        res.redirect("/user/dashboard")
+    }
+    
 
 })
 app.post("/livegame", async (req, res) => {
@@ -864,7 +914,7 @@ app.get("/livegame/:id", async (req, res) => {
     let winner = null
     try {
         [winner, balls, time, gamestatus] = await Promise.all([db.GetGameWinner(gameid), db.latestBallPosition(gameid), db.TimePlayed(gameid),
-        db.IsGameActive(gameid)]); //This runns all the functions in parallel to save execution time
+        db.IsGameActive(gameid)]); //This runs all the functions in parallel to save execution time
 
         if (gamestatus == true) {
             usernames = await db.fetchUsernamesInGame(gameid)
@@ -935,8 +985,7 @@ app.get("/admin", checkAuth, async (req, res) => {
     //Checks that the user is 
     let userid = req.user.userid
     let username = req.user.username
-    let usernames = [] //Array to store the usernames
-    let error = []
+    let usernames = [] 
     let activegames = []
     let tables = []
     let tableids = []

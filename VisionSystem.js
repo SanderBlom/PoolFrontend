@@ -5,13 +5,13 @@ let db = require("./db.js"); //Gives us access to the db class to access data in
 
 
 
-async function SendStart(gameid, playerid1, playerid2, username1, username2, timestamp) {
+async function SendStart(gameid, playerid1, playerid2, username1, username2) {
   //This function will start send necessary data to start a game. Returns true or false depending if the game is started or not.
   let error1 = null
   let error2 = null
   let ipaddress
   const body = {
-    gameid: gameid, playerid1: playerid1, playerid2: playerid2, timestamp: timestamp,
+    gameid: gameid, playerid1: playerid1, playerid2: playerid2,
     username1: username1, username2: username2
   }
 
@@ -45,8 +45,6 @@ async function SendStart(gameid, playerid1, playerid2, username1, username2, tim
     }
 
   }
-  
-  
 }
 
 async function SendStop(gameid) {

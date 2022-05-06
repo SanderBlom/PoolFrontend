@@ -17,7 +17,6 @@
 		<br>
 		<br>
 		<br>
-		<!-- Background image -->
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12">
@@ -38,14 +37,14 @@
 							</p>
 							<br>
 							<p>
-							<form class="form-inline" action="/user/dashboard/joingame/" method="POST" >
-								<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
-								<div class="form-group mx-sm-3 mb-2">
-									<label for="tablecode" class="sr-only"></label>
-									<input type="number" class="form-control" id="tablecode" placeholder="Enter the GameID">
-								</div>
-								<button type="submit" class="btn btn-primary mb-2">Join game</button>
-							</form>
+								<form class="form-inline" action="/user/dashboard/joingame/" method="POST">
+									<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+									<div class="form-group mx-sm-3 mb-2">
+										<input type="number" class="form-control" name="gameid" id="gameid"
+											placeholder="Game ID" required>
+									</div>
+									<button type="submit" class="btn btn-primary mb-2">Join game</button>
+								</form>
 							<h6>The table ID can be found on a sticker on your table</h6>
 							</p>
 							<!-- If user is NOT logged in, the quick play button is inactive. -->

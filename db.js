@@ -592,13 +592,19 @@ async function AvrageStatsWL() {
 
     for (let index = 0; index < result.rows.length; index++) {
 
-        if (result.rows[index].losses == 0) {
-            let indexWL = (result.rows[index].wins / 1)
+       if (result.rows[index].losses == 0 && result.rows[index].wins == 0) {
+            let indexWL = 1
+            WL.push(indexWL) //Adding each WL to the array
+        } 
+    
+        else if (result.rows[index].losses != 0 && result.rows[index].wins > 0){
+            let indexWL = (result.rows[index].wins / result.rows[index].losses)
             WL.push(indexWL) //Adding each WL to the array
         }
         else {
-            let indexWL = (result.rows[index].wins / result.rows[index].losses)
+            let indexWL = 1
             WL.push(indexWL) //Adding each WL to the array
+
         }
 
     }
@@ -711,6 +717,20 @@ async function CreateNewTournament(tournamentName) {
 
 }
 
+async function AddPlayersToTournament(tournamentid, playerids) {
+    //This function adds an array of users to a tournament.
+    for (let index = 0; index < playerids.length; index++) {
+        const playerid = playerids[index];
+        const query = {
+            text: `INSERT INTO public.tournament_player(
+                tournamentid, playerid)
+                VALUES ($1, $2);`,
+            values: [tournamentid, playerid]
+        }
+        await pool.query(query)
+    }
+}
+
 async function GetPlayerIDFromUserID(userid) {
     //This function will return the playerid correlating to the playerid
     const query = {
@@ -720,6 +740,29 @@ async function GetPlayerIDFromUserID(userid) {
     let result = await pool.query(query)
     if (result.rows.length > 0) {
         return result.rows[0].playerid
+    }
+    else { return null }
+
+
+}
+
+async function GetPlayerIDFromUsername(username) {
+    //This function will return the playerid correlating to the playerid
+    const query = {
+        text: 'SELECT userid from users WHERE username = $1',
+        values: [username]
+    }
+    let result = await pool.query(query)
+    if (result.rows.length > 0) {
+        userid = result.rows[0].userid
+
+        const query = {
+            text: 'SELECT playerid from player WHERE userid = $1',
+            values: [userid]
+        }
+        let result2 = await pool.query(query)
+
+        return result2.rows[0].playerid
     }
     else { return null }
 
@@ -965,6 +1008,70 @@ async function GetTablelActiveState(tableid) {
     return result.rows[0].active
 }
 
+async function GetTournamentName(tournamentid) {
+    //This will return a tournament name based on the provided tournamentid
+    const query = {
+        text: `SELECT tournamentname
+        FROM public.tournament
+        WHERE tournamentid = $1`,
+        values: [tournamentid]
+    }
+    let result = await pool.query(query) 
+    return result.rows[0].tournamentname
+
+}
+
+async function GetTournamentDetails(userid) {
+    //This will return details about users active tournament 
+    let playerid = await GetPlayerIDFromUserID(userid)
+    const query = {
+        text: `SELECT tournamentid
+        FROM public.tournament_player
+        WHERE playerid = $1`,
+        values: [playerid]
+    }
+    let result = await pool.query(query)
+
+    if(result.rows.length > 0){
+        let tournamentid = result.rows[0].tournamentid
+        let tournamentname = await GetTournamentName(tournamentid)
+
+        const tournament = {
+            name: tournamentname,
+            id: tournamentid
+        }
+        return tournament
+    }
+
+    else{
+        const tournament = {
+            name: null,
+            id: null
+        }
+        return tournament
+    }
+
+    
+
+}
+async function RemoveUserFromTournament(userid, tournamentid) {
+    //This will remove a player from a tournamet
+    let playerid = await GetPlayerIDFromUserID(userid)
+    const query = {
+        text: `DELETE FROM public.tournament_player
+        WHERE playerid = $1 AND tournamentid = $2 RETURNING *`,
+        values: [playerid, tournamentid]
+    }
+    let result = await pool.query(query)
+
+    if(result.rows.length > 0){
+       return true
+    }
+    else{return false}
+}
+
+
+
 //Exporting all the functions so they can be access by other files
 module.exports = {
     ValidateUniqueEmail, ValidateUniqueUsername, UpdaterUserDetails, RegisterNewUser,
@@ -974,5 +1081,6 @@ module.exports = {
     GetUsername, GetGameWinner, CreateNewTournament, GetPreviousGameList, ValidateGameAccess, GetGameLoser,
     TotalGameTime, GetAllBallPositions, GetAllUserNames, GetUsersActiveState, ActivateUser, DeactivateUser,
     GetAllActiveGames, GetAllTables, AddNewTable, DeactivateTable, ActivateTable, GetAllActiveTableIds, GetAllInActiveTableIds,
-    GetAllInactiveUserNames, GetTablelActiveState
+    GetAllInactiveUserNames, GetTablelActiveState, GetTournamentDetails, GetPlayerIDFromUsername, AddPlayersToTournament, RemoveUserFromTournament
 }
+
