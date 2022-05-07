@@ -886,9 +886,7 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
            req.flash('message', 'The usernames:' + invalidusernamestring + ' are invalid')
            res.redirect('back');
         }
-       
     }
-
 })
 
 app.delete("/tournament/leave/:id", checkAuth, async (req, res) => {
