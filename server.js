@@ -583,12 +583,13 @@ app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
 
 app.post("/game/start/:id", checkAuth, async (req, res) => {
     let gameid = req.params.id.trim(); //Getting gameid from url
-    let { username1, username2 } = req.body //Getting usernames from post request.
+    let { username1, username2 } = await req.body //Getting usernames from post request.
     let username = await req.user.username //Getting logged in users username
     let tablestatus //Stores the table status. This should be true if there are no active games on the table.
     let tableid
 
     if (username1 != null && username2 != null) {
+        console.log('Both users are present.' + 'Users:' + username1 + username2)
         //Checks that the game is not allready started
         let gamestatus = await db.IsGameActive(gameid)
         if (gamestatus == true) {
@@ -643,6 +644,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     }
 
     else{
+        console.log('Both players are not present')
         req.flash('message', `You can not start the game with just one player.`)
         res.redirect(`/game/${gameid}`)
 
