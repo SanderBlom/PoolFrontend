@@ -39,33 +39,48 @@
 						</h3>
 					</div>
 				</form>
-					<div>
-						<form class="form-inline" action="/game/cancel/<%=locals.gameid%>" method="GET">
+	</div>	
+
+	<div class="container-medium">
+		<form id="boxed">
+			<div>
+				<form action="/game/cancel/<%=locals.gameid%>" method="GET">
+					<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+					<input type="hidden" value="<%= locals.username1%>" name="username1" />
+					<input type="hidden" value="<%= locals.username2%>" name="username2" />
+					<button class="btn btn-danger" id="submit-cancel" type="submit">Cancel game</button>
+				</form>
+				<% if (locals.gamestatus==true) { %>
+					<!--If the game has allready been started. The user should not be able to start it again. -->
+					<form action="/livegame/<%=locals.gameid%>" method="GET">
+
+						<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
+						<input type="hidden" value="<%= locals.username1%>" name="username1" />
+						<input type="hidden" value="<%= locals.username2%>" name="username2" />
+						<button class="btn btn-primary" id="submit" type="submit">Resume game</button>
+					</form>
+					<% } else { %>
+						<form action="/game/start/<%=locals.gameid%>" method="POST">
 							<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
 							<input type="hidden" value="<%= locals.username1%>" name="username1" />
 							<input type="hidden" value="<%= locals.username2%>" name="username2" />
-							<button class="btn btn-danger" type="submit">Cancel game</button>
+							<button class="btn btn-success" id="submit" type="submit">Start game</button>
 						</form>
-					</div>
-					<div>
-						<% if (locals.gamestatus==true) { %>
-							<!--If the game has allready been started. The user should not be able to start it again. -->
-							<form class="form-inline" action="/livegame/<%=locals.gameid%>" method="GET">
+						<% } %>
 
-								<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
-								<input type="hidden" value="<%= locals.username1%>" name="username1" />
-								<input type="hidden" value="<%= locals.username2%>" name="username2" />
-								<button class="btn btn-primary" type="submit">Resume game</button>
-							</form>
-							<% } else { %>
-								<form class="form-inline" action="/game/start/<%=locals.gameid%>" method="POST">
-									<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
-									<input type="hidden" value="<%= locals.username1%>" name="username1" />
-									<input type="hidden" value="<%= locals.username2%>" name="username2" />
-									<button class="btn btn-success" type="submit">Start game</button>
-								</form>
-								<% } %>
-					</div>
+			</div>
+		</form>
+		</div>
+			<div>
+				
+			</div>
+
+		</form>
+
+	</div>
+
+
+					
 
 		
 		<div>

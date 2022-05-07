@@ -70,7 +70,7 @@
 						<lab name="validationmessage" id="validationmessage"></lab>
 					</div>
 					<div id="submit-div">
-						<button name="submit" type="submit" id="boxed-submit" data-submit="...Sending">Create
+						<button name="submit" type="submit" id="submit" data-submit="...Sending">Create
 							account</button>
 					</div>
 					<h4>Do you already have an account? Login <a href="/login"> here</a> </h4>
@@ -99,7 +99,7 @@
 		<script>
 			function disableField() {
 				const invalidForm = document.querySelector('form:invalid');
-				const submitBtn = document.getElementById('boxed-submit');
+				const submitBtn = document.getElementById('submit');
 				if (invalidForm) {
 					submitBtn.disabled = true;
 					submitBtn.style.opacity = '0.4'
@@ -109,7 +109,7 @@
 			}
 			function enableField() {
 				const invalidForm = document.querySelector('form:valid');
-				const submitBtn = document.getElementById('boxed-submit');
+				const submitBtn = document.getElementById('submit');
 				if (invalidForm) {
 					submitBtn.disabled = false;
 					submitBtn.style.opacity = '1'

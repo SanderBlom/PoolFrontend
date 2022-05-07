@@ -209,18 +209,7 @@ fieldset {
   max-width: 100%;
   resize: none;
 }
-
-#boxed button[type="submit"] {
-  cursor: pointer;
-  width: 100%;
-  border: none;
-  background: #4CAF50;
-  color: #FFF;
-  margin: 0 0 5px;
-  padding: 10px;
-  font-size: 15px;
-}
-#boxed button[type="submit-cancel"] {
+#boxed button[id="submit-cancel"] {
   cursor: pointer;
   width: 100%;
   border: none;
@@ -230,15 +219,26 @@ fieldset {
   padding: 10px;
   font-size: 15px;
 }
+#boxed button[id="submit"] {
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  background: #4CAF50;
+  color: #FFF;
+  margin: 0 0 5px;
+  padding: 10px;
+  font-size: 15px;
+}
 
-#boxed button[type="submit"]:hover {
+
+#boxed button[id="submit"]:hover {
   background: #43A047;
   -webkit-transition: background 0.3s ease-in-out;
   -moz-transition: background 0.3s ease-in-out;
   transition: background-color 0.3s ease-in-out;
 }
-#boxed button[type="submit2"]:hover {
-  background: #43A047;
+#boxed button[id="submit-cancel"]:hover {
+  background: #ff004c;
   -webkit-transition: background 0.3s ease-in-out;
   -moz-transition: background 0.3s ease-in-out;
   transition: background-color 0.3s ease-in-out;
