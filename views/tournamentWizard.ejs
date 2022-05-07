@@ -19,9 +19,9 @@
 			<h3>Create new tournament</h3>
 
 			<!--Yellow message for a unsuccessful function-->
-			<% if(messages.error) { %>
+			<% if(locals.message.length > 0) { %>
 				<div class="alert alert-warning">
-					<%= messages.error%>
+					<%= message%>
 				</div>
 				<% }%>
 
@@ -50,8 +50,7 @@
 					</div>
 
 					<div class="submit-div">
-						<button name="submit" type="submit" id="boxed-submit" onclick="submitBtn()">Create
-							tournament</button>
+						<button name="submit" type="submit" id="submit" onclick="submitBtn()">Create tournament</button>
 					</div>
 					<div>
 						<label name="limitlabel" id="limitlabel">This gamemode is limited to 12 players</label>
@@ -111,7 +110,6 @@
 				await del()
 				await del()
 			}
-
 		}
 
 		var submitBtn = function () {

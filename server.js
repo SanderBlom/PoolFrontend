@@ -870,7 +870,23 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
         await db.AddPlayersToTournament(id, playerids)
     }
     else {
-        res.redirect('back');
+        if(invalidusernames.length < 2){
+            let invalidusernamestring = ''
+            invalidusernames.forEach(username => {
+               invalidusernamestring = invalidusernamestring + ' ' + username
+           });
+           req.flash('message', 'The username:' + invalidusernamestring + ' is invalid')
+           res.redirect('back');
+        }
+        else{
+            let invalidusernamestring = ''
+            invalidusernames.forEach(username => {
+               invalidusernamestring = invalidusernamestring + ' ' + username + ','
+           });
+           req.flash('message', 'The usernames:' + invalidusernamestring + ' are invalid')
+           res.redirect('back');
+        }
+       
     }
 
 })
