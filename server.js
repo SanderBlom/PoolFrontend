@@ -855,14 +855,8 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
             const username = usernames[index]
             let playerid = await db.GetPlayerIDFromUsername(username)
             playerids.push(playerid)
-            
         }
-
-        
         await db.AddPlayersToTournament(id, playerids)
-
-
-
     }
     else {
         res.redirect('back');
