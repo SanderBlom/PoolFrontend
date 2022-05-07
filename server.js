@@ -870,12 +870,12 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
         await db.AddPlayersToTournament(id, playerids)
     }
     else {
-        if(invalidusernames.length < 2){
+        if(invalidusernames.length == 1){
             let invalidusernamestring = ''
             invalidusernames.forEach(username => {
                invalidusernamestring = invalidusernamestring + ' ' + username
            });
-           req.flash('message', 'The username:' + invalidusernamestring + ' is invalid')
+           req.flash('message', 'The username:' + invalidusernamestring + ' is invalid.')
            res.redirect('back');
         }
         else{
@@ -883,7 +883,7 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
             invalidusernames.forEach(username => {
                invalidusernamestring = invalidusernamestring + ' ' + username + ','
            });
-           req.flash('message', 'The usernames:' + invalidusernamestring + ' are invalid')
+           req.flash('message', 'The usernames:' + invalidusernamestring + ' are invalid.')
            res.redirect('back');
         }
     }
