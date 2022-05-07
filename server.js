@@ -19,7 +19,7 @@ const http = require('http');
 
 let app = express();
 //Force redirect to https
-httpApp.get("*", function(req, res, next) {
+httpApp.get("*", function (req, res, next) {
     res.redirect("https://" + req.headers.host + req.path);
 });
 
@@ -82,7 +82,7 @@ app.post("/login", checkNotAuth, passport.authenticate('local', {
     successRedirect: '/user/dashboard',
     failureRedirect: '/login',
     failureFlash: true
-     
+
 
 }))
 
@@ -214,7 +214,7 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
         console.log(error)
         res.sendStatus(404, `Something went wrong. Error: ${error}`)
     }
-    else{
+    else {
         const tournamentname = tournamentdetails.name
         const tournamentid = tournamentdetails.id
         if (ingame == true) {
@@ -223,7 +223,7 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
                 username, gameid, user: userid, firstname, lastname, email, ingame, message: req.flash('message'), gamemessage: req.flash('gamemessage'),
                 personalWL: wl, averagewl: avwl, gamelist: previousgames, tournamentname, tournamentid, title: 'profile'
             })
-    
+
         }
         else {
             res.render("profile", {
@@ -234,7 +234,7 @@ app.get("/user/dashboard", checkAuth, async (req, res) => {
     }
 
 
-   
+
 })
 
 app.post("/game/previous/", checkAuth, async (req, res) => {
@@ -520,25 +520,25 @@ app.post("/game/create", checkAuth, async (req, res) => {
     }
 })
 
-app.get("/game/cancel/:id", checkAuth, async (req, res) => {
+app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
     let gameid = req.params.id.trim();
     const usr = await req.user.username
     let error
-    
+
 
     if (usr == 'admin') {
         try {
             let result = await vision.SendStop(gameid)
 
-            if(result == 200){
+            if (result == 200) {
                 await db.CancelGame(gameid)
-                console.log('Canceled game. API response: ' + result )
+                console.log('Canceled game. API response: ' + result)
             }
-            else{
+            else {
                 error = `Could not cancel the game. Bad response from API. Response: ${result} `
                 console.log('Could not cancel game. API response:' + result)
             }
-            
+
         } catch (err) {
             err = error
         }
@@ -556,11 +556,11 @@ app.get("/game/cancel/:id", checkAuth, async (req, res) => {
         try {
             let result = await vision.SendStop(gameid)
 
-            if(result == 200){
+            if (result == 200) {
                 await db.CancelGame(gameid)
-                console.log('Canceled game. API response: ' + result )
+                console.log('Canceled game. API response: ' + result)
             }
-            else{
+            else {
                 error = `Could not cancel the game. Bad response from API. Response: ${result} `
                 console.log('Could not cancel game. API response:' + result)
             }
@@ -588,57 +588,66 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     let tablestatus //Stores the table status. This should be true if there are no active games on the table.
     let tableid
 
-    //Checks that the game is not allready started
-    let gamestatus = await db.IsGameActive(gameid)
-    if (gamestatus == true) {
-        res.redirect(`/livegame/${gameid}`)
-    }
-    else {
-        let playerids = await db.GetPlayerIDinGame(gameid)
-        let playerid1 = playerids[0]
-        let playerid2 = playerids[1]
-        if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
-        {
-            const timestamp = moment() //Creating timestamp in millisec
-            const timestampFormated = timestamp.format('YYYY-MM-DDTHH:mm:SS') //Formats data into a format that matches with C# Timestamp format.
-            tableid = await db.GetTableID(gameid) //Fetches the tableid for the game
-            tablestatus = await vision.CheckTableAvailability(tableid) //Checks that nobody has started a game on the same table.
-            if (tablestatus == true) {
+    if (username1 != null && username2 != null) {
+        //Checks that the game is not allready started
+        let gamestatus = await db.IsGameActive(gameid)
+        if (gamestatus == true) {
+            res.redirect(`/livegame/${gameid}`)
+        }
+        else {
+            let playerids = await db.GetPlayerIDinGame(gameid)
+            let playerid1 = playerids[0]
+            let playerid2 = playerids[1]
+            if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
+            {
+                tableid = await db.GetTableID(gameid) //Fetches the tableid for the game. 
+                tablestatus = await vision.CheckTableAvailability(tableid) //Checks that nobody has started a game on the same table.
+                if (tablestatus == true) {
 
-                let response = await vision.SendStart(gameid, playerid1, playerid2, username1, username2, timestampFormated) //Send data to API to check. Returns HTTP status codes
+                    let response = await vision.SendStart(gameid, playerid1, playerid2, username1, username2) //Send data to API to check. Returns HTTP status codes
 
-                if (response == 200) {
-                    let creategame = await db.StartGame(gameid)
-                    if (creategame == true) {
-                        res.redirect(`/livegame/${gameid}`)
+                    if (response == 200) {
+                        let creategame = await db.StartGame(gameid)
+                        if (creategame == true) {
+                            res.redirect(`/livegame/${gameid}`)
+                        }
+                        else {
+                            vision.SendStop(gameid) //Stoping the game if it started on the vision system.
+                            console.log('Could not insert the gamedata into the database')
+                            req.flash('gamemessage', 'Could not start the game')
+                            res.redirect("/user/dashboard")
+                        }
                     }
                     else {
-                        //We should add a stop game API call here.
-                        req.flash('gamemessage', 'Could not start the game')
+                        req.flash('gamemessage', `Error in response from API. HTTP response: ${response}`)
                         res.redirect("/user/dashboard")
                     }
                 }
+                else if (tablestatus == false) {
+                    req.flash('gamemessage', 'Table is already in use.')
+                    res.redirect("/user/dashboard")
+                }
                 else {
-                    req.flash('gamemessage', `Error in response from API. HTTP response: ${response}`)
+                    req.flash('gamemessage', 'No response from API')
                     res.redirect("/user/dashboard")
                 }
             }
-            else if (tablestatus == false) {
-                req.flash('gamemessage', 'Table is already in use.')
-                res.redirect("/user/dashboard")
-            }
+
             else {
-                req.flash('gamemessage', 'No response from API')
-                res.redirect("/user/dashboard")
+                //If the user trying to start the game is not one of the users that plays. Redirect him back to his profile.
+                req.flash('message', 'Looks like your dont have access to stop this game')
+                res.redirect("/")
             }
         }
 
-        else {
-            //If the user trying to start the game is not one of the users that plays. Redirect him back to his profile.
-            req.flash('gamemessage', 'Looks like your not a part on the game...')
-            res.redirect("/user/dashboard")
-        }
     }
+
+    else{
+        req.flash('message', `You can not start the game with just one player.`)
+        res.redirect(`/game/${gameid}`)
+
+    }
+
 })
 app.get("/game/:id", checkAuth, async (req, res) => {
     let gameid = req.params.id.trim();
@@ -869,7 +878,7 @@ app.delete("/tournament/leave/:id", checkAuth, async (req, res) => {
     const tournamentid = req.params.id
     const userid = await req.user.userid
     let error
-    
+
 
     try {
         db.RemoveUserFromTournament(userid, tournamentid)
@@ -878,16 +887,16 @@ app.delete("/tournament/leave/:id", checkAuth, async (req, res) => {
         error = err
     }
 
-    if(error){
+    if (error) {
         req.flash('message', 'Could not delete your from the tournament')
         res.redirect("/user/dashboard")
     }
 
-    else{
+    else {
         req.flash('message', 'Deleted you from the tournament')
         res.redirect("/user/dashboard")
     }
-    
+
 
 })
 app.post("/livegame", async (req, res) => {
@@ -979,7 +988,7 @@ app.get("/admin", checkAuth, async (req, res) => {
     //Checks that the user is 
     let userid = req.user.userid
     let username = req.user.username
-    let usernames = [] 
+    let usernames = []
     let activegames = []
     let tables = []
     let tableids = []
@@ -1015,10 +1024,10 @@ const sslServer = https.createServer({
 
 //Starting server
 let PORT
-if(process.env.DEVELOPMENT == 'false'){
+if (process.env.DEVELOPMENT == 'false') {
     PORT = 443 //Ports that the server will listen to.
 }
-else{
+else {
     PORT = 3000 //Ports that the server will listen to.
 }
 sslServer.listen(PORT, () => {
@@ -1026,9 +1035,9 @@ sslServer.listen(PORT, () => {
 
 })
 
-if(process.env.DEVELOPMENT == 'false'){
+if (process.env.DEVELOPMENT == 'false') {
     //Setting up a http server to redirect all requests to the https server
-    http.createServer(httpApp).listen(80, function() {
+    http.createServer(httpApp).listen(80, function () {
         console.log("Redirect server listening on port 80");
     });
 }
