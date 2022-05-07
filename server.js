@@ -588,7 +588,9 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     let tablestatus //Stores the table status. This should be true if there are no active games on the table.
     let tableid
 
-    if (username1 != null && username2 != null) {
+    console.log('User 2: ' + username2)
+
+    if (username1 != '' && username2 != '') {
         console.log('Both users are present.' + 'Users:' + username1 + username2)
         //Checks that the game is not allready started
         let gamestatus = await db.IsGameActive(gameid)
