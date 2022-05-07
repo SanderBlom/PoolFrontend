@@ -588,10 +588,8 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     let tablestatus //Stores the table status. This should be true if there are no active games on the table.
     let tableid
 
-    console.log('User 2: ' + username2)
-
+    //Checking that the usernames are not empty. We need two players to start a game.
     if (username1 != '' && username2 != '') {
-        console.log('Both users are present.' + 'Users:' + username1 + username2)
         //Checks that the game is not allready started
         let gamestatus = await db.IsGameActive(gameid)
         if (gamestatus == true) {
@@ -646,7 +644,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     }
 
     else{
-        console.log('Both players are not present')
+        console.log('Missing one or more players...')
         req.flash('message', `You can not start the game with just one player.`)
         res.redirect(`/game/${gameid}`)
 

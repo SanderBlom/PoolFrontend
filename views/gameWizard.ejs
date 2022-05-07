@@ -45,7 +45,7 @@
 		<div id="boxed">
 			<!--The desgin her was made with a bootstrap generator: https://www.layoutit.com/build-->
 			<div>
-				<form id="cancel" action="/game/cancel/<%=locals.gameid%>" method="DELETE"> </form>
+				<form id="cancel" action="/game/cancel/<%=locals.gameid%>?_method=DELETE" action="" method="POST"> </form>
 				<div>
 					<input type="hidden" value="<%= locals.username1%>" name="username1" form="cancel" />
 					<input type="hidden" value="<%= locals.username2%>" name="username2" form="cancel"/>
