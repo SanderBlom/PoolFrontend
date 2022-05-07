@@ -31,13 +31,13 @@
 							placeholder="Tournament Name" required> <br><br>
 						<div id="survey_options">
 							<h4>Please add all the usernames of all the players</h4>
-							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username0"
+							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username 1"
 								id="firstuser" value="<%= locals.username%>"required>
-							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username1"
+							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username 2"
 								required>
-							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username2"
+							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username 3"
 								required>
-							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username3"
+							<input type="text" name="usernames" class="survey_options" size="50" placeholder="Username 4"
 								required>
 
 						</div>
@@ -78,7 +78,6 @@
 			else {
 				var limittext = document.getElementById('limitlabel').style.color = 'red';
 			}
-
 		}
 
 		var add = async function (){
@@ -87,7 +86,7 @@
 				newField.setAttribute('name', 'usernames');
 				newField.setAttribute('class', 'survey_options');
 				newField.setAttribute('siz', 50);
-				newField.setAttribute('placeholder', `Username${count}`);
+				newField.setAttribute('placeholder', `Username ${count + 1}`);
 				newField.required = true;
 				survey_options.appendChild(newField);
 				var limittext = document.getElementById('limitlabel').style.color = 'black';
