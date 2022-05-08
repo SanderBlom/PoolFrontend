@@ -660,55 +660,72 @@ app.get("/game/:id", checkAuth, async (req, res) => {
     let usernames = null
     let error = null
     let tableid
-
+    let gameactivestatus
 
     try {
-        tableid = await db.GetTableID(gameid)
-        usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
-
-        if (usernames == null) {
-            username1 == null
-            username2 == null
-        }
-        else {
-            username1 = usernames[0]
-            username2 = usernames[1]
-        }
-        if (username1 != null && username2 != null) {
-            gamestartedstatus = await db.IsGameActive(gameid)
-        }
-    }
-    catch (err) {
-        error = err
-    }
-    if (error) {
-        console.log('Error... getting game details')
+        gameactivestatus = await db.IsGameActive(gameid)
+    } catch (err) {
         console.log(error)
-        res.sendStatus(404).send(`Could not get the game details..<a href="/">Go back</a>`)
+        err = error
     }
-    else {
-        if (username1 == null && username2 == null) {
-            res.redirect("/login")
-        }
-        else if (req.user) {
-            if (username != username1 && username != username2) {
-                //If user is not a part of the game they should be redirected 
-                res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
-                console.log('Her gikk noe galt')
+     
 
+    if (gameactivestatus){
+        //If the game has not ended we can continue to try to display the page.
+        try {
+            tableid = await db.GetTableID(gameid)
+            usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
+    
+            if (usernames == null) {
+                username1 == null
+                username2 == null
             }
             else {
-                let userid = req.user.userid
-                res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid, gamestatus: gamestartedstatus })
+                username1 = usernames[0]
+                username2 = usernames[1]
             }
-
+            if (username1 != null && username2 != null) {
+                gamestartedstatus = await db.IsGameActive(gameid)
+            }
         }
-
-
+        catch (err) {
+            error = err
+        }
+        if (error) {
+            console.log('Error... getting game details')
+            console.log(error)
+            res.sendStatus(404).send(`Could not get the game details..<a href="/">Go back</a>`)
+        }
         else {
-            res.redirect("/login")
+            if (username1 == null && username2 == null) {
+                res.redirect("/login")
+            }
+            else if (req.user) {
+                if (username != username1 && username != username2) {
+                    //If user is not a part of the game they should be redirected 
+                    res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
+                    console.log('Her gikk noe galt')
+    
+                }
+                else {
+                    let userid = req.user.userid
+                    res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid, gamestatus: gamestartedstatus })
+                }
+    
+            }
+    
+    
+            else {
+                res.redirect("/login")
+            }
         }
     }
+    else{
+        //If the game has ended we redirect the user back to their profile page.
+        req.flash('gamemessage', 'Looks like the game has ended')
+        res.redirect('/user/dashboard')
+    }
+   
 })
 
 //This page loads after you have picked a table and the system has checked that its not in use.
