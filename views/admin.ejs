@@ -168,7 +168,7 @@
 								<th>TableID</th>
 								<th>Player 1</th>
 								<th>Player 2</th>
-								<th>Cancel game</th>
+								<th></th>
 							</tr>
 
 							<% if(activegames.length!=0){ var i=1; activegames.forEach(function(data){ %>
@@ -191,9 +191,9 @@
 									<td>
 										<%=data.playerid2 %>
 									</td>
-									<td><a href="/game/cancel/<%=data.gameid %>">
-											Cancel game
-										</a></td>
+									<td><form action="/game/cancel/<%=data.gameid%>?_method=DELETE" method="post">
+										<button class="btn btn-danger" id="submit-cancel" type="submit" value="<%=data.gameid%>" class="btn-link">Cancel</button>
+									</form></td>
 								</tr>
 								<% i++; }) %>
 									<% } else{ %>
