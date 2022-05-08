@@ -663,7 +663,7 @@ app.get("/game/:id", checkAuth, async (req, res) => {
     let gameactivestatus
 
     try {
-        gameactivestatus = await db.IsGameActive(gameid)
+        gameactivestatus = await db.HasGameEnded(gameid)
     } catch (err) {
         console.log(error)
         err = error

@@ -469,6 +469,19 @@ async function IsGameActive(gameid) {
     else { return false }
 }
 
+async function HasGameEnded(gameid) {
+    //This function returns true if the inputed gameid is an active game.
+    const query = {
+        text: 'SELECT gameid FROM public.game WHERE (endtime is null) AND (starttime is null) AND gameid = $1;',
+        values: [gameid]
+    }
+    let result = await pool.query(query)
+
+    if (result.rows.length > 0) {
+        return true
+    }
+    else { return false }
+}
 
 async function TimePlayed(gameid) {
     //This will return a timestamp object with hours, minutes and seconds from the database. We then format the data and return an integer representing the time in minutes 
@@ -1081,6 +1094,7 @@ module.exports = {
     GetUsername, GetGameWinner, CreateNewTournament, GetPreviousGameList, ValidateGameAccess, GetGameLoser,
     TotalGameTime, GetAllBallPositions, GetAllUserNames, GetUsersActiveState, ActivateUser, DeactivateUser,
     GetAllActiveGames, GetAllTables, AddNewTable, DeactivateTable, ActivateTable, GetAllActiveTableIds, GetAllInActiveTableIds,
-    GetAllInactiveUserNames, GetTablelActiveState, GetTournamentDetails, GetPlayerIDFromUsername, AddPlayersToTournament, RemoveUserFromTournament
+    GetAllInactiveUserNames, GetTablelActiveState, GetTournamentDetails, GetPlayerIDFromUsername, AddPlayersToTournament, 
+    RemoveUserFromTournament,HasGameEnded
 }
 
