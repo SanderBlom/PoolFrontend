@@ -670,7 +670,7 @@ app.get("/game/:id", checkAuth, async (req, res) => {
     }
      
 
-    if (gameactivestatus){
+    if (!gameactivestatus){
         //If the game has not ended we can continue to try to display the page.
         try {
             tableid = await db.GetTableID(gameid)
