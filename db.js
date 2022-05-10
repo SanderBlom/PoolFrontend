@@ -472,7 +472,7 @@ async function IsGameActive(gameid) {
 async function HasGameEnded(gameid) {
     //This function returns true if the inputed gameid is an active game.
     const query = {
-        text: 'SELECT gameid FROM public.game WHERE (endtime is null) AND (starttime is null) AND (createtime is not null) AND gameid = $1;',
+        text: 'SELECT gameid FROM public.game WHERE (endtime is not null) AND gameid = $1;',
         values: [gameid]
     }
     let result = await pool.query(query)
