@@ -1,8 +1,8 @@
 
-//Kilde1 = https://www.passportjs.org/docs/
+//Source 1  = https://www.passportjs.org/docs/
 
-//Kilde 2 =https://github.com/WebDevSimplified/Nodejs-Passport-Login
-const LocalStrategy = require('passport-local').Strategy //Local strategy. Other options could be login with google, facebook, etc
+//Source 2 = https://github.com/WebDevSimplified/Nodejs-Passport-Login
+const LocalStrategy = require('passport-local').Strategy //Local strategy. Other options could be login with google, facebook, local, etc
 const bcrypt = require('bcrypt') //Require becrypt to give us hashing functionality
 const {pool} = require("./dbConfig") //Required to query the database
 function initialize(passport) {
