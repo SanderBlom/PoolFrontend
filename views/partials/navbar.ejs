@@ -23,7 +23,7 @@
               <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">FAQ</a>
             <div class="dropdown-menu">
               <a <% if (locals.title === 'rules') { %>class="dropdown-item active" <% } else { %>class="dropdown-item" <% }  %>  href="/rules">Our game rules</a>
-              <a class="dropdown-item" href="#">How to start a game</a>
+              <a <% if (locals.title === 'tutorial') { %>class="dropdown-item active" <% } else { %>class="dropdown-item" <% }  %>  href="/tutorial">How to start a game</a>
               <div class="dropdown-divider"></div>
               <a <% if (locals.title === 'about') { %>class="dropdown-item active" <% } else { %>class="dropdown-item" <% }  %>  href="/about">About us</a>
             </div>

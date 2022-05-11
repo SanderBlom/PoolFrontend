@@ -101,6 +101,12 @@ input {
   margin: 0 auto;
   position: relative;
 }
+.container-mediumlarge {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
 
 .centered-image {
   position: absolute;

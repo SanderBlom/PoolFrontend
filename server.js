@@ -843,6 +843,27 @@ app.get("/rules", (req, res) => {
 
 })
 
+app.get("/tutorial", (req, res) => {
+
+    try {
+        if (req.user) {
+            let userid = req.user.userid
+            let username = req.user.username
+            res.render('tutorial', { message: req.flash('message'), username, user: userid, title: 'tutorial' }) //Renderes the index websites and passes title for the navbar
+        }
+        else {
+            let userid = null
+            let username = null
+            res.render('tutorial', { message: req.flash('message'), username: username, user: userid, title: 'tutorial' }) //Renderes the index websites and passes title for the navbar
+        }
+
+    } catch (error) {
+        console.log('User is not probably not logged in' + error)
+    }
+
+})
+
+
 app.get("/tournament/new", checkAuth, (req, res) => {
     let username = req.user.username
     let userid = req.user.userid
