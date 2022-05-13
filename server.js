@@ -6,10 +6,9 @@ const methodOverride = require('method-override') //Used to override methods.
 const passport = require('passport') //Lib to keep track of logged in users
 const bcrypt = require('bcrypt'); //This is used to hash password and check hashes so we dont store the passwords in plain text
 require('dotenv').config(); //Used to store passwords. This should not be uploaded to github :) 
-let vision = require("./VisionSystem")
+let vision = require("./vision.js") //Used to communicate with the vision systems API
 let db = require("./db.js") //Used to access the database functions
 let game = require("./game.js") //Used to access the database functions
-const moment = require('moment'); //Used to generate timestamps
 const https = require('https')
 const fs = require('fs')
 const path = require('path')
@@ -264,6 +263,7 @@ app.get("/game/previous/:id", checkAuth, async (req, res) => {
     let usernames
     let winner = null
     let loser = null
+    let images
     if (validate) {
 
         try {
@@ -271,6 +271,7 @@ app.get("/game/previous/:id", checkAuth, async (req, res) => {
             db.TotalGameTime(gameid), db.IsGameActive(gameid), db.fetchUsernamesInGame(gameid)]); //This runs all the functions in parallel to reduce execution time
             player1Username = usernames[0]
             player2Username = usernames[1]
+            images = await game.RenderMultipleTables(balls) //Function returns an array with images of the selected game.
 
         } catch (err) {
             error = err
@@ -282,7 +283,6 @@ app.get("/game/previous/:id", checkAuth, async (req, res) => {
 
         else {
             try {
-                let images = await game.renderwholegame(balls) //Function returns an array with images of the selected game.
                 res.render('previousgame', {
                     message: req.flash('message'), username, user: userid, title: 'test', images: images, gameid: gameid,
                     constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time, winner: winner, loser: loser
@@ -992,7 +992,7 @@ app.get("/livegame/:id", async (req, res) => {
             if (req.user) {
                 let userid = req.user.userid
                 let username = req.user.username
-                game.renderballs(balls)
+                game.RenderSingleTable(balls)
                     .then((image) => res.render('game', {
                         message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
                         constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time, winner: winner
@@ -1002,7 +1002,7 @@ app.get("/livegame/:id", async (req, res) => {
             else {
                 let userid = null
                 let username = null
-                game.renderballs(balls)
+                game.RenderSingleTable(balls)
                     .then((image) => res.render('game', {
                         message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
                         constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time, winner: winner

@@ -1,7 +1,5 @@
 const { createCanvas, loadImage } = require('canvas') //Used to draw images
-const fs = require('fs') //used to access local files
-let db = require("./db.js") //Used to access the database functions
-//Based on https://blog.logrocket.com/creating-saving-images-node-canvas/
+//Inspired by https://blog.logrocket.com/creating-saving-images-node-canvas/
 
 
 function convertCoordinatesX(inputX) {
@@ -14,7 +12,7 @@ function convertCoordinatesX(inputX) {
 }
 function convertCoordinatesY(inputY) {
     let ballRadius = 20 //Defining the ball radius. 
-    let tableHeight = 569 - ballRadius //old = 569
+    let tableHeight = 569 - ballRadius 
     let lengtdiff = 100//Diffrence in pixels between the edge of the table and the cloth where the balls exist.
     let y = (tableHeight * inputY) + lengtdiff
     y = Math.trunc(y)
@@ -47,7 +45,7 @@ function ballColor(color) {
 }
 
 
-async function renderwholegame(balls){
+async function RenderMultipleTables(balls){
 
     let ballarray = [] //New array to store the sorted rows
     let images = [] //Creating an array to store the generated images (base64 strings)
@@ -86,7 +84,7 @@ async function renderwholegame(balls){
     //Foreach play we generate a base64 image and add it to the array.
     for (let index = 0; index < ballarray.length; index++) {
         const row = ballarray[index];
-        await renderballs(row).then((image => {
+        await RenderSingleTable(row).then((image => {
             images.push(image)
         
 
@@ -97,7 +95,7 @@ async function renderwholegame(balls){
     return images
 }
 
-async function renderballs(Balls) {
+async function RenderSingleTable(Balls) {
     //This function gets the x, y coordinates from the database and generates an image representing the pool table 
     return new Promise((resolve, reject) => {
         const billiardboard = createCanvas(1280, 731)
@@ -182,4 +180,4 @@ async function renderballs(Balls) {
 
 
 
-module.exports = { renderballs, renderwholegame }
+module.exports = { RenderSingleTable, RenderMultipleTables }
