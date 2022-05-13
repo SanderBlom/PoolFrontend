@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt'); //This is used to hash password and check hash
 require('dotenv').config(); //Used to store passwords. This should not be uploaded to github :) 
 let vision = require("./vision.js") //Used to communicate with the vision systems API
 let db = require("./db.js") //Used to access the database functions
-let game = require("./game.js") //Used to access the database functions
+let canvas = require("./canvas.js") //Used to access the database functions
 const https = require('https')
 const fs = require('fs')
 const path = require('path')
@@ -271,7 +271,7 @@ app.get("/game/previous/:id", checkAuth, async (req, res) => {
             db.TotalGameTime(gameid), db.IsGameActive(gameid), db.fetchUsernamesInGame(gameid)]); //This runs all the functions in parallel to reduce execution time
             player1Username = usernames[0]
             player2Username = usernames[1]
-            images = await game.RenderMultipleTables(balls) //Function returns an array with images of the selected game.
+            images = await canvas.RenderMultipleTables(balls) //Function returns an array with images of the selected canvas.
 
         } catch (err) {
             error = err
@@ -295,7 +295,7 @@ app.get("/game/previous/:id", checkAuth, async (req, res) => {
 
     }
     else {
-        req.flash('gamemessage', `Looks like you dont have access to this game.`)
+        req.flash('gamemessage', `Looks like you dont have access to this canvas.`)
         res.redirect("/user/dashboard")
     }
 
@@ -511,7 +511,7 @@ app.post("/game/create", checkAuth, async (req, res) => {
             res.redirect(`/game/${gameid}`)
         }
         else {
-            req.flash('gamemessage', `Could not create a new game. Please contact staff`)
+            req.flash('gamemessage', `Could not create a new canvas. Please contact staff`)
             res.redirect("/user/dashboard")
         }
     }
@@ -532,11 +532,11 @@ app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
 
             if (result == 200) {
                 await db.CancelGame(gameid)
-                console.log('Canceled game. API response: ' + result)
+                console.log('Canceled canvas. API response: ' + result)
             }
             else {
-                error = `Could not cancel the game. Bad response from API. Response: ${result} `
-                console.log('Could not cancel game. API response:' + result)
+                error = `Could not cancel the canvas. Bad response from API. Response: ${result} `
+                console.log('Could not cancel canvas. API response:' + result)
             }
 
         } catch (err) {
@@ -558,11 +558,11 @@ app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
 
             if (result == 200) {
                 await db.CancelGame(gameid)
-                console.log('Canceled game. API response: ' + result)
+                console.log('Canceled canvas. API response: ' + result)
             }
             else {
-                error = `Could not cancel the game. Bad response from API. Response: ${result} `
-                console.log('Could not cancel game. API response:' + result)
+                error = `Could not cancel the canvas. Bad response from API. Response: ${result} `
+                console.log('Could not cancel canvas. API response:' + result)
             }
 
         } catch (error) {
@@ -588,7 +588,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
     let tablestatus //Stores the table status. This should be true if there are no active games on the table.
     let tableid
 
-    //Checking that the usernames are not empty. We need two players to start a game.
+    //Checking that the usernames are not empty. We need two players to start a canvas.
     if (username1 != '' && username2 != '') {
         //Checks that the game is not allready started
         let gamestatus = await db.IsGameActive(gameid)
@@ -601,7 +601,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
             let playerid2 = playerids[1]
             if ((username == username1) || (username == username2)) //Checks that the logged in user is one of the players in the game 
             {
-                tableid = await db.GetTableID(gameid) //Fetches the tableid for the game. 
+                tableid = await db.GetTableID(gameid) //Fetches the tableid for the canvas. 
                 tablestatus = await vision.CheckTableAvailability(tableid) //Checks that nobody has started a game on the same table.
                 if (tablestatus == true) {
 
@@ -766,7 +766,7 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
             res.redirect(`/game/${gameid}`)
         }
         else {
-            req.flash('gamemessage', "Could not add you to the game. It's either full or does not exsist")
+            req.flash('gamemessage', "Could not add you to the canvas. It's either full or does not exsist")
             res.redirect("/user/dashboard/")
         }
     }
@@ -992,7 +992,7 @@ app.get("/livegame/:id", async (req, res) => {
             if (req.user) {
                 let userid = req.user.userid
                 let username = req.user.username
-                game.RenderSingleTable(balls)
+                canvas.RenderSingleTable(balls)
                     .then((image) => res.render('game', {
                         message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
                         constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time, winner: winner
@@ -1002,7 +1002,7 @@ app.get("/livegame/:id", async (req, res) => {
             else {
                 let userid = null
                 let username = null
-                game.RenderSingleTable(balls)
+                canvas.RenderSingleTable(balls)
                     .then((image) => res.render('game', {
                         message: req.flash('message'), username, user: userid, title: 'test', gameimage: image, gameid: gameid,
                         constatus: gamestatus, player1Name: player1Username, player2Name: player2Username, minutes: time, winner: winner
