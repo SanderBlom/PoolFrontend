@@ -7,7 +7,7 @@ const passport = require('passport') //Lib to keep track of logged in users
 const bcrypt = require('bcrypt'); //This is used to hash password and check hashes so we dont store the passwords in plain text
 require('dotenv').config(); //Used to store passwords. This should not be uploaded to github :) 
 let vision = require("./vision.js") //Used to communicate with the vision systems API
-let db = require("./db.js") //Used to access the database functions
+let db = require("./database.js") //Used to access the database functions
 let canvas = require("./canvas.js") //Used to access the database functions
 const https = require('https')
 const fs = require('fs')
@@ -17,10 +17,12 @@ const httpApp = express();
 const http = require('http');
 
 let app = express();
-//Force redirect to https
+//Redirect all http requests to https
 httpApp.get("*", function (req, res, next) {
     res.redirect("https://" + req.headers.host + req.path);
 });
+
+
 
 app.set('view engine', 'ejs'); // Changing the view engine to ejs
 app.use(express.static('views'));//Gives express access to views folder 
@@ -55,9 +57,10 @@ function checkAuth(req, res, next) {
     }
 }
 
-//If user is logged in and tries to access login or register they will be redirected to their homepage
+//Checks if the user is not logged in
 function checkNotAuth(req, res, next) {
     if (req.user) {
+        //If user is logged in and tries to access any route using this middleware they will be redirected to their homepage
         res.redirect("/user/dashboard")
     }
     else {
@@ -1068,6 +1071,12 @@ app.get("/admin", checkAuth, async (req, res) => {
     }
 
 })
+
+
+//--------------------------------Last route to  match any incorect urls----------------//
+app.all('*', function(req, res) {
+    res.status(404).send(`Looks like that pages does not exsist. <a href="/">Go back</a> `)
+  }); 
 
 //-------------------------------------Start server-------------------------------------//
 //Loading the private key and the certificate

@@ -1,7 +1,5 @@
-//This file is used to store functions related to fetching data from the pool table. 
-const moment = require('moment'); //Used to generate timestamps
-const fetch = require("node-fetch") //Used to fetch data from http/https
-let db = require("./db.js"); //Gives us access to the db class to access data in the database
+const fetch = require("node-fetch") //Used to fetch data from http/https endpoints
+let db = require("./database.js"); //Gives us access to the db class to access data in the database
 
 
 
