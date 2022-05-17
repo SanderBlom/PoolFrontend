@@ -1,8 +1,4 @@
-//This file is used to store functions related to fetching data from the pool table. 
-const moment = require('moment'); //Used to generate timestamps
-const fetch = require("node-fetch") //Used to fetch data from http/https
-const https = require("https"); //Used to be able to work with self signed certificates 
-let db = require("./db.js") //Gives us access to the db class to access data in the database
+
 const { pool } = require("./dbConfig");
 
 
@@ -39,5 +35,5 @@ async function correctWinsnLosses() {
 
 correctWinsnLosses()
 
-//CreateArray()
+
 
