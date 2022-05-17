@@ -140,22 +140,30 @@ app.post("/register", checkNotAuth, async function (req, res) {
         else {
             if ((usernameresponse == true) && (emailresponse == true)) {
                 //Both email and username are unique. Lets let the user create the account.
+                const validatorregex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{12,34}$/;
+                if(validatorregex.test(pwd) == true){
+                    try {
+                        const hashedPassword = await bcrypt.hash(pwd, 10) //Hashing the password
+                        InsertUserResult = await db.RegisterNewUser(username, firstname, lastname, email, hashedPassword)
+                    }
+                    catch (error) {
+                        console.log(error)
+                    }
+                    if (InsertUserResult) {
+                        req.flash('message', `You are now registered and can login!`)
+                        res.redirect("login")
+                    }
+                    else {
+                        req.flash('message', `Ops, something went wrong..`)
+                        res.redirect("register")
+                    }
 
-                try {
-                    const hashedPassword = await bcrypt.hash(pwd, 10) //Hashing the password
-                    InsertUserResult = await db.RegisterNewUser(username, firstname, lastname, email, hashedPassword)
                 }
-                catch (error) {
-                    console.log(error)
-                }
-                if (InsertUserResult) {
-                    req.flash('message', `You are now registered and can login!`)
+                else{
+                    req.flash('message', `Password does not meet the minimum requirements`)
                     res.redirect("login")
                 }
-                else {
-                    req.flash('message', `Ops, something went wrong..`)
-                    res.redirect("register")
-                }
+               
             }
             //Checks if email or username is unique.
             else if ((usernameresponse != true) || (emailresponse != true)) {

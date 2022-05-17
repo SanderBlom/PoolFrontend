@@ -60,8 +60,9 @@
 							Retype password:
 						</h4>
 						<input type="password" id="repwd" name="repwd"
-							placeholder="Retype your strong and secure password" required pattern=".{8,24}" required
-							title="8 to 24 characters">
+							placeholder="Retype your strong and secure password" required pattern=".{12,32}" required
+							title="12 to 32 characters">
+
 						<div>
 							<lab name="pwdmessage" id="pwdmessage"></lab>
 						</div>
@@ -82,16 +83,42 @@
 		<!-- Checks if both passwords match. -->
 		<script>
 			var passwordchecker = function () {
-				if ((document.getElementById('pwd').value == document.getElementById('repwd').value) && (document.getElementById('pwd').value.length >= 8 && document.getElementById('repwd').value.length >= 8)) {
-					document.getElementById('pwdmessage').style.color = 'green';
-					document.getElementById('pwdmessage').innerHTML = 'Passwords are matching!';
-					console.log('pwd length ' + document.getElementById('pwd').value.length);
-					return true
-				} else {
-					document.getElementById('pwdmessage').style.color = 'red';
-					document.getElementById('pwdmessage').innerHTML = 'Passwords are not matching or not long enough (8 characters minimum)';
+				//Regex found here: https://docs.looker.com/admin-options/security/password-requirements
+				var validatorregex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{12,34}$/; //Regex that the password has to match
+				//Shows password requirements if both password fields are empty 
+				if ((document.getElementById('pwd').value != null && document.getElementById('repwd').value != null)) {
+					document.getElementById('pwdmessage').style.color = 'grey';
+					document.getElementById('pwdmessage').innerHTML = 'Passwords requirements: <br> -12-24 charters, <br> -Minimum one number, <br> -Minimum special character';
 					return false
 				}
+				else {
+					if ((document.getElementById('pwd').value == document.getElementById('repwd').value)) {
+						//Checks thats its 12 or more characters long.
+						if ((document.getElementById('pwd').value.length >= 12 && document.getElementById('repwd').value.length >= 12)) {
+							//Checks that it matches the regex pattern. It has to contain at least one number and a special charter 
+							if (document.getElementById('pwd').value.match(validatorregex)) {
+								document.getElementById('pwdmessage').style.color = 'green';
+								document.getElementById('pwdmessage').innerHTML = 'Passwords are matching!';
+								return true
+							}
+							else {
+								document.getElementById('pwdmessage').style.color = 'red';
+								document.getElementById('pwdmessage').innerHTML = 'Password does not contain a special character and/or a number';
+								return false
+							}
+						}
+						else {
+							document.getElementById('pwdmessage').style.color = 'red';
+							document.getElementById('pwdmessage').innerHTML = 'Password is not long enough';
+							return false
+						}
+					} else {
+						document.getElementById('pwdmessage').style.color = 'red';
+						document.getElementById('pwdmessage').innerHTML = 'Passwords are not matching.<br> It must contain: <br> -12 to 32 charters, <br> -Minimum one number, <br> -Minimum special character';
+						return false
+					}
+				}
+
 			}
 		</script>
 		<!--Script to disable submit button until from is valid. The script bellow is heavily based on the script I found on the url bellow.
@@ -105,7 +132,7 @@
 					submitBtn.style.opacity = '0.4'
 					submitBtn.innerHTML = 'Please fill out the form'
 					submitBtn.style.backgroundColor = 'grey'
-				} 
+				}
 			}
 			function enableField() {
 				const invalidForm = document.querySelector('form:valid');
@@ -115,16 +142,16 @@
 					submitBtn.style.opacity = '1'
 					submitBtn.innerHTML = 'Create account'
 					submitBtn.style.backgroundColor = '#4CAF50'
-				} 
+				}
 			}
 		</script>
 		<script>
 			var intervalId = window.setInterval(function () {
 				var result = passwordchecker()
-				if (result){
+				if (result) {
 					enableField()
 				}
-				else{
+				else {
 					disableField()
 				}
 			}, 1500);
