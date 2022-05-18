@@ -1,0 +1,607 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 14.2 (Ubuntu 14.2-1.pgdg20.04+1+b1)
+-- Dumped by pg_dump version 14.2 (Ubuntu 14.2-1ubuntu1)
+
+-- Started on 2022-05-18 14:07:08 CEST
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 218 (class 1259 OID 16431)
+-- Name: game; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.game (
+    gameid integer NOT NULL,
+    endtime timestamp without time zone,
+    starttime timestamp without time zone,
+    winner integer,
+    loser integer,
+    createtime timestamp without time zone NOT NULL,
+    tableid integer NOT NULL
+);
+
+
+ALTER TABLE public.game OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 16430)
+-- Name: Game_gameid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Game_gameid_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public."Game_gameid_seq" OWNER TO postgres;
+
+--
+-- TOC entry 3355 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: Game_gameid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Game_gameid_seq" OWNED BY public.game.gameid;
+
+
+--
+-- TOC entry 216 (class 1259 OID 16418)
+-- Name: game_players; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.game_players (
+    gameid integer NOT NULL,
+    playerid integer NOT NULL,
+    playerid2 integer
+);
+
+
+ALTER TABLE public.game_players OWNER TO postgres;
+
+--
+-- TOC entry 214 (class 1259 OID 16416)
+-- Name: Game_players_gameid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Game_players_gameid_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public."Game_players_gameid_seq" OWNER TO postgres;
+
+--
+-- TOC entry 3356 (class 0 OID 0)
+-- Dependencies: 214
+-- Name: Game_players_gameid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Game_players_gameid_seq" OWNED BY public.game_players.gameid;
+
+
+--
+-- TOC entry 215 (class 1259 OID 16417)
+-- Name: Game_players_playerid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Game_players_playerid_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public."Game_players_playerid_seq" OWNER TO postgres;
+
+--
+-- TOC entry 3357 (class 0 OID 0)
+-- Dependencies: 215
+-- Name: Game_players_playerid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Game_players_playerid_seq" OWNED BY public.game_players.playerid;
+
+
+--
+-- TOC entry 222 (class 1259 OID 16463)
+-- Name: tournament; Type: TABLE; Schema: public; Owner: vision
+--
+
+CREATE TABLE public.tournament (
+    tournamentid integer NOT NULL,
+    tournamentname text,
+    createtime timestamp without time zone,
+    starttime timestamp with time zone,
+    endtime timestamp without time zone
+);
+
+
+ALTER TABLE public.tournament OWNER TO vision;
+
+--
+-- TOC entry 221 (class 1259 OID 16462)
+-- Name: Tournament_TournamentID_seq; Type: SEQUENCE; Schema: public; Owner: vision
+--
+
+CREATE SEQUENCE public."Tournament_TournamentID_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public."Tournament_TournamentID_seq" OWNER TO vision;
+
+--
+-- TOC entry 3358 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: Tournament_TournamentID_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: vision
+--
+
+ALTER SEQUENCE public."Tournament_TournamentID_seq" OWNED BY public.tournament.tournamentid;
+
+
+--
+-- TOC entry 224 (class 1259 OID 16497)
+-- Name: billiardball; Type: TABLE; Schema: public; Owner: vision
+--
+
+CREATE TABLE public.billiardball (
+    gameid integer,
+    x_pos real,
+    y_pos real,
+    playerid integer,
+    "timestamp" time without time zone,
+    playcount integer,
+    ballcoulor integer,
+    ballid integer NOT NULL
+);
+
+
+ALTER TABLE public.billiardball OWNER TO vision;
+
+--
+-- TOC entry 225 (class 1259 OID 16544)
+-- Name: billiardball_ballID_seq; Type: SEQUENCE; Schema: public; Owner: vision
+--
+
+ALTER TABLE public.billiardball ALTER COLUMN ballid ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public."billiardball_ballID_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 200000
+    CACHE 1
+);
+
+
+--
+-- TOC entry 212 (class 1259 OID 16397)
+-- Name: player; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.player (
+    playerid integer NOT NULL,
+    wins integer DEFAULT 0 NOT NULL,
+    losses integer DEFAULT 0 NOT NULL,
+    userid integer NOT NULL
+);
+
+
+ALTER TABLE public.player OWNER TO postgres;
+
+--
+-- TOC entry 211 (class 1259 OID 16396)
+-- Name: player_playerid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.player_playerid_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.player_playerid_seq OWNER TO postgres;
+
+--
+-- TOC entry 3359 (class 0 OID 0)
+-- Dependencies: 211
+-- Name: player_playerid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.player_playerid_seq OWNED BY public.player.playerid;
+
+
+--
+-- TOC entry 213 (class 1259 OID 16405)
+-- Name: player_userid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.player_userid_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.player_userid_seq OWNER TO postgres;
+
+--
+-- TOC entry 3360 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: player_userid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.player_userid_seq OWNED BY public.player.userid;
+
+
+--
+-- TOC entry 220 (class 1259 OID 16453)
+-- Name: tables; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tables (
+    tableid integer NOT NULL,
+    ipaddress text NOT NULL,
+    active boolean DEFAULT true NOT NULL
+);
+
+
+ALTER TABLE public.tables OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16452)
+-- Name: tables_tableid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tables_tableid_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tables_tableid_seq OWNER TO postgres;
+
+--
+-- TOC entry 3361 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: tables_tableid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.tables_tableid_seq OWNED BY public.tables.tableid;
+
+
+--
+-- TOC entry 223 (class 1259 OID 16469)
+-- Name: tournament_player; Type: TABLE; Schema: public; Owner: vision
+--
+
+CREATE TABLE public.tournament_player (
+    tournamentid integer NOT NULL,
+    playerid integer NOT NULL
+);
+
+
+ALTER TABLE public.tournament_player OWNER TO vision;
+
+--
+-- TOC entry 209 (class 1259 OID 16387)
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    userid integer NOT NULL,
+    username text NOT NULL,
+    firstname text NOT NULL,
+    lastname text NOT NULL,
+    email text NOT NULL,
+    password text NOT NULL,
+    active boolean DEFAULT true NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- TOC entry 210 (class 1259 OID 16392)
+-- Name: users_pk_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_pk_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_pk_seq OWNER TO postgres;
+
+--
+-- TOC entry 3362 (class 0 OID 0)
+-- Dependencies: 210
+-- Name: users_pk_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_pk_seq OWNED BY public.users.userid;
+
+
+--
+-- TOC entry 3180 (class 2604 OID 16434)
+-- Name: game gameid; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game ALTER COLUMN gameid SET DEFAULT nextval('public."Game_gameid_seq"'::regclass);
+
+
+--
+-- TOC entry 3178 (class 2604 OID 16421)
+-- Name: game_players gameid; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game_players ALTER COLUMN gameid SET DEFAULT nextval('public."Game_players_gameid_seq"'::regclass);
+
+
+--
+-- TOC entry 3179 (class 2604 OID 16422)
+-- Name: game_players playerid; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game_players ALTER COLUMN playerid SET DEFAULT nextval('public."Game_players_playerid_seq"'::regclass);
+
+
+--
+-- TOC entry 3174 (class 2604 OID 16400)
+-- Name: player playerid; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.player ALTER COLUMN playerid SET DEFAULT nextval('public.player_playerid_seq'::regclass);
+
+
+--
+-- TOC entry 3177 (class 2604 OID 16406)
+-- Name: player userid; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.player ALTER COLUMN userid SET DEFAULT nextval('public.player_userid_seq'::regclass);
+
+
+--
+-- TOC entry 3181 (class 2604 OID 16456)
+-- Name: tables tableid; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tables ALTER COLUMN tableid SET DEFAULT nextval('public.tables_tableid_seq'::regclass);
+
+
+--
+-- TOC entry 3183 (class 2604 OID 16466)
+-- Name: tournament tournamentid; Type: DEFAULT; Schema: public; Owner: vision
+--
+
+ALTER TABLE ONLY public.tournament ALTER COLUMN tournamentid SET DEFAULT nextval('public."Tournament_TournamentID_seq"'::regclass);
+
+
+--
+-- TOC entry 3172 (class 2604 OID 16393)
+-- Name: users userid; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN userid SET DEFAULT nextval('public.users_pk_seq'::regclass);
+
+
+--
+-- TOC entry 3191 (class 2606 OID 16436)
+-- Name: game Game_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game
+    ADD CONSTRAINT "Game_pkey" PRIMARY KEY (gameid);
+
+
+--
+-- TOC entry 3189 (class 2606 OID 16424)
+-- Name: game_players Game_players_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game_players
+    ADD CONSTRAINT "Game_players_pkey" PRIMARY KEY (gameid);
+
+
+--
+-- TOC entry 3197 (class 2606 OID 16478)
+-- Name: tournament_player Tournament_Player_pkey; Type: CONSTRAINT; Schema: public; Owner: vision
+--
+
+ALTER TABLE ONLY public.tournament_player
+    ADD CONSTRAINT "Tournament_Player_pkey" PRIMARY KEY (tournamentid, playerid);
+
+
+--
+-- TOC entry 3195 (class 2606 OID 16468)
+-- Name: tournament Tournament_pkey; Type: CONSTRAINT; Schema: public; Owner: vision
+--
+
+ALTER TABLE ONLY public.tournament
+    ADD CONSTRAINT "Tournament_pkey" PRIMARY KEY (tournamentid);
+
+
+--
+-- TOC entry 3199 (class 2606 OID 16549)
+-- Name: billiardball ballPrimary; Type: CONSTRAINT; Schema: public; Owner: vision
+--
+
+ALTER TABLE ONLY public.billiardball
+    ADD CONSTRAINT "ballPrimary" PRIMARY KEY (ballid);
+
+
+--
+-- TOC entry 3187 (class 2606 OID 16404)
+-- Name: player playerid; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.player
+    ADD CONSTRAINT playerid PRIMARY KEY (playerid);
+
+
+--
+-- TOC entry 3193 (class 2606 OID 16460)
+-- Name: tables tables_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tables
+    ADD CONSTRAINT tables_pkey PRIMARY KEY (tableid);
+
+
+--
+-- TOC entry 3185 (class 2606 OID 16395)
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (userid);
+
+
+--
+-- TOC entry 3207 (class 2606 OID 16472)
+-- Name: tournament_player C_1; Type: FK CONSTRAINT; Schema: public; Owner: vision
+--
+
+ALTER TABLE ONLY public.tournament_player
+    ADD CONSTRAINT "C_1" FOREIGN KEY (tournamentid) REFERENCES public.tournament(tournamentid);
+
+
+--
+-- TOC entry 3208 (class 2606 OID 16479)
+-- Name: tournament_player C_2; Type: FK CONSTRAINT; Schema: public; Owner: vision
+--
+
+ALTER TABLE ONLY public.tournament_player
+    ADD CONSTRAINT "C_2" FOREIGN KEY (playerid) REFERENCES public.player(playerid) NOT VALID;
+
+
+--
+-- TOC entry 3206 (class 2606 OID 16559)
+-- Name: game Loser; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game
+    ADD CONSTRAINT "Loser" FOREIGN KEY (loser) REFERENCES public.player(playerid) NOT VALID;
+
+
+--
+-- TOC entry 3205 (class 2606 OID 16554)
+-- Name: game Winner; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game
+    ADD CONSTRAINT "Winner" FOREIGN KEY (winner) REFERENCES public.player(playerid) NOT VALID;
+
+
+--
+-- TOC entry 3210 (class 2606 OID 16521)
+-- Name: billiardball game; Type: FK CONSTRAINT; Schema: public; Owner: vision
+--
+
+ALTER TABLE ONLY public.billiardball
+    ADD CONSTRAINT game FOREIGN KEY (gameid) REFERENCES public.game(gameid) NOT VALID;
+
+
+--
+-- TOC entry 3201 (class 2606 OID 16437)
+-- Name: game_players gameid; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game_players
+    ADD CONSTRAINT gameid FOREIGN KEY (gameid) REFERENCES public.game(gameid) NOT VALID;
+
+
+--
+-- TOC entry 3209 (class 2606 OID 16516)
+-- Name: billiardball player; Type: FK CONSTRAINT; Schema: public; Owner: vision
+--
+
+ALTER TABLE ONLY public.billiardball
+    ADD CONSTRAINT player FOREIGN KEY (playerid) REFERENCES public.player(playerid) NOT VALID;
+
+
+--
+-- TOC entry 3202 (class 2606 OID 16425)
+-- Name: game_players playerid 1 (fk); Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game_players
+    ADD CONSTRAINT "playerid 1 (fk)" FOREIGN KEY (playerid) REFERENCES public.player(playerid);
+
+
+--
+-- TOC entry 3203 (class 2606 OID 16447)
+-- Name: game_players playerid 2 (fk); Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game_players
+    ADD CONSTRAINT "playerid 2 (fk)" FOREIGN KEY (playerid2) REFERENCES public.player(playerid) NOT VALID;
+
+
+--
+-- TOC entry 3204 (class 2606 OID 16511)
+-- Name: game tab; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game
+    ADD CONSTRAINT tab FOREIGN KEY (tableid) REFERENCES public.tables(tableid) NOT VALID;
+
+
+--
+-- TOC entry 3200 (class 2606 OID 16411)
+-- Name: player userid; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.player
+    ADD CONSTRAINT userid FOREIGN KEY (userid) REFERENCES public.users(userid) NOT VALID;
+
+
+-- Completed on 2022-05-18 14:07:18 CEST
+
+--
+-- PostgreSQL database dump complete
+--
+
