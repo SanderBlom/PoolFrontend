@@ -24,7 +24,7 @@ echo "Installing NPM and NodeJS"
 curl -s https://deb.nodesource.com/setup_16.x | sudo bash
 sudo apt-get install -y nodejs
 echo "Installing pm2 prosesses manger"
-npm install pm2@latest -g
+sudo npm install pm2@latest -g
 
 #Getting the source code from github
 echo "Cloing source code from github"
@@ -34,8 +34,8 @@ git clone https://github.com/SanderBlom/PoolFrontend.git
 cd PoolFrontend
 #Installing the required depences.
 echo "Installing dependecies from package-lock file "
-npm i --package-lock-only
-npm upate
+sudo npm i --package-lock-only
+sudo npm upate
 
 #User inputs nesassary information to create the .env file. 
 echo "Please enter the username for the postgreSQL database:"
