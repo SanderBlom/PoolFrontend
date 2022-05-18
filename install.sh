@@ -1,5 +1,6 @@
 #!/bin/bash
-# This script will install the web application on an ubuntu 22.04 server.
+# This script will install the web application on an ubuntu 22.04 server. 
+#There are no validions in this script so this may not work in a year or two if anything changes.
 
 #Asks user if they have installed postgres. This has to be installed for the web server to work. 
 read -p "Is postgres installed? (yes/no) " yn
@@ -7,7 +8,7 @@ read -p "Is postgres installed? (yes/no) " yn
 
 case $yn in 
 	yes ) echo ok, we will proceed;;
-	no ) echo exiting...;
+	no ) echo "Please install postgres first and apply the required shcema";
 		exit;;
 	* ) echo invalid response;
 		exit 1;;
@@ -92,40 +93,13 @@ case $yn in
 		exit 1;;
 esac
 
-echo "Please provide a domainname. Eks smartpool.no"
-read domainname
-
-foldercount=$(ls -l /etc/letsencrypt/live/$domainname* | egrep -c '^-')
-
-if [ foldercount -gt 0] 
-then
-    echo "Looks like the certs allready has been generated. Please move them manualy"
-fi
 
 
-else
-    echo "No certs found for that domain. Generating new ones."
-    sudo certbot certonly --standalone
-    #Checking for the new files
-    echo "Please provide cert path:"
-    read certpath
-    echo "Please provide key path:"
-    read keypath
 
-if test -f "$certpath"; then
-    echo "Where should we place the cert ? eks: /root/PoolFrontend/ssl/"
-    read sslfolder
-    cp $certpath sslfolder
-fi
 
-if test -f "$keypath"; then
-    cp $keypath sslfolder
-    echo "Key as been copied"
-fi
+sudo certbot certonly --standalone
 
-echo "The server can be started by running: pm2 start server.js"
-
-fi
+echo "If the certbot finished without errors. Please copy the privkey.pem and fullchain.pem to $ssl_loccation"
 
 
 
