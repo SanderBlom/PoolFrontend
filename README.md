@@ -1,17 +1,17 @@
 # PoolFrontend
-.env fil må opprettes i root dir med disse variablene:
 
-DB_USER=brukernavntilDB
+To install the application follow theese steps:
 
-DB_PASSWORD=passordtilDB
+1. Install postgreSQL, create a new database and a new user with access to the database.
 
-DB_HOST=hostname/ip til db
+2. Copy the content of the "database schema" file and run this in a new querry window.
 
-DB_PORT=port
+3. Download the install.sh file under release.
 
-DB_DATABASE=navnpådb
+4. Make the file executable by running "chmod +x install.sh"
 
-SESSION_SECRET=lang string for session krytpering
+5. Run the installer by running "./install.sh"
 
-DEVELOPMENT=true/false
+6. Add ssl certficiate and key to the ssl folder. 
 
+7. Run "pm2 start server" to start the application.
