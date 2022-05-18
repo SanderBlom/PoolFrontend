@@ -6,7 +6,7 @@ To install the application follow theese steps:
 
 2. Copy the content of the "database schema" file and run this in a new querry window.
 
-3. Download the install.sh file under release.
+3. Download the install.sh file <a href="https://github.com/SanderBlom/PoolFrontend/releases">here</a> (only tested on ubuntu 22.04) .
 
 4. Make the file executable by running "chmod +x install.sh"
 
