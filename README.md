@@ -1,6 +1,6 @@
 # PoolFrontend
 
-How to deploy the application to a Ubuntu server.
+How to deploy the application to a Ubuntu server. A live demo application can be accesed <a href="https://smartpool.no">here</a>
 
 1. Install postgreSQL, create a new database with the name smartpool and a new user with access to the database.
 
