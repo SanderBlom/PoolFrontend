@@ -777,7 +777,7 @@ app.post("/user/dashboard/joingame/", checkAuth, async (req, res) => {
             res.redirect(`/game/${gameid}`)
         }
         else {
-            req.flash('gamemessage', "Could not add you to the canvas. It's either full or does not exsist")
+            req.flash('gamemessage', "Could not add you to the the game. It's either full or does not exsist")
             res.redirect("/user/dashboard/")
         }
     }
