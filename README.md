@@ -5,7 +5,7 @@ A live demo application can be accesed <a href="https://smartpool.no">here</a>
 How to deploy the application on Ubuntu server 22.04:
 1. Install postgreSQL, create a new database with the name smartpool and a new user with access to the database.
 
-2. Copy the content of the "database schema" file and open a new querry window for the smartpool database, paste the content and execute.
+2. Download and copy the content of the "database schema" <a href="https://github.com/SanderBlom/PoolFrontend/releases"> file</a> and open a new querry window for the smartpool database, paste the content and execute.
 
 3. Download the install.sh file <a href="https://github.com/SanderBlom/PoolFrontend/releases">here</a> (only tested on ubuntu 22.04) .
 
