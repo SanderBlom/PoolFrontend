@@ -427,6 +427,7 @@ async function GetTableIPWithGameID(gameid) {
     }
     let result = await pool.query(query)//Gets the tableid from the database 
     tableid = result.rows[0].tableid
+    console.log(result.rows)
     if (tableid = ! null) {
         if (tableid == true) {
             tableid = 1
