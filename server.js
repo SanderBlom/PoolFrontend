@@ -539,23 +539,21 @@ app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
 
     if (usr == 'admin') {
         console.log('User is admin')
-
+        await db.CancelGame(gameid)
         let result = await vision.SendStop(gameid)
         console.log(result)
 
         if (result == 200) {
-            await db.CancelGame(gameid)
             message = 'Deleted game with gameID: ' + gameid
             console.log('Canceled game. API response: ' + result)
         }
         else {
             message = `Could not contact API, but deleted the game form the db`
-            await db.CancelGame(gameid)
             console.log('Could not cancel canvas. API response:' + result)
         }
 
 
-        req.flash('mgmtmessage', 'Canceled game with gameid:' + gameid)
+        req.flash('mgmtmessage', message)
         res.redirect("/admin")
 
     }
