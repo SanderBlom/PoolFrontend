@@ -539,7 +539,7 @@ app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
 
     if (usr == 'admin') {
         console.log('User is admin')
-        await db.CancelGame(gameid)
+        db.CancelGame(gameid)
         let response
         try {
             response = await vision.SendStop(gameid)
