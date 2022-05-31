@@ -543,10 +543,11 @@ app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
 
             if (result == 200) {
                 await db.CancelGame(gameid)
-                console.log('Canceled canvas. API response: ' + result)
+                console.log('Canceled game. API response: ' + result)
             }
             else {
-                error = `Could not cancel the canvas. Bad response from API. Response: ${result} `
+                error = `Could not contact API, but deleted the game form the db`
+                await db.CancelGame(gameid)
                 console.log('Could not cancel canvas. API response:' + result)
             }
 
@@ -558,6 +559,7 @@ app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
             res.redirect("/admin")
         }
         else {
+            console.log(error)
             req.flash('mgmtmessage', 'Canceled game with gameid:' + gameid)
             res.redirect("/admin")
         }
