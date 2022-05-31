@@ -141,7 +141,7 @@ app.post("/register", checkNotAuth, async function (req, res) {
             if ((usernameresponse == true) && (emailresponse == true)) {
                 //Both email and username are unique. Lets let the user create the account.
                 const validatorregex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{12,34}$/;
-                if(validatorregex.test(pwd) == true){
+                if (validatorregex.test(pwd) == true) {
                     try {
                         const hashedPassword = await bcrypt.hash(pwd, 10) //Hashing the password
                         InsertUserResult = await db.RegisterNewUser(username, firstname, lastname, email, hashedPassword)
@@ -159,11 +159,11 @@ app.post("/register", checkNotAuth, async function (req, res) {
                     }
 
                 }
-                else{
+                else {
                     req.flash('message', `Password does not meet the minimum requirements`)
                     res.redirect("login")
                 }
-               
+
             }
             //Checks if email or username is unique.
             else if ((usernameresponse != true) || (emailresponse != true)) {
@@ -534,36 +534,30 @@ app.post("/game/create", checkAuth, async (req, res) => {
 app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
     let gameid = req.params.id.trim();
     const usr = await req.user.username
-    let error = null
-
+    let message
+    console.log('Trying to delete game with gameid: ' + gameid)
 
     if (usr == 'admin') {
-        try {
-            let result = await vision.SendStop(gameid)
-            console.log(result)
+        console.log('User is admin')
 
-            if (result == 200) {
-                await db.CancelGame(gameid)
-                console.log('Canceled game. API response: ' + result)
-            }
-            else {
-                error = `Could not contact API, but deleted the game form the db`
-                await db.CancelGame(gameid)
-                console.log('Could not cancel canvas. API response:' + result)
-            }
+        let result = await vision.SendStop(gameid)
+        console.log(result)
 
-        } catch (err) {
-            err = error
-        }
-        if (error) {
-            req.flash('mgmtmessage', 'Could not cancel your game with gameID:' + gameid)
-            res.redirect("/admin")
+        if (result == 200) {
+            await db.CancelGame(gameid)
+            message = 'Deleted game with gameID: ' + gameid
+            console.log('Canceled game. API response: ' + result)
         }
         else {
-            console.log(error)
-            req.flash('mgmtmessage', 'Canceled game with gameid:' + gameid)
-            res.redirect("/admin")
+            message = `Could not contact API, but deleted the game form the db`
+            await db.CancelGame(gameid)
+            console.log('Could not cancel canvas. API response:' + result)
         }
+
+
+        req.flash('mgmtmessage', 'Canceled game with gameid:' + gameid)
+        res.redirect("/admin")
+
     }
 
     else {
@@ -572,7 +566,7 @@ app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
 
             if (result == 200) {
                 await db.CancelGame(gameid)
-                console.log('Canceled canvas. API response: ' + result)
+                console.log('Canceled game. API response: ' + result)
             }
             else {
                 error = `Could not cancel the canvas. Bad response from API. Response: ${result} `
@@ -657,7 +651,7 @@ app.post("/game/start/:id", checkAuth, async (req, res) => {
 
     }
 
-    else{
+    else {
         console.log('Missing one or more players...')
         req.flash('message', `You can not start the game with just one player.`)
         res.redirect(`/game/${gameid}`)
@@ -682,14 +676,14 @@ app.get("/game/:id", checkAuth, async (req, res) => {
         console.log(error)
         err = error
     }
-     
 
-    if (!gameactivestatus){
+
+    if (!gameactivestatus) {
         //If the game has not ended we can continue to try to display the page.
         try {
             tableid = await db.GetTableID(gameid)
             usernames = await db.fetchUsernamesInGame(gameid) //returns an array with users added to the game
-    
+
             if (usernames == null) {
                 username1 == null
                 username2 == null
@@ -719,27 +713,27 @@ app.get("/game/:id", checkAuth, async (req, res) => {
                     //If user is not a part of the game they should be redirected 
                     res.sendStatus(404).send(`Looks like your not supposed to be here...<a href="/">Go back</a> `)
                     console.log('Her gikk noe galt')
-    
+
                 }
                 else {
                     let userid = req.user.userid
                     res.render('gameWizard', { message: req.flash('message'), username, username1, username2, user: userid, gameid, title: 'game', tableid, gamestatus: gamestartedstatus })
                 }
-    
+
             }
-    
-    
+
+
             else {
                 res.redirect("/login")
             }
         }
     }
-    else{
+    else {
         //If the game has ended we redirect the user back to their profile page.
         req.flash('gamemessage', 'Looks like the game has ended')
         res.redirect('/user/dashboard')
     }
-   
+
 })
 
 //This page loads after you have picked a table and the system has checked that its not in use.
@@ -922,21 +916,21 @@ app.post("/tournament/new", checkAuth, async (req, res) => {
         await db.AddPlayersToTournament(id, playerids)
     }
     else {
-        if(invalidusernames.length == 1){
+        if (invalidusernames.length == 1) {
             let invalidusernamestring = ''
             invalidusernames.forEach(username => {
-               invalidusernamestring = invalidusernamestring + ' ' + username
-           });
-           req.flash('message', 'The username:' + invalidusernamestring + ' is invalid.')
-           res.redirect('back');
+                invalidusernamestring = invalidusernamestring + ' ' + username
+            });
+            req.flash('message', 'The username:' + invalidusernamestring + ' is invalid.')
+            res.redirect('back');
         }
-        else{
+        else {
             let invalidusernamestring = ''
             invalidusernames.forEach(username => {
-               invalidusernamestring = invalidusernamestring + ' ' + username + ','
-           });
-           req.flash('message', 'The usernames:' + invalidusernamestring + ' are invalid.')
-           res.redirect('back');
+                invalidusernamestring = invalidusernamestring + ' ' + username + ','
+            });
+            req.flash('message', 'The usernames:' + invalidusernamestring + ' are invalid.')
+            res.redirect('back');
         }
     }
 })
@@ -1085,9 +1079,9 @@ app.get("/admin", checkAuth, async (req, res) => {
 
 
 //--------------------------------Last route to  match any incorect urls----------------//
-app.all('*', function(req, res) {
+app.all('*', function (req, res) {
     res.status(404).send(`Looks like that pages does not exsist. <a href="/">Go back</a> `)
-  }); 
+});
 
 //-------------------------------------Start server-------------------------------------//
 //Loading the private key and the certificate
