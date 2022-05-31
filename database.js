@@ -400,6 +400,8 @@ async function CancelGame(gameid) {
     }
     await pool.query(query3)
 
+    console.log('Deleted game with gameid: ' + gameid)
+
 }
 
 async function GetTableIPWithTableID(tableid) {

@@ -534,12 +534,13 @@ app.post("/game/create", checkAuth, async (req, res) => {
 app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
     let gameid = req.params.id.trim();
     const usr = await req.user.username
-    let error
+    let error = null
 
 
     if (usr == 'admin') {
         try {
             let result = await vision.SendStop(gameid)
+            console.log(result)
 
             if (result == 200) {
                 await db.CancelGame(gameid)
