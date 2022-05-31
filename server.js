@@ -549,11 +549,11 @@ app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
 
         if (response == 200) {
             message = 'Deleted game with gameID: ' + gameid
-            console.log('Canceled game. API response: ' + result)
+            console.log('Canceled game. API response: ' + response)
         }
         else {
             message = `Could not contact API, but deleted the game form the db`
-            console.log('Could not cancel canvas. API response:' + result)
+            console.log('Could not cancel canvas. API response:' + response)
         }
 
 
