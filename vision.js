@@ -85,7 +85,7 @@ async function CheckTableAvailability(tableid) {
     if (tablestatus == true) {
       try {
         const response = await fetch(API, {
-          timeout: '5000'
+          timeout: '3000'
         })
         responseJson = await response.json()
 

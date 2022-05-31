@@ -540,10 +540,14 @@ app.delete("/game/cancel/:id", checkAuth, async (req, res) => {
     if (usr == 'admin') {
         console.log('User is admin')
         await db.CancelGame(gameid)
-        let result = await vision.SendStop(gameid)
-        console.log(result)
+        let response
+        try {
+            response = await vision.SendStop(gameid)
+        } catch (error) {
+            console.log(error)
+        }
 
-        if (result == 200) {
+        if (response == 200) {
             message = 'Deleted game with gameID: ' + gameid
             console.log('Canceled game. API response: ' + result)
         }
